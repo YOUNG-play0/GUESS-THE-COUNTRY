@@ -1,0 +1,9 @@
+{
+  "name": "Guess The Country",
+  "short_name": "GuessCountry",
+  "start_url": "https://TON-VRAI-SITE.com/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "fr",
+  "scope": "https://TON-VRAI-SITE.com/"
+}
