@@ -8,11 +8,4 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>
 );
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/GUESS-THE-COUNTRY/sw.js")
-      .then((reg) => console.log("SW OK:", reg))
-      .catch((err) => console.log("SW ERROR:", err));
-  });
-}
+
