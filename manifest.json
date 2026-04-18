@@ -1,9 +1,54 @@
 {
   "name": "Guess The Country",
-  "short_name": "GuessCountry",
-  "start_url": "https://TON-VRAI-SITE.com/",
+  "short_name": "GeoQuiz",
+  "id": "/GUESS-THE-COUNTRY/",
+  "start_url": "/GUESS-THE-COUNTRY/index.html",
+  "scope": "/GUESS-THE-COUNTRY/",
   "display": "standalone",
   "orientation": "portrait",
-  "lang": "fr",
-  "scope": "https://TON-VRAI-SITE.com/"
+  "lang": "en",
+
+  "background_color": "#0A0A1A",
+  "theme_color": "#6366F1",
+
+  "description": "Ultimate Geography Challenge - Test your world knowledge!",
+
+  "categories": ["games", "education"],
+
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Play Now",
+      "short_name": "Play",
+      "url": "/GUESS-THE-COUNTRY/index.html",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+
+  "prefer_related_applications": false
 }
