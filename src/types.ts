@@ -5,6 +5,8 @@ export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint';
 
 export interface Country {
   name: string;
+  /** Nom du pays en français (le nom anglais reste la clé interne du jeu) */
+  nameFr: string;
   code: string;
   flag: string;
   capital: string;

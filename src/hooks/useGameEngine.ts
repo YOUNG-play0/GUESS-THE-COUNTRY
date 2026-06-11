@@ -19,6 +19,9 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
     questionTypes.push('shape');
   } else {
     questionTypes.push('flag', 'capital');
+    if (country.monument) {
+      questionTypes.push('monument');
+    }
     if (difficulty === 'hard' || difficulty === 'expert') {
       questionTypes.push('hint', 'shape');
     }
@@ -35,9 +38,9 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
   let blurred = false;
   let zoomed = false;
 
-  if (type === 'capital') {
-    hint = `The capital is ${country.capital}`;
-  } else if (type === 'hint') {
+  // Pas de hint pour le type 'capital' : l'écran de jeu affiche déjà la
+  // capitale avec un libellé traduit (clé i18n which_capital).
+  if (type === 'hint') {
     const hintIdx = Math.floor(Math.random() * country.hints.length);
     hint = country.hints[hintIdx];
     if (difficulty === 'hard') blurred = true;
@@ -114,7 +117,8 @@ export function useGameEngine() {
       totalQuestions: totalQ,
       timeLeft: maxTime,
       maxTime,
-      lives: mode === 'survival' ? 1 : 3,
+      // Les vies n'existent qu'en mode Survie (le compteur n'est affiché que dans ce mode)
+      lives: mode === 'survival' ? 1 : 0,
       xpEarned: 0,
       questionsAnswered: 0,
       correctAnswers: 0,
@@ -136,9 +140,10 @@ export function useGameEngine() {
     }
   }, [clearTimers]);
 
-  // Per-question countdown timer
+  // Per-question countdown timer (désactivé en Chrono : seul le chrono global compte)
   useEffect(() => {
     if (!gameState?.isActive || gameState.isPaused || showResult) return;
+    if (gameState.mode === 'chrono') return;
 
     const interval = setInterval(() => {
       setGameState(prev => {
@@ -153,7 +158,7 @@ export function useGameEngine() {
 
     timerRef.current = interval;
     return () => clearInterval(interval);
-  }, [gameState?.isActive, gameState?.isPaused, showResult, gameState?.currentQuestion]);
+  }, [gameState?.isActive, gameState?.isPaused, gameState?.mode, showResult, gameState?.currentQuestion]);
 
   // Chrono global timer
   useEffect(() => {
@@ -252,7 +257,16 @@ export function useGameEngine() {
     }
 
     const nextIdx = gameState.currentQuestion + 1;
-    if (nextIdx >= questions.length) {
+    let qs = questions;
+
+    // En Survie, la partie ne s'arrête qu'à 0 vie : on régénère des
+    // questions à la volée quand on approche de la fin du tableau.
+    if (gameState.mode === 'survival' && nextIdx >= qs.length - 5) {
+      qs = [...qs, ...generateQuestions(gameState.mode, gameState.difficulty, 25)];
+      setQuestions(qs);
+    }
+
+    if (nextIdx >= qs.length) {
       endGame();
       return;
     }
@@ -263,7 +277,7 @@ export function useGameEngine() {
       currentQuestion: nextIdx,
       timeLeft: prev.maxTime,
     } : prev);
-    setCurrentQuestion(questions[nextIdx]);
+    setCurrentQuestion(qs[nextIdx]);
     setSelectedAnswer(null);
     setIsCorrect(null);
     setShowResult(false);

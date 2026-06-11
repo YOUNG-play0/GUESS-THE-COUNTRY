@@ -1,25 +1,45 @@
+import { useState, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
-import { countries } from '../data/countries';
+import { countries, getCountryDisplayName } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 
-function getCountryCode(name: string): string {
-  const c = countries.find(c => c.name === name);
-  return c?.code?.toLowerCase() || '';
+// Drapeau : image flagcdn en priorité (rendu identique partout),
+// repli sur l'emoji si l'image ne charge pas (hors-ligne, CDN bloqué...).
+function FlagImg({ code, emoji, cdnWidth = 80, emojiSize = 24, className, style }: {
+  code: string;
+  emoji: string;
+  cdnWidth?: 80 | 160 | 320;
+  emojiSize?: number;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const [failedCode, setFailedCode] = useState<string | null>(null);
+  if (!code || failedCode === code) {
+    return <span className="select-none" style={{ fontSize: emojiSize }}>{emoji}</span>;
+  }
+  return (
+    <img
+      src={`https://flagcdn.com/w${cdnWidth}/${code}.png`}
+      alt="Flag"
+      className={className}
+      style={style}
+      onError={() => setFailedCode(code)}
+    />
+  );
 }
 
 function CountryFlag({ name, size = 24 }: { name: string; size?: number }) {
-  const code = getCountryCode(name);
-  if (!code) return <span className="text-lg">🏳️</span>;
+  const country = countries.find(c => c.name === name);
   return (
-    <img
-      src={`https://flagcdn.com/w80/${code}.png`}
-      alt={name}
+    <FlagImg
+      code={country?.code?.toLowerCase() || ''}
+      emoji={country?.flag || '🏳️'}
+      emojiSize={size * 0.8}
       className="flag-img"
       style={{ width: size, height: size * 0.7 }}
-      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
     />
   );
 }
@@ -40,7 +60,7 @@ export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
   chronoTimeLeft, onAnswer, onNext, onQuit,
 }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
@@ -77,16 +97,14 @@ export default function GameScreen({
               transition={{ type: 'spring', stiffness: 200 }}
               className={`my-5 flex justify-center ${q.blurred ? 'blur-md' : ''}`}
             >
-              {questionCode ? (
-                <img
-                  src={`https://flagcdn.com/w320/${questionCode}.png`}
-                  alt="Flag"
-                  className="rounded-lg shadow-2xl border border-white/10"
-                  style={{ width: 'min(280px, 70vw)', height: 'auto' }}
-                />
-              ) : (
-                <span style={{ fontSize: '80px' }}>{q.country.flag}</span>
-              )}
+              <FlagImg
+                code={questionCode}
+                emoji={q.country.flag}
+                cdnWidth={320}
+                emojiSize={80}
+                className="rounded-lg shadow-2xl border border-white/10"
+                style={{ width: 'min(280px, 70vw)', height: 'auto' }}
+              />
             </motion.div>
           </div>
         );
@@ -110,6 +128,26 @@ export default function GameScreen({
             </motion.div>
           </div>
         );
+      case 'monument':
+        return (
+          <div className="text-center">
+            <p className="text-slate-400 text-xs mb-3 flex items-center justify-center gap-1.5 uppercase tracking-wider font-medium">
+              <MapPin className="w-4 h-4" /> {t.which_monument}
+            </p>
+            <motion.div
+              key={`mon-${gameState.currentQuestion}`}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 150 }}
+              className="my-5"
+            >
+              <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                <span className="text-3xl">🗽</span>
+                <span className="text-2xl font-bold text-white">{q.country.monument}</span>
+              </div>
+            </motion.div>
+          </div>
+        );
       case 'hint':
         return (
           <div className="text-center">
@@ -128,11 +166,14 @@ export default function GameScreen({
                 </p>
               </div>
               <div className={`flex justify-center ${q.blurred ? 'blur-lg' : ''} ${q.zoomed ? 'scale-150 my-6' : ''}`}>
-                {questionCode ? (
-                  <img src={`https://flagcdn.com/w160/${questionCode}.png`} alt="Flag" className="rounded shadow-lg" style={{ width: 64 }} />
-                ) : (
-                  <span style={{ fontSize: 56 }}>{q.country.flag}</span>
-                )}
+                <FlagImg
+                  code={questionCode}
+                  emoji={q.country.flag}
+                  cdnWidth={160}
+                  emojiSize={56}
+                  className="rounded shadow-lg"
+                  style={{ width: 64 }}
+                />
               </div>
             </motion.div>
           </div>
@@ -159,11 +200,14 @@ export default function GameScreen({
                 </div>
               ) : (
                 <div className="w-40 h-40 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center">
-                  {questionCode ? (
-                    <img src={`https://flagcdn.com/w160/${questionCode}.png`} alt="Flag" className="blur-sm rounded" style={{ width: 80 }} />
-                  ) : (
-                    <span className="text-6xl blur-sm select-none">{q.country.flag}</span>
-                  )}
+                  <FlagImg
+                    code={questionCode}
+                    emoji={q.country.flag}
+                    cdnWidth={160}
+                    emojiSize={60}
+                    className="blur-sm rounded"
+                    style={{ width: 80 }}
+                  />
                 </div>
               )}
             </motion.div>
@@ -240,10 +284,12 @@ export default function GameScreen({
         </div>
       )}
 
-      {/* Question Timer Bar */}
-      <div className={`h-1.5 bg-white/5 rounded-full overflow-hidden mb-4 ${isUrgent ? 'animate-pulse' : ''}`}>
-        <motion.div className={`h-full ${timerColor} rounded-full`} animate={{ width: `${timerPercent}%` }} transition={{ duration: 0.1, ease: 'linear' }} />
-      </div>
+      {/* Question Timer Bar (en Chrono, seul le compteur global est affiché) */}
+      {gameState.mode !== 'chrono' && (
+        <div className={`h-1.5 bg-white/5 rounded-full overflow-hidden mb-4 ${isUrgent ? 'animate-pulse' : ''}`}>
+          <motion.div className={`h-full ${timerColor} rounded-full`} animate={{ width: `${timerPercent}%` }} transition={{ duration: 0.1, ease: 'linear' }} />
+        </div>
+      )}
 
       {/* Question Content */}
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -297,7 +343,7 @@ export default function GameScreen({
                   {currentQuestion.type !== 'flag' && (
                     <CountryFlag name={option} size={28} />
                   )}
-                  <span className="flex-1 truncate text-sm">{option}</span>
+                  <span className="flex-1 truncate text-sm">{getCountryDisplayName(option, language)}</span>
                   {extraContent && (
                     <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="shrink-0">
                       {extraContent}
@@ -365,7 +411,7 @@ export default function GameScreen({
                     <span className="text-4xl select-none">⏰</span>
                     <p className="text-yellow-400 font-bold text-xl mt-2">{t.times_up}</p>
                     <p className="text-slate-400 text-sm mt-1 flex items-center justify-center gap-2">
-                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {currentQuestion.correctAnswer}
+                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {getCountryDisplayName(currentQuestion.correctAnswer, language)}
                     </p>
                   </motion.div>
                 ) : (
@@ -373,7 +419,7 @@ export default function GameScreen({
                     <span className="text-4xl select-none">😔</span>
                     <p className="text-red-400 font-bold text-xl mt-2">{t.wrong}</p>
                     <p className="text-slate-400 text-sm mt-1 flex items-center justify-center gap-2">
-                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {currentQuestion.correctAnswer}
+                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {getCountryDisplayName(currentQuestion.correctAnswer, language)}
                     </p>
                   </motion.div>
                 )}

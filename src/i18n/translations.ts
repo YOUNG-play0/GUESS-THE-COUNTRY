@@ -44,6 +44,7 @@ export interface Translations {
   // Game Screen
   which_flag: string;
   which_capital: string;
+  which_monument: string;
   guess_clue: string;
   which_shape: string;
   streak: string;
@@ -188,6 +189,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'Which country has this flag?',
     which_capital: 'Which country has this capital?',
+    which_monument: 'Which country is home to this monument?',
     guess_clue: 'Guess from this clue',
     which_shape: 'Which country has this shape?',
     streak: 'streak!',
@@ -322,6 +324,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'Quel pays a ce drapeau ?',
     which_capital: 'Quel pays a cette capitale ?',
+    which_monument: 'Dans quel pays se trouve ce monument ?',
     guess_clue: 'Devine avec cet indice',
     which_shape: 'Quel pays a cette forme ?',
     streak: 'série !',
@@ -456,6 +459,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: '¿Qué país tiene esta bandera?',
     which_capital: '¿Qué país tiene esta capital?',
+    which_monument: '¿En qué país se encuentra este monumento?',
     guess_clue: 'Adivina con esta pista',
     which_shape: '¿Qué país tiene esta forma?',
     streak: '¡racha!',
@@ -590,6 +594,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'Welches Land hat diese Flagge?',
     which_capital: 'Welches Land hat diese Hauptstadt?',
+    which_monument: 'In welchem Land steht dieses Monument?',
     guess_clue: 'Rate mit diesem Hinweis',
     which_shape: 'Welches Land hat diese Form?',
     streak: 'in Folge!',
@@ -724,6 +729,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'Qual país tem esta bandeira?',
     which_capital: 'Qual país tem esta capital?',
+    which_monument: 'Em que país fica este monumento?',
     guess_clue: 'Adivinhe com esta dica',
     which_shape: 'Qual país tem esta forma?',
     streak: 'sequência!',
@@ -858,6 +864,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: '哪个国家有这个国旗？',
     which_capital: '哪个国家有这个首都？',
+    which_monument: '这个名胜位于哪个国家？',
     guess_clue: '根据线索猜测',
     which_shape: '哪个国家有这个形状？',
     streak: '连胜！',
@@ -992,6 +999,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'この国旗の国はどこ？',
     which_capital: 'この首都のある国はどこ？',
+    which_monument: 'この名所はどこの国にある？',
     guess_clue: 'この手がかりから推測',
     which_shape: 'この形の国はどこ？',
     streak: '連続！',
@@ -1126,6 +1134,7 @@ export const translations: Record<Language, Translations> = {
 
     which_flag: 'أي دولة لها هذا العلم؟',
     which_capital: 'أي دولة لها هذه العاصمة؟',
+    which_monument: 'في أي دولة يقع هذا المعلم؟',
     guess_clue: 'خمن من هذه التلميح',
     which_shape: 'أي دولة لها هذا الشكل؟',
     streak: '!متتالية',

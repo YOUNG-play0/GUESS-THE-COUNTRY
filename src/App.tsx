@@ -15,6 +15,10 @@ import ProfileScreen from './components/ProfileScreen';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
+// En dessous de ce nombre de questions répondues, une partie quittée
+// est considérée comme abandonnée et n'est pas comptée dans les stats.
+const MIN_QUESTIONS_TO_RECORD = 3;
+
 function AppContent() {
   const { isRTL } = useLanguage();
   const [screen, setScreen] = useState<Screen>('home');
@@ -67,7 +71,14 @@ function AppContent() {
 
   const handleQuitGame = useCallback(() => {
     clearTimers();
-    if (gameState) endGame();
+    if (!gameState) return;
+    if (gameState.questionsAnswered < MIN_QUESTIONS_TO_RECORD) {
+      gameRecordedRef.current = true;
+      endGame();
+      setScreen('home');
+      return;
+    }
+    endGame();
   }, [clearTimers, endGame, gameState]);
 
   const handlePlayAgain = useCallback(() => {

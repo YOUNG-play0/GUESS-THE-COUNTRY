@@ -7,33 +7,33 @@
 
 ## 🧹 PHASE 0 — Hygiène du dépôt (30 min)
 
-- [ ] **0.1** Retirer le topic `delete-repo` du dépôt GitHub (Settings du repo → Topics) — il signale que le repo doit être supprimé
-- [ ] **0.2** Écrire un `README.md` (description du jeu, capture d'écran, comment lancer en local)
-- [ ] **0.3** Corriger `package.json` : remplacer le nom générique `react-vite-tailwind` par `guess-the-country`, version `1.0.0`
-- [ ] **0.4** Ajouter un `.gitignore` propre (`dist/`, `node_modules/`)
-- [ ] **0.5** ⚠️ Nettoyer le `index.html` à la racine : il contient actuellement **tout le build minifié committé dans les sources** (sortie de vite-plugin-singlefile). Séparer clairement le code source du build
-- [ ] **0.6** Mettre en place un déploiement automatique GitHub Pages via **GitHub Actions** (à chaque push, le build est généré et déployé — plus jamais de build committé à la main)
+- [ ] **0.1** Retirer le topic `delete-repo` du dépôt GitHub (Settings du repo → Topics) — il signale que le repo doit être supprimé ⚠️ *Action manuelle dans l'interface GitHub (page du repo → ⚙️ à côté de « About » → champ Topics)*
+- [x] **0.2** Écrire un `README.md` (description du jeu, capture d'écran, comment lancer en local)
+- [x] **0.3** Corriger `package.json` : remplacer le nom générique `react-vite-tailwind` par `guess-the-country`, version `1.0.0`
+- [x] **0.4** Ajouter un `.gitignore` propre (`dist/`, `node_modules/`)
+- [x] **0.5** ⚠️ Nettoyer le `index.html` à la racine : il contient actuellement **tout le build minifié committé dans les sources** (sortie de vite-plugin-singlefile). Séparer clairement le code source du build
+- [x] **0.6** Mettre en place un déploiement automatique GitHub Pages via **GitHub Actions** (à chaque push, le build est généré et déployé — plus jamais de build committé à la main)
 
 ---
 
 ## 🐛 PHASE 1 — Bugs et incohérences à corriger (audit du code)
 
 ### Bugs de gameplay
-- [ ] **1.1** ❤️ **Les vies ne servent à rien en mode Classique.** `lives: 3` est initialisé et affiché à l'écran, mais seul le mode Survie les décrémente (`useGameEngine.ts`). Décision à prendre : soit perdre une vie par erreur en Classique (et finir la partie à 0), soit masquer le compteur de vies hors Survie
-- [ ] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
-- [ ] **1.3** 📊 **Quitter une partie fausse les statistiques.** `handleQuitGame` → `endGame` → la partie est enregistrée dans les stats (totalGames, etc.) même si on quitte à la 1ʳᵉ question. Ne pas enregistrer les parties abandonnées avant X questions
-- [ ] **1.4** ⏱️ **Mode Chrono : double timer.** Le timer par question ET le chrono global tournent en même temps ; un timeout de question coupe le combo. Vérifier que c'est voulu (sinon, en Chrono, désactiver le timer par question)
-- [ ] **1.5** 🔢 **Survie limitée à 50 questions.** Un très bon joueur atteint la fin du tableau de questions et la partie s'arrête alors qu'il lui reste sa vie. Régénérer des questions à la volée quand on approche de la fin
+- [x] **1.1** ❤️ **Les vies ne servent à rien en mode Classique.** `lives: 3` est initialisé et affiché à l'écran, mais seul le mode Survie les décrémente (`useGameEngine.ts`). Décision à prendre : soit perdre une vie par erreur en Classique (et finir la partie à 0), soit masquer le compteur de vies hors Survie
+- [x] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
+- [x] **1.3** 📊 **Quitter une partie fausse les statistiques.** `handleQuitGame` → `endGame` → la partie est enregistrée dans les stats (totalGames, etc.) même si on quitte à la 1ʳᵉ question. Ne pas enregistrer les parties abandonnées avant X questions
+- [x] **1.4** ⏱️ **Mode Chrono : double timer.** Le timer par question ET le chrono global tournent en même temps ; un timeout de question coupe le combo. Vérifier que c'est voulu (sinon, en Chrono, désactiver le timer par question)
+- [x] **1.5** 🔢 **Survie limitée à 50 questions.** Un très bon joueur atteint la fin du tableau de questions et la partie s'arrête alors qu'il lui reste sa vie. Régénérer des questions à la volée quand on approche de la fin
 
 ### Bugs de traduction (l'app gère 8 langues dont l'arabe RTL !)
-- [ ] **1.6** 🌐 **Indice "capital" codé en dur en anglais** : `` `The capital is ${country.capital}` `` dans `useGameEngine.ts`. Passer par le système i18n
-- [ ] **1.7** 🌐 **Les noms de pays et tous les `hints` sont uniquement en anglais** dans `countries.ts`. Un joueur français/arabe/chinois voit les réponses en anglais. Ajouter des traductions de noms de pays (au minimum FR + EN pour commencer)
+- [x] **1.6** 🌐 **Indice "capital" codé en dur en anglais** : `` `The capital is ${country.capital}` `` dans `useGameEngine.ts`. Passer par le système i18n
+- [x] **1.7** 🌐 **Les noms de pays et tous les `hints` sont uniquement en anglais** *(noms FR faits ; traduction des hints → phase 2.4)* dans `countries.ts`. Un joueur français/arabe/chinois voit les réponses en anglais. Ajouter des traductions de noms de pays (au minimum FR + EN pour commencer)
 
 ### Bugs PWA / déploiement (bloquants pour le Play Store)
-- [ ] **1.8** 🚫 **Aucun service worker** : l'app n'est pas "installable" ni hors-ligne → refusée par PWABuilder. Ajouter `vite-plugin-pwa`
-- [ ] **1.9** 🔗 **`manifest.json` incohérent avec GitHub Pages** : `start_url: "/"` et icônes `/icon-192.png` alors que l'app vit sur `/GUESS-THE-COUNTRY/`. Corriger en chemins relatifs ou préfixés
-- [ ] **1.10** 🖼️ **Icône maskable mal configurée** : `icon-512-maskable.png` traîne à la racine (pas dans `public/`) et n'est pas déclarée dans le manifest ; les autres icônes utilisent `"purpose": "any maskable"` combiné (déconseillé). Déclarer une entrée `maskable` séparée
-- [ ] **1.11** 📱 **Drapeaux en emoji** : OK sur Android, mais prévoir un fallback image (flagcdn.com, déjà utilisé dans LanguageSelector) pour un rendu identique partout
+- [x] **1.8** 🚫 **Aucun service worker** : l'app n'est pas "installable" ni hors-ligne → refusée par PWABuilder. Ajouter `vite-plugin-pwa`
+- [x] **1.9** 🔗 **`manifest.json` incohérent avec GitHub Pages** : `start_url: "/"` et icônes `/icon-192.png` alors que l'app vit sur `/GUESS-THE-COUNTRY/`. Corriger en chemins relatifs ou préfixés
+- [x] **1.10** 🖼️ **Icône maskable mal configurée** : `icon-512-maskable.png` traîne à la racine (pas dans `public/`) et n'est pas déclarée dans le manifest ; les autres icônes utilisent `"purpose": "any maskable"` combiné (déconseillé). Déclarer une entrée `maskable` séparée
+- [x] **1.11** 📱 **Drapeaux en emoji** : OK sur Android, mais prévoir un fallback image (flagcdn.com, déjà utilisé dans LanguageSelector) pour un rendu identique partout
 
 ---
 
