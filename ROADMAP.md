@@ -39,10 +39,10 @@
 
 ## 🌍 PHASE 2 — Contenu (le nerf de la guerre)
 
-- [ ] **2.1** Passer de **60 à 195 pays** (avec difficulté, capitale, continent, indices) — indispensable pour la mécanique de collection
-- [ ] **2.2** Ajouter les **formes (silhouettes)** des pays manquants dans `countryShapes.ts`
-- [ ] **2.3** Implémenter les questions **monument** (cf. bug 1.2) avec images
-- [ ] **2.4** Traduire noms de pays + indices en français (puis autres langues progressivement)
+- [x] **2.1** Passer de **60 à 195 pays** (avec difficulté, capitale, continent, indices) — indispensable pour la mécanique de collection
+- [x] **2.2** Ajouter les **formes (silhouettes)** des pays manquants dans `countryShapes.ts`
+- [x] **2.3** Implémenter les questions **monument** (cf. bug 1.2) avec images
+- [x] **2.4** Traduire noms de pays + indices en français (puis autres langues progressivement)
 
 ---
 

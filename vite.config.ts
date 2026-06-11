@@ -60,6 +60,25 @@ export default defineConfig({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
+          // Images des monuments : API REST Wikipédia + vignettes Wikimedia
+          {
+            urlPattern: /^https:\/\/en\.wikipedia\.org\/api\/rest_v1\/page\/summary\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "wikipedia-api-cache",
+              expiration: { maxEntries: 250, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/upload\.wikimedia\.org\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "wikimedia-images-cache",
+              expiration: { maxEntries: 250, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
     }),

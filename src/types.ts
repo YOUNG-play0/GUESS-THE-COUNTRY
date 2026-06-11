@@ -13,7 +13,11 @@ export interface Country {
   continent: string;
   difficulty: Difficulty;
   hints: string[];
+  /** Indices en français (même ordre que hints) */
+  hintsFr?: string[];
   monument?: string;
+  /** Titre de l'article Wikipédia du monument, si différent de son nom affiché */
+  monumentWiki?: string;
 }
 
 export interface Question {
@@ -22,7 +26,8 @@ export interface Question {
   options: string[];
   correctAnswer: string;
   imageUrl?: string;
-  hint?: string;
+  /** Index de l'indice dans country.hints — résolu à l'affichage selon la langue */
+  hintIndex?: number;
   blurred?: boolean;
   zoomed?: boolean;
 }
