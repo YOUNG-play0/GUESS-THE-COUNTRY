@@ -33,7 +33,7 @@
 - [x] **1.8** 🚫 **Aucun service worker** : l'app n'est pas "installable" ni hors-ligne → refusée par PWABuilder. Ajouter `vite-plugin-pwa`
 - [x] **1.9** 🔗 **`manifest.json` incohérent avec GitHub Pages** : `start_url: "/"` et icônes `/icon-192.png` alors que l'app vit sur `/GUESS-THE-COUNTRY/`. Corriger en chemins relatifs ou préfixés
 - [x] **1.10** 🖼️ **Icône maskable mal configurée** : `icon-512-maskable.png` traîne à la racine (pas dans `public/`) et n'est pas déclarée dans le manifest ; les autres icônes utilisent `"purpose": "any maskable"` combiné (déconseillé). Déclarer une entrée `maskable` séparée
-- [ ] **1.11** 📱 **Drapeaux en emoji** : OK sur Android, mais prévoir un fallback image (flagcdn.com, déjà utilisé dans LanguageSelector) pour un rendu identique partout
+- [x] **1.11** 📱 **Drapeaux en emoji** : OK sur Android, mais prévoir un fallback image (flagcdn.com, déjà utilisé dans LanguageSelector) pour un rendu identique partout
 
 ---
 

@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
@@ -5,21 +6,40 @@ import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 
-function getCountryCode(name: string): string {
-  const c = countries.find(c => c.name === name);
-  return c?.code?.toLowerCase() || '';
+// Drapeau : image flagcdn en priorité (rendu identique partout),
+// repli sur l'emoji si l'image ne charge pas (hors-ligne, CDN bloqué...).
+function FlagImg({ code, emoji, cdnWidth = 80, emojiSize = 24, className, style }: {
+  code: string;
+  emoji: string;
+  cdnWidth?: 80 | 160 | 320;
+  emojiSize?: number;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const [failedCode, setFailedCode] = useState<string | null>(null);
+  if (!code || failedCode === code) {
+    return <span className="select-none" style={{ fontSize: emojiSize }}>{emoji}</span>;
+  }
+  return (
+    <img
+      src={`https://flagcdn.com/w${cdnWidth}/${code}.png`}
+      alt="Flag"
+      className={className}
+      style={style}
+      onError={() => setFailedCode(code)}
+    />
+  );
 }
 
 function CountryFlag({ name, size = 24 }: { name: string; size?: number }) {
-  const code = getCountryCode(name);
-  if (!code) return <span className="text-lg">🏳️</span>;
+  const country = countries.find(c => c.name === name);
   return (
-    <img
-      src={`https://flagcdn.com/w80/${code}.png`}
-      alt={name}
+    <FlagImg
+      code={country?.code?.toLowerCase() || ''}
+      emoji={country?.flag || '🏳️'}
+      emojiSize={size * 0.8}
       className="flag-img"
       style={{ width: size, height: size * 0.7 }}
-      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
     />
   );
 }
@@ -77,16 +97,14 @@ export default function GameScreen({
               transition={{ type: 'spring', stiffness: 200 }}
               className={`my-5 flex justify-center ${q.blurred ? 'blur-md' : ''}`}
             >
-              {questionCode ? (
-                <img
-                  src={`https://flagcdn.com/w320/${questionCode}.png`}
-                  alt="Flag"
-                  className="rounded-lg shadow-2xl border border-white/10"
-                  style={{ width: 'min(280px, 70vw)', height: 'auto' }}
-                />
-              ) : (
-                <span style={{ fontSize: '80px' }}>{q.country.flag}</span>
-              )}
+              <FlagImg
+                code={questionCode}
+                emoji={q.country.flag}
+                cdnWidth={320}
+                emojiSize={80}
+                className="rounded-lg shadow-2xl border border-white/10"
+                style={{ width: 'min(280px, 70vw)', height: 'auto' }}
+              />
             </motion.div>
           </div>
         );
@@ -148,11 +166,14 @@ export default function GameScreen({
                 </p>
               </div>
               <div className={`flex justify-center ${q.blurred ? 'blur-lg' : ''} ${q.zoomed ? 'scale-150 my-6' : ''}`}>
-                {questionCode ? (
-                  <img src={`https://flagcdn.com/w160/${questionCode}.png`} alt="Flag" className="rounded shadow-lg" style={{ width: 64 }} />
-                ) : (
-                  <span style={{ fontSize: 56 }}>{q.country.flag}</span>
-                )}
+                <FlagImg
+                  code={questionCode}
+                  emoji={q.country.flag}
+                  cdnWidth={160}
+                  emojiSize={56}
+                  className="rounded shadow-lg"
+                  style={{ width: 64 }}
+                />
               </div>
             </motion.div>
           </div>
@@ -179,11 +200,14 @@ export default function GameScreen({
                 </div>
               ) : (
                 <div className="w-40 h-40 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center">
-                  {questionCode ? (
-                    <img src={`https://flagcdn.com/w160/${questionCode}.png`} alt="Flag" className="blur-sm rounded" style={{ width: 80 }} />
-                  ) : (
-                    <span className="text-6xl blur-sm select-none">{q.country.flag}</span>
-                  )}
+                  <FlagImg
+                    code={questionCode}
+                    emoji={q.country.flag}
+                    cdnWidth={160}
+                    emojiSize={60}
+                    className="blur-sm rounded"
+                    style={{ width: 80 }}
+                  />
                 </div>
               )}
             </motion.div>
