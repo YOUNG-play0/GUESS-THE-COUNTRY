@@ -257,7 +257,16 @@ export function useGameEngine() {
     }
 
     const nextIdx = gameState.currentQuestion + 1;
-    if (nextIdx >= questions.length) {
+    let qs = questions;
+
+    // En Survie, la partie ne s'arrête qu'à 0 vie : on régénère des
+    // questions à la volée quand on approche de la fin du tableau.
+    if (gameState.mode === 'survival' && nextIdx >= qs.length - 5) {
+      qs = [...qs, ...generateQuestions(gameState.mode, gameState.difficulty, 25)];
+      setQuestions(qs);
+    }
+
+    if (nextIdx >= qs.length) {
       endGame();
       return;
     }
@@ -268,7 +277,7 @@ export function useGameEngine() {
       currentQuestion: nextIdx,
       timeLeft: prev.maxTime,
     } : prev);
-    setCurrentQuestion(questions[nextIdx]);
+    setCurrentQuestion(qs[nextIdx]);
     setSelectedAnswer(null);
     setIsCorrect(null);
     setShowResult(false);

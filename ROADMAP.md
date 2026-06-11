@@ -23,7 +23,7 @@
 - [x] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
 - [x] **1.3** 📊 **Quitter une partie fausse les statistiques.** `handleQuitGame` → `endGame` → la partie est enregistrée dans les stats (totalGames, etc.) même si on quitte à la 1ʳᵉ question. Ne pas enregistrer les parties abandonnées avant X questions
 - [x] **1.4** ⏱️ **Mode Chrono : double timer.** Le timer par question ET le chrono global tournent en même temps ; un timeout de question coupe le combo. Vérifier que c'est voulu (sinon, en Chrono, désactiver le timer par question)
-- [ ] **1.5** 🔢 **Survie limitée à 50 questions.** Un très bon joueur atteint la fin du tableau de questions et la partie s'arrête alors qu'il lui reste sa vie. Régénérer des questions à la volée quand on approche de la fin
+- [x] **1.5** 🔢 **Survie limitée à 50 questions.** Un très bon joueur atteint la fin du tableau de questions et la partie s'arrête alors qu'il lui reste sa vie. Régénérer des questions à la volée quand on approche de la fin
 
 ### Bugs de traduction (l'app gère 8 langues dont l'arabe RTL !)
 - [ ] **1.6** 🌐 **Indice "capital" codé en dur en anglais** : `` `The capital is ${country.capital}` `` dans `useGameEngine.ts`. Passer par le système i18n
