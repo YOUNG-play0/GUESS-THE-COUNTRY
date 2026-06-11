@@ -114,7 +114,8 @@ export function useGameEngine() {
       totalQuestions: totalQ,
       timeLeft: maxTime,
       maxTime,
-      lives: mode === 'survival' ? 1 : 3,
+      // Les vies n'existent qu'en mode Survie (le compteur n'est affiché que dans ce mode)
+      lives: mode === 'survival' ? 1 : 0,
       xpEarned: 0,
       questionsAnswered: 0,
       correctAnswers: 0,

@@ -7,7 +7,7 @@
 
 ## 🧹 PHASE 0 — Hygiène du dépôt (30 min)
 
-- [ ] **0.1** Retirer le topic `delete-repo` du dépôt GitHub (Settings du repo → Topics) — il signale que le repo doit être supprimé
+- [ ] **0.1** Retirer le topic `delete-repo` du dépôt GitHub (Settings du repo → Topics) — il signale que le repo doit être supprimé ⚠️ *Action manuelle dans l'interface GitHub (page du repo → ⚙️ à côté de « About » → champ Topics)*
 - [x] **0.2** Écrire un `README.md` (description du jeu, capture d'écran, comment lancer en local)
 - [x] **0.3** Corriger `package.json` : remplacer le nom générique `react-vite-tailwind` par `guess-the-country`, version `1.0.0`
 - [x] **0.4** Ajouter un `.gitignore` propre (`dist/`, `node_modules/`)
@@ -19,7 +19,7 @@
 ## 🐛 PHASE 1 — Bugs et incohérences à corriger (audit du code)
 
 ### Bugs de gameplay
-- [ ] **1.1** ❤️ **Les vies ne servent à rien en mode Classique.** `lives: 3` est initialisé et affiché à l'écran, mais seul le mode Survie les décrémente (`useGameEngine.ts`). Décision à prendre : soit perdre une vie par erreur en Classique (et finir la partie à 0), soit masquer le compteur de vies hors Survie
+- [x] **1.1** ❤️ **Les vies ne servent à rien en mode Classique.** `lives: 3` est initialisé et affiché à l'écran, mais seul le mode Survie les décrémente (`useGameEngine.ts`). Décision à prendre : soit perdre une vie par erreur en Classique (et finir la partie à 0), soit masquer le compteur de vies hors Survie
 - [ ] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
 - [ ] **1.3** 📊 **Quitter une partie fausse les statistiques.** `handleQuitGame` → `endGame` → la partie est enregistrée dans les stats (totalGames, etc.) même si on quitte à la 1ʳᵉ question. Ne pas enregistrer les parties abandonnées avant X questions
 - [ ] **1.4** ⏱️ **Mode Chrono : double timer.** Le timer par question ET le chrono global tournent en même temps ; un timeout de question coupe le combo. Vérifier que c'est voulu (sinon, en Chrono, désactiver le timer par question)
