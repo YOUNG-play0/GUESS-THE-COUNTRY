@@ -11,7 +11,7 @@
 - [ ] **0.2** Écrire un `README.md` (description du jeu, capture d'écran, comment lancer en local)
 - [x] **0.3** Corriger `package.json` : remplacer le nom générique `react-vite-tailwind` par `guess-the-country`, version `1.0.0`
 - [x] **0.4** Ajouter un `.gitignore` propre (`dist/`, `node_modules/`)
-- [ ] **0.5** ⚠️ Nettoyer le `index.html` à la racine : il contient actuellement **tout le build minifié committé dans les sources** (sortie de vite-plugin-singlefile). Séparer clairement le code source du build
+- [x] **0.5** ⚠️ Nettoyer le `index.html` à la racine : il contient actuellement **tout le build minifié committé dans les sources** (sortie de vite-plugin-singlefile). Séparer clairement le code source du build
 - [ ] **0.6** Mettre en place un déploiement automatique GitHub Pages via **GitHub Actions** (à chaque push, le build est généré et déployé — plus jamais de build committé à la main)
 
 ---
