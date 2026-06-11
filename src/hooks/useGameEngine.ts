@@ -34,20 +34,18 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
   const wrongCountries = getRandomCountries(3, undefined, [country.name]);
   const options = shuffleArray([country.name, ...wrongCountries.map(c => c.name)]);
   const correctAnswer = country.name;
-  let hint: string | undefined;
+  let hintIndex: number | undefined;
   let blurred = false;
   let zoomed = false;
 
-  // Pas de hint pour le type 'capital' : l'écran de jeu affiche déjà la
-  // capitale avec un libellé traduit (clé i18n which_capital).
   if (type === 'hint') {
-    const hintIdx = Math.floor(Math.random() * country.hints.length);
-    hint = country.hints[hintIdx];
+    // On stocke l'index : le texte est résolu à l'affichage selon la langue
+    hintIndex = Math.floor(Math.random() * country.hints.length);
     if (difficulty === 'hard') blurred = true;
     if (difficulty === 'expert') { blurred = true; zoomed = true; }
   }
 
-  return { type, country, options, correctAnswer, hint, blurred, zoomed };
+  return { type, country, options, correctAnswer, hintIndex, blurred, zoomed };
 }
 
 function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number): Question[] {

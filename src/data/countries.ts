@@ -79,6 +79,12 @@ export function getCountryDisplayName(name: string, language: Language): string 
   return country?.nameFr ?? name;
 }
 
+// Indice à afficher selon la langue (même index dans hints et hintsFr).
+export function getCountryHint(country: Country, index: number, language: Language): string {
+  if (language === 'fr' && country.hintsFr?.[index]) return country.hintsFr[index];
+  return country.hints[index] ?? country.hints[0];
+}
+
 export function getCountriesByDifficulty(difficulty: Difficulty): Country[] {
   return countries.filter(c => c.difficulty === difficulty);
 }

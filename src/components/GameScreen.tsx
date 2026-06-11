@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
-import { countries, getCountryDisplayName } from '../data/countries';
+import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // Drapeau : image flagcdn en priorité (rendu identique partout),
@@ -162,7 +162,7 @@ export default function GameScreen({
             >
               <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mx-auto max-w-xs">
                 <p className={`text-lg font-semibold text-indigo-300 italic leading-relaxed ${q.blurred ? 'blur-[3px]' : ''}`}>
-                  "{q.hint}"
+                  "{getCountryHint(q.country, q.hintIndex ?? 0, language)}"
                 </p>
               </div>
               <div className={`flex justify-center ${q.blurred ? 'blur-lg' : ''} ${q.zoomed ? 'scale-150 my-6' : ''}`}>
