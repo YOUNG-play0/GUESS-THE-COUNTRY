@@ -20,7 +20,7 @@
 
 ### Bugs de gameplay
 - [x] **1.1** ❤️ **Les vies ne servent à rien en mode Classique.** `lives: 3` est initialisé et affiché à l'écran, mais seul le mode Survie les décrémente (`useGameEngine.ts`). Décision à prendre : soit perdre une vie par erreur en Classique (et finir la partie à 0), soit masquer le compteur de vies hors Survie
-- [ ] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
+- [x] **1.2** 🏛️ **Le type de question `monument` est du code mort.** Il existe dans `QuestionType` et les données (`monument: 'Eiffel Tower'`) mais `generateQuestion()` ne le génère jamais. L'implémenter (bonne question facile et visuelle) ou le retirer
 - [ ] **1.3** 📊 **Quitter une partie fausse les statistiques.** `handleQuitGame` → `endGame` → la partie est enregistrée dans les stats (totalGames, etc.) même si on quitte à la 1ʳᵉ question. Ne pas enregistrer les parties abandonnées avant X questions
 - [ ] **1.4** ⏱️ **Mode Chrono : double timer.** Le timer par question ET le chrono global tournent en même temps ; un timeout de question coupe le combo. Vérifier que c'est voulu (sinon, en Chrono, désactiver le timer par question)
 - [ ] **1.5** 🔢 **Survie limitée à 50 questions.** Un très bon joueur atteint la fin du tableau de questions et la partie s'arrête alors qu'il lui reste sa vie. Régénérer des questions à la volée quand on approche de la fin

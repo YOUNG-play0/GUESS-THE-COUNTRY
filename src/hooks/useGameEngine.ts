@@ -19,6 +19,9 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
     questionTypes.push('shape');
   } else {
     questionTypes.push('flag', 'capital');
+    if (country.monument) {
+      questionTypes.push('monument');
+    }
     if (difficulty === 'hard' || difficulty === 'expert') {
       questionTypes.push('hint', 'shape');
     }

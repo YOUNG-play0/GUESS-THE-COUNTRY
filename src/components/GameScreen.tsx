@@ -110,6 +110,26 @@ export default function GameScreen({
             </motion.div>
           </div>
         );
+      case 'monument':
+        return (
+          <div className="text-center">
+            <p className="text-slate-400 text-xs mb-3 flex items-center justify-center gap-1.5 uppercase tracking-wider font-medium">
+              <MapPin className="w-4 h-4" /> {t.which_monument}
+            </p>
+            <motion.div
+              key={`mon-${gameState.currentQuestion}`}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 150 }}
+              className="my-5"
+            >
+              <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                <span className="text-3xl">🗽</span>
+                <span className="text-2xl font-bold text-white">{q.country.monument}</span>
+              </div>
+            </motion.div>
+          </div>
+        );
       case 'hint':
         return (
           <div className="text-center">
