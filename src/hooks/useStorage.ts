@@ -82,6 +82,16 @@ export function useStorage() {
     });
   }, []);
 
+  // Dépense d'XP (gel de série...). Le niveau et les difficultés débloquées
+  // ne redescendent jamais : l'XP sert aussi de monnaie.
+  const spendXP = useCallback((amount: number): boolean => {
+    if (stats.xp < amount) return false;
+    const next = { ...stats, xp: stats.xp - amount };
+    setStats(next);
+    saveStats(next);
+    return true;
+  }, [stats]);
+
   const setPlayerName = useCallback((name: string) => {
     updateStats({ name });
   }, [updateStats]);
@@ -90,6 +100,7 @@ export function useStorage() {
     stats,
     updateStats,
     addXP,
+    spendXP,
     recordGame,
     setPlayerName,
   };

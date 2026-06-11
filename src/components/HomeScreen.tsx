@@ -5,10 +5,15 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   stats: PlayerStats;
+  streak: number;
+  freezes: number;
+  maxFreezes: number;
+  freezeCost: number;
+  onBuyFreeze: () => void;
   onNavigate: (screen: Screen) => void;
 }
 
-export default function HomeScreen({ stats, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -38,6 +43,43 @@ export default function HomeScreen({ stats, onNavigate }: Props) {
           {t.home_subtitle}
         </p>
       </motion.div>
+
+      {/* Streak de jours consécutifs */}
+      {stats.totalGames > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-4 w-full max-w-sm bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-2xl px-5 py-3 flex items-center gap-3"
+        >
+          <motion.span
+            animate={streak > 0 ? { scale: [1, 1.25, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+            className="text-3xl select-none"
+          >
+            🔥
+          </motion.span>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-black text-xl leading-none">{streak}</p>
+            <p className="text-orange-300/80 text-[11px] uppercase tracking-wider">{t.day_streak}</p>
+          </div>
+          <div className="text-right shrink-0 flex items-center gap-2">
+            <span className="text-blue-200 text-sm font-semibold" title={t.streak_freezes}>
+              ❄️ ×{freezes}
+            </span>
+            {freezes < maxFreezes && (
+              <motion.button
+                whileTap={{ scale: 0.93 }}
+                onClick={onBuyFreeze}
+                disabled={stats.xp < freezeCost}
+                className="px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all bg-blue-500/15 border-blue-400/30 text-blue-200 hover:bg-blue-500/25 disabled:opacity-35"
+              >
+                {t.buy_freeze}
+              </motion.button>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Player Level Badge */}
       {stats.name && (

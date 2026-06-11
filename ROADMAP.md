@@ -49,7 +49,7 @@
 ## 🔥 PHASE 3 — Mécaniques d'addiction (par ordre d'impact)
 
 ### 3A. Rétention quotidienne — LE plus important
-- [ ] **3.1** 🔥 **Streak de jours consécutifs** : compteur en évidence sur l'accueil, animation de flamme, "gel de streak" achetable en XP
+- [x] **3.1** 🔥 **Streak de jours consécutifs** : compteur en évidence sur l'accueil, animation de flamme, "gel de streak" achetable en XP
 - [ ] **3.2** 📅 **Défi du jour** : 5 questions identiques pour tous (générées depuis la date), 1 seule tentative, résultat partageable ("4/5 au GeoQuiz du jour 🌍")
 - [ ] **3.3** 🎯 **3 quêtes quotidiennes** ("10 questions sur l'Afrique", "Combo x5"...) avec récompenses XP
 

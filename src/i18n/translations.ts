@@ -147,6 +147,9 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  day_streak: string;
+  streak_freezes: string;
+  buy_freeze: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -283,6 +286,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    day_streak: 'day streak',
+    streak_freezes: 'Streak freezes',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   fr: {
@@ -418,6 +424,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    day_streak: 'jours de suite',
+    streak_freezes: 'Gels de série',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   es: {
@@ -553,6 +562,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    day_streak: 'días seguidos',
+    streak_freezes: 'Congelaciones de racha',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   de: {
@@ -688,6 +700,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    day_streak: 'Tage in Folge',
+    streak_freezes: 'Serien-Schutz',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   pt: {
@@ -823,6 +838,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    day_streak: 'dias seguidos',
+    streak_freezes: 'Congelamentos de sequência',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   zh: {
@@ -958,6 +976,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    day_streak: '连续天数',
+    streak_freezes: '连胜冻结',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   ja: {
@@ -1093,6 +1114,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    day_streak: '日連続',
+    streak_freezes: 'ストリーク保護',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 
   ar: {
@@ -1228,6 +1252,9 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    day_streak: 'أيام متتالية',
+    streak_freezes: 'تجميد السلسلة',
+    buy_freeze: '+1 ❄️ (200 XP)',
   },
 };
 

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Screen, GameMode, Difficulty } from './types';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
+import { useProgress, FREEZE_COST_XP, MAX_FREEZES } from './hooks/useProgress';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import WorldBackground from './components/WorldBackground';
 import HomeScreen from './components/HomeScreen';
@@ -28,9 +29,16 @@ function AppContent() {
   const {
     stats,
     addXP,
+    spendXP,
     recordGame,
     setPlayerName,
   } = useStorage();
+
+  const { streak, freezes, touchStreak, addFreeze } = useProgress();
+
+  const handleBuyFreeze = useCallback(() => {
+    if (spendXP(FREEZE_COST_XP)) addFreeze();
+  }, [spendXP, addFreeze]);
 
   const {
     gameState,
@@ -57,6 +65,7 @@ function AppContent() {
         gameState.correctAnswers,
         gameState.questionsAnswered
       );
+      touchStreak();
       setScreen('game-over');
     }
   }, [gameState?.isActive]);
@@ -117,7 +126,15 @@ function AppContent() {
         <AnimatePresence mode="wait">
           {screen === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <HomeScreen stats={stats} onNavigate={setScreen} />
+              <HomeScreen
+                stats={stats}
+                streak={streak}
+                freezes={freezes}
+                maxFreezes={MAX_FREEZES}
+                freezeCost={FREEZE_COST_XP}
+                onBuyFreeze={handleBuyFreeze}
+                onNavigate={setScreen}
+              />
             </motion.div>
           )}
           {screen === 'name-entry' && (
