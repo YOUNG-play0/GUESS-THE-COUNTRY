@@ -5,6 +5,7 @@ import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
+import MonumentImage from './MonumentImage';
 
 // Drapeau : image flagcdn en priorité (rendu identique partout),
 // repli sur l'emoji si l'image ne charge pas (hors-ligne, CDN bloqué...).
@@ -141,6 +142,7 @@ export default function GameScreen({
               transition={{ type: 'spring', stiffness: 150 }}
               className="my-5"
             >
+              <MonumentImage title={q.country.monumentWiki ?? q.country.monument!} />
               <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
                 <span className="text-3xl">🗽</span>
                 <span className="text-2xl font-bold text-white">{q.country.monument}</span>
