@@ -140,9 +140,10 @@ export function useGameEngine() {
     }
   }, [clearTimers]);
 
-  // Per-question countdown timer
+  // Per-question countdown timer (désactivé en Chrono : seul le chrono global compte)
   useEffect(() => {
     if (!gameState?.isActive || gameState.isPaused || showResult) return;
+    if (gameState.mode === 'chrono') return;
 
     const interval = setInterval(() => {
       setGameState(prev => {
@@ -157,7 +158,7 @@ export function useGameEngine() {
 
     timerRef.current = interval;
     return () => clearInterval(interval);
-  }, [gameState?.isActive, gameState?.isPaused, showResult, gameState?.currentQuestion]);
+  }, [gameState?.isActive, gameState?.isPaused, gameState?.mode, showResult, gameState?.currentQuestion]);
 
   // Chrono global timer
   useEffect(() => {

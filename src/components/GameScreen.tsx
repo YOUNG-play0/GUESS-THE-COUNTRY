@@ -260,10 +260,12 @@ export default function GameScreen({
         </div>
       )}
 
-      {/* Question Timer Bar */}
-      <div className={`h-1.5 bg-white/5 rounded-full overflow-hidden mb-4 ${isUrgent ? 'animate-pulse' : ''}`}>
-        <motion.div className={`h-full ${timerColor} rounded-full`} animate={{ width: `${timerPercent}%` }} transition={{ duration: 0.1, ease: 'linear' }} />
-      </div>
+      {/* Question Timer Bar (en Chrono, seul le compteur global est affiché) */}
+      {gameState.mode !== 'chrono' && (
+        <div className={`h-1.5 bg-white/5 rounded-full overflow-hidden mb-4 ${isUrgent ? 'animate-pulse' : ''}`}>
+          <motion.div className={`h-full ${timerColor} rounded-full`} animate={{ width: `${timerPercent}%` }} transition={{ duration: 0.1, ease: 'linear' }} />
+        </div>
+      )}
 
       {/* Question Content */}
       <div className="flex-1 flex flex-col items-center justify-center">
