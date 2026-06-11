@@ -38,9 +38,9 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
   let blurred = false;
   let zoomed = false;
 
-  if (type === 'capital') {
-    hint = `The capital is ${country.capital}`;
-  } else if (type === 'hint') {
+  // Pas de hint pour le type 'capital' : l'écran de jeu affiche déjà la
+  // capitale avec un libellé traduit (clé i18n which_capital).
+  if (type === 'hint') {
     const hintIdx = Math.floor(Math.random() * country.hints.length);
     hint = country.hints[hintIdx];
     if (difficulty === 'hard') blurred = true;
