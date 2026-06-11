@@ -1,0 +1,20 @@
+# Dépendances
+node_modules/
+
+# Build (généré par GitHub Actions, jamais committé)
+dist/
+
+# Logs et caches
+npm-debug.log*
+*.log
+.cache/
+
+# Éditeurs / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Environnement local
+.env
+.env.local
