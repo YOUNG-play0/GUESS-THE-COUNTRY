@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
-import { countries } from '../data/countries';
+import { countries, getCountryDisplayName } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 
 function getCountryCode(name: string): string {
@@ -40,7 +40,7 @@ export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
   chronoTimeLeft, onAnswer, onNext, onQuit,
 }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
@@ -319,7 +319,7 @@ export default function GameScreen({
                   {currentQuestion.type !== 'flag' && (
                     <CountryFlag name={option} size={28} />
                   )}
-                  <span className="flex-1 truncate text-sm">{option}</span>
+                  <span className="flex-1 truncate text-sm">{getCountryDisplayName(option, language)}</span>
                   {extraContent && (
                     <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="shrink-0">
                       {extraContent}
@@ -387,7 +387,7 @@ export default function GameScreen({
                     <span className="text-4xl select-none">⏰</span>
                     <p className="text-yellow-400 font-bold text-xl mt-2">{t.times_up}</p>
                     <p className="text-slate-400 text-sm mt-1 flex items-center justify-center gap-2">
-                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {currentQuestion.correctAnswer}
+                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {getCountryDisplayName(currentQuestion.correctAnswer, language)}
                     </p>
                   </motion.div>
                 ) : (
@@ -395,7 +395,7 @@ export default function GameScreen({
                     <span className="text-4xl select-none">😔</span>
                     <p className="text-red-400 font-bold text-xl mt-2">{t.wrong}</p>
                     <p className="text-slate-400 text-sm mt-1 flex items-center justify-center gap-2">
-                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {currentQuestion.correctAnswer}
+                      {t.answer}: <CountryFlag name={currentQuestion.correctAnswer} size={20} /> {getCountryDisplayName(currentQuestion.correctAnswer, language)}
                     </p>
                   </motion.div>
                 )}

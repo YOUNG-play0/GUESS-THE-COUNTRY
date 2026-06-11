@@ -27,7 +27,7 @@
 
 ### Bugs de traduction (l'app gère 8 langues dont l'arabe RTL !)
 - [x] **1.6** 🌐 **Indice "capital" codé en dur en anglais** : `` `The capital is ${country.capital}` `` dans `useGameEngine.ts`. Passer par le système i18n
-- [ ] **1.7** 🌐 **Les noms de pays et tous les `hints` sont uniquement en anglais** dans `countries.ts`. Un joueur français/arabe/chinois voit les réponses en anglais. Ajouter des traductions de noms de pays (au minimum FR + EN pour commencer)
+- [x] **1.7** 🌐 **Les noms de pays et tous les `hints` sont uniquement en anglais** *(noms FR faits ; traduction des hints → phase 2.4)* dans `countries.ts`. Un joueur français/arabe/chinois voit les réponses en anglais. Ajouter des traductions de noms de pays (au minimum FR + EN pour commencer)
 
 ### Bugs PWA / déploiement (bloquants pour le Play Store)
 - [ ] **1.8** 🚫 **Aucun service worker** : l'app n'est pas "installable" ni hors-ligne → refusée par PWABuilder. Ajouter `vite-plugin-pwa`
