@@ -36,6 +36,14 @@ export default defineConfig({
           // Entrée maskable séparée (combiner "any maskable" est déconseillé)
           { src: "icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
+        shortcuts: [
+          {
+            name: "Daily Challenge",
+            short_name: "Daily",
+            url: "./?daily=1",
+            icons: [{ src: "icon-192.png", sizes: "192x192", type: "image/png" }],
+          },
+        ],
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,svg,ico,webmanifest}"],

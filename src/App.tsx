@@ -131,6 +131,16 @@ function AppContent() {
     setScreen('game');
   }, [stats.name, startDaily, startGame]);
 
+  // Lien profond du raccourci PWA « Défi du jour » (manifest shortcuts)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('daily') === '1') {
+      window.history.replaceState(null, '', window.location.pathname);
+      if (stats.name && !dailyToday) handleStartDaily();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleQuitGame = useCallback(() => {
     clearTimers();
     if (!gameState) return;
