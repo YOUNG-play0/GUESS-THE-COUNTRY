@@ -1,4 +1,7 @@
-export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'legendary';
+
+/** Échelle des difficultés, du plus simple au plus dur */
+export const DIFFICULTY_LADDER: Difficulty[] = ['easy', 'medium', 'hard', 'expert', 'legendary'];
 export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily' | 'explorer';
 export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint'
@@ -113,4 +116,5 @@ export const DIFFICULTY_TIMERS: Record<Difficulty, number> = {
   medium: 10,
   hard: 8,
   expert: 6,
+  legendary: 5,
 };

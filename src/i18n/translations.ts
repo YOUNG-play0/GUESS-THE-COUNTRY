@@ -147,6 +147,8 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  legendary_diff: string;
+  adaptive_difficulty_info: string;
   nav_home: string;
   themes_title: string;
   continent_stats_title: string;
@@ -366,6 +368,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    legendary_diff: 'Legendary',
+    adaptive_difficulty_info: 'Difficulty adapts to you: it follows your last 10 answers and rises or falls in real time during the game.',
     nav_home: 'Home',
     themes_title: 'Visual theme',
     continent_stats_title: 'Stats by continent',
@@ -584,6 +588,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    legendary_diff: 'Légendaire',
+    adaptive_difficulty_info: 'La difficulté s\'adapte à toi : elle suit tes 10 dernières réponses et monte ou descend en temps réel pendant la partie.',
     nav_home: 'Accueil',
     themes_title: 'Thème visuel',
     continent_stats_title: 'Stats par continent',
@@ -802,6 +808,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    legendary_diff: 'Legendario',
+    adaptive_difficulty_info: 'La dificultad se adapta a ti: sigue tus últimas 10 respuestas y sube o baja en tiempo real durante la partida.',
     nav_home: 'Inicio',
     themes_title: 'Tema visual',
     continent_stats_title: 'Estadísticas por continente',
@@ -1020,6 +1028,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    legendary_diff: 'Legendär',
+    adaptive_difficulty_info: 'Die Schwierigkeit passt sich dir an: Sie folgt deinen letzten 10 Antworten und steigt oder sinkt in Echtzeit im Spiel.',
     nav_home: 'Start',
     themes_title: 'Visuelles Theme',
     continent_stats_title: 'Statistik pro Kontinent',
@@ -1238,6 +1248,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    legendary_diff: 'Lendário',
+    adaptive_difficulty_info: 'A dificuldade se adapta a você: segue suas últimas 10 respostas e sobe ou desce em tempo real durante a partida.',
     nav_home: 'Início',
     themes_title: 'Tema visual',
     continent_stats_title: 'Estatísticas por continente',
@@ -1456,6 +1468,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    legendary_diff: '传奇',
+    adaptive_difficulty_info: '难度会自动适应你：根据你最近10次作答实时升降。',
     nav_home: '首页',
     themes_title: '视觉主题',
     continent_stats_title: '各大洲统计',
@@ -1674,6 +1688,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    legendary_diff: '伝説',
+    adaptive_difficulty_info: '難易度は自動調整：直近10問の正答に応じてゲーム中にリアルタイムで上下します。',
     nav_home: 'ホーム',
     themes_title: 'ビジュアルテーマ',
     continent_stats_title: '大陸別統計',
@@ -1892,6 +1908,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    legendary_diff: 'أسطوري',
+    adaptive_difficulty_info: 'الصعوبة تتكيف معك: تتبع آخر 10 إجابات وترتفع أو تنخفض في الوقت الفعلي أثناء اللعب.',
     nav_home: 'الرئيسية',
     themes_title: 'السمة البصرية',
     continent_stats_title: 'إحصاءات حسب القارة',

@@ -59,12 +59,8 @@ export function useStorage() {
     setStats(prev => {
       const newXP = prev.xp + amount;
       const newLevel = Math.max(prev.level, levelForXP(newXP));
-      const unlockedDiffs = prev.unlockedDifficulties.slice();
-      if (newLevel >= 2 && !unlockedDiffs.includes('medium')) unlockedDiffs.push('medium');
-      if (newLevel >= 4 && !unlockedDiffs.includes('hard')) unlockedDiffs.push('hard');
-      if (newLevel >= 7 && !unlockedDiffs.includes('expert')) unlockedDiffs.push('expert');
-
-      const next = { ...prev, xp: newXP, level: newLevel, unlockedDifficulties: unlockedDiffs };
+      // Plus de déblocage de difficulté par niveau : la difficulté est adaptative
+      const next = { ...prev, xp: newXP, level: newLevel };
       saveStats(next);
       return next;
     });

@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { playCorrect, playWrong, playTick } from '../utils/sound';
 import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
-import { GameState, Question } from '../types';
+import { GameState, Question, Difficulty } from '../types';
+import { Translations } from '../i18n/translations';
 import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -45,6 +46,25 @@ function CountryFlag({ name, size = 24 }: { name: string; size?: number }) {
       style={{ width: size, height: size * 0.7 }}
     />
   );
+}
+
+// Difficulté adaptative : libellé + couleurs du badge temps réel
+const DIFFICULTY_BADGE: Record<Difficulty, { emoji: string; classes: string }> = {
+  easy: { emoji: '🟢', classes: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' },
+  medium: { emoji: '🟡', classes: 'bg-yellow-500/15 border-yellow-500/30 text-yellow-300' },
+  hard: { emoji: '🔴', classes: 'bg-red-500/15 border-red-500/30 text-red-300' },
+  expert: { emoji: '💀', classes: 'bg-purple-500/15 border-purple-500/30 text-purple-300' },
+  legendary: { emoji: '👑', classes: 'bg-amber-500/20 border-amber-400/40 text-amber-200' },
+};
+
+export function difficultyLabel(d: Difficulty, t: Translations): string {
+  switch (d) {
+    case 'easy': return t.easy;
+    case 'medium': return t.medium;
+    case 'hard': return t.hard;
+    case 'expert': return t.expert;
+    case 'legendary': return t.legendary_diff;
+  }
 }
 
 interface Props {
@@ -310,6 +330,19 @@ export default function GameScreen({
           <X className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
+          {/* Difficulté adaptative en temps réel (fixe pour le défi du jour) */}
+          {gameState.mode !== 'daily' && (
+            <motion.div
+              key={gameState.difficulty}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className={`flex items-center gap-1 border px-2.5 py-2 rounded-xl ${DIFFICULTY_BADGE[gameState.difficulty].classes}`}
+            >
+              <span className="text-xs select-none leading-none">{DIFFICULTY_BADGE[gameState.difficulty].emoji}</span>
+              <span className="font-bold text-[11px]">{difficultyLabel(gameState.difficulty, t)}</span>
+            </motion.div>
+          )}
           <motion.div key={gameState.score} initial={false} animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 0.3 }} className="flex items-center gap-1.5 bg-white/5 backdrop-blur px-3 py-2 rounded-xl">
             <Zap className="w-4 h-4 text-yellow-400" />
             <span className="text-white font-bold text-sm tabular-nums">{gameState.score}</span>
