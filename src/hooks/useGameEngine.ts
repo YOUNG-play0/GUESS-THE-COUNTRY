@@ -12,14 +12,17 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMode): Question {
+function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMode, allowMonument = true): Question {
   const questionTypes: QuestionType[] = [];
 
   if (mode === 'map') {
     questionTypes.push('shape');
+  } else if (mode === 'explorer') {
+    // Mode Explorateur (Passe du Savoir) : monnaies, langues, populations, superficies
+    questionTypes.push('currency', 'language', 'population', 'area');
   } else {
     questionTypes.push('flag', 'capital');
-    if (country.monument) {
+    if (country.monument && allowMonument) {
       questionTypes.push('monument');
     }
     if (difficulty === 'hard' || difficulty === 'expert') {
@@ -31,7 +34,32 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
   }
 
   const type = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-  const wrongCountries = getRandomCountries(3, undefined, [country.name]);
+
+  // Questions comparatives : la bonne réponse est le plus grand des 4 pays
+  if (type === 'population' || type === 'area') {
+    const metric = (c: Country) => type === 'population' ? c.population : c.area;
+    const others = getRandomCountries(3, undefined, [country.name]);
+    const four = [country, ...others];
+    const winner = four.reduce((a, b) => metric(b) > metric(a) ? b : a);
+    return {
+      type,
+      country: winner,
+      options: shuffleArray(four.map(c => c.name)),
+      correctAnswer: winner.name,
+    };
+  }
+
+  // Monnaies et langues partagées (euro, espagnol…) : les mauvaises options
+  // ne doivent pas partager l'attribut de la bonne réponse
+  let wrongPool: Country[] | undefined;
+  if (type === 'currency') {
+    wrongPool = countries.filter(c => c.currency !== country.currency);
+  } else if (type === 'language') {
+    wrongPool = countries.filter(c => c.language !== country.language);
+  }
+  const wrongCountries = wrongPool
+    ? shuffleArray(wrongPool).slice(0, 3)
+    : getRandomCountries(3, undefined, [country.name]);
   const options = shuffleArray([country.name, ...wrongCountries.map(c => c.name)]);
   const correctAnswer = country.name;
   let hintIndex: number | undefined;
@@ -48,12 +76,24 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
   return { type, country, options, correctAnswer, hintIndex, blurred, zoomed };
 }
 
-function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number): Question[] {
+export interface GameOptions {
+  /** Mode Explorateur : continents accessibles (Pack Continent) — undefined = tous */
+  continents?: string[];
+  /** Nombre max de questions monument par partie (gratuit) — undefined = illimité (Passe) */
+  monumentCap?: number;
+}
+
+function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number, opts?: GameOptions): Question[] {
   let pool: Country[];
 
   if (mode === 'map') {
     const shapedCountries = countries.filter(c => countryShapes[c.name]);
     pool = shuffleArray(shapedCountries).slice(0, count);
+  } else if (mode === 'explorer') {
+    const base = opts?.continents
+      ? countries.filter(c => opts.continents!.includes(c.continent))
+      : countries;
+    pool = shuffleArray(base).slice(0, count);
   } else {
     const difficultyMap: Record<Difficulty, Difficulty[]> = {
       easy: ['easy'],
@@ -67,12 +107,18 @@ function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number
     ).slice(0, count);
   }
 
-  if (pool.length < count) {
+  if (pool.length < count && mode !== 'explorer') {
     const extra = shuffleArray(countries.filter(c => !pool.includes(c))).slice(0, count - pool.length);
     pool = [...pool, ...extra];
   }
 
-  return pool.map(c => generateQuestion(c, difficulty, mode));
+  let monumentsUsed = 0;
+  return pool.map(c => {
+    const allowMonument = opts?.monumentCap === undefined || monumentsUsed < opts.monumentCap;
+    const q = generateQuestion(c, difficulty, mode, allowMonument);
+    if (q.type === 'monument') monumentsUsed++;
+    return q;
+  });
 }
 
 export function useGameEngine() {
@@ -87,6 +133,7 @@ export function useGameEngine() {
   const chronoRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const questionStartRef = useRef<number>(0);
   const answeredRef = useRef(false);
+  const gameOptsRef = useRef<GameOptions | undefined>(undefined);
 
   const clearTimers = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
@@ -98,12 +145,13 @@ export function useGameEngine() {
     setGameState(prev => prev ? { ...prev, isActive: false } : prev);
   }, [clearTimers]);
 
-  const startGame = useCallback((mode: GameMode, difficulty: Difficulty, presetQuestions?: Question[]) => {
+  const startGame = useCallback((mode: GameMode, difficulty: Difficulty, presetQuestions?: Question[], opts?: GameOptions) => {
     clearTimers();
+    gameOptsRef.current = opts;
     // presetQuestions : questions imposées (défi du jour, déterministe)
     const totalQ = presetQuestions ? presetQuestions.length : mode === 'chrono' ? 50 : mode === 'survival' ? 50 : 15;
     const maxTime = DIFFICULTY_TIMERS[difficulty];
-    const qs = presetQuestions ?? generateQuestions(mode, difficulty, totalQ);
+    const qs = presetQuestions ?? generateQuestions(mode, difficulty, totalQ, opts);
 
     const state: GameState = {
       mode,
@@ -271,7 +319,7 @@ export function useGameEngine() {
     // En Survie, la partie ne s'arrête qu'à 0 vie : on régénère des
     // questions à la volée quand on approche de la fin du tableau.
     if (gameState.mode === 'survival' && nextIdx >= qs.length - 5) {
-      qs = [...qs, ...generateQuestions(gameState.mode, gameState.difficulty, 25)];
+      qs = [...qs, ...generateQuestions(gameState.mode, gameState.difficulty, 25, gameOptsRef.current)];
       setQuestions(qs);
     }
 

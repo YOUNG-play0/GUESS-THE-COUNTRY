@@ -1,16 +1,22 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal } from 'lucide-react';
+import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal, Palette } from 'lucide-react';
 import { PlayerStats, XP_LEVELS, Difficulty } from '../types';
 import { BADGES, badgeLabel } from '../data/badges';
+import { THEMES, DEFAULT_THEME } from '../utils/themes';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   stats: PlayerStats;
   badges: string[];
+  /** Passe du Savoir : badges dorés + thèmes visuels */
+  isPremium: boolean;
+  theme: string;
+  onSetTheme: (id: string) => void;
+  onPremium: () => void;
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTheme, onPremium, onBack }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -24,7 +30,7 @@ export default function ProfileScreen({ stats, badges, onBack }: Props) {
   ];
 
   return (
-    <div className="min-h-screen px-4 py-16">
+    <div className="min-h-screen px-4 pt-16 pb-28">
       <div className="max-w-md mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}
@@ -83,6 +89,34 @@ export default function ProfileScreen({ stats, badges, onBack }: Props) {
           </div>
         </motion.div>
 
+        {/* Thèmes visuels — Passe du Savoir */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
+          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+            <Palette className="w-5 h-5 text-pink-400" /> {t.themes_title}
+            {!isPremium && <Lock className="w-4 h-4 text-yellow-400/70 ml-auto" />}
+          </h3>
+          <div className="grid grid-cols-4 gap-2.5">
+            {THEMES.map(th => {
+              const active = (isPremium ? theme : DEFAULT_THEME) === th.id;
+              const locked = !isPremium && th.id !== DEFAULT_THEME;
+              return (
+                <button
+                  key={th.id}
+                  onClick={() => locked ? onPremium() : onSetTheme(th.id)}
+                  className={`rounded-2xl border p-3 flex flex-col items-center gap-1.5 transition-all ${
+                    active ? 'border-indigo-400/60 bg-indigo-500/15' : 'border-white/10 bg-white/[0.03] hover:bg-white/10'
+                  } ${locked ? 'opacity-50' : ''}`}
+                >
+                  <span className={`w-8 h-8 rounded-full bg-gradient-to-br ${th.gradient} border border-white/20 flex items-center justify-center text-sm select-none`}>
+                    {locked ? '👑' : th.emoji}
+                  </span>
+                  {active && <Check className="w-3.5 h-3.5 text-indigo-300" />}
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
         {/* Succès */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
           <h3 className="text-white font-bold mb-4 flex items-center gap-2">
@@ -98,7 +132,11 @@ export default function ProfileScreen({ stats, badges, onBack }: Props) {
                   key={b.id}
                   title={`${name} — ${desc}`}
                   className={`rounded-2xl border p-2.5 text-center ${
-                    unlocked ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-white/[0.02] border-white/5 opacity-40'
+                    unlocked
+                      ? isPremium
+                        ? 'bg-gradient-to-b from-yellow-500/25 to-amber-600/10 border-yellow-400/50 shadow-lg shadow-yellow-500/10'
+                        : 'bg-yellow-500/10 border-yellow-500/25'
+                      : 'bg-white/[0.02] border-white/5 opacity-40'
                   }`}
                 >
                   <span className={`text-2xl select-none ${unlocked ? '' : 'grayscale'}`} style={unlocked ? undefined : { filter: 'grayscale(1)' }}>

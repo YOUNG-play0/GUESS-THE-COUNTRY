@@ -27,6 +27,9 @@ export interface QuestItem {
   progress: number;
   done: boolean;
   continent?: string;
+  /** Quête premium (Passe du Savoir) : récompense doublée */
+  premium?: boolean;
+  reward: number;
 }
 
 /** Résumé d'une partie terminée, transmis par App à la fin de chaque jeu */
@@ -57,32 +60,49 @@ export interface ProgressState {
   passport: string[];
   /** Identifiants des succès débloqués */
   badges: string[];
+  /** Bonnes réponses cumulées par continent (stats détaillées premium) */
+  continentStats: Record<string, number>;
+  /** Semaine du dernier gel hebdo offert (Passe du Savoir) */
+  lastFreezeWeek: string;
 }
 
 export const QUEST_XP_REWARD = 30;
+export const PREMIUM_QUEST_XP_REWARD = 60;
 const CONTINENTS = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
 const QUEST_TARGETS: Record<QuestId, number> = {
   correct: 15, combo: 5, continent: 8, games: 3, score: 300, flags: 10,
 };
+// La quête premium est plus exigeante (cible ×2 environ)
+const PREMIUM_TARGETS: Record<QuestId, number> = {
+  correct: 30, combo: 8, continent: 15, games: 6, score: 500, flags: 20,
+};
 
-// 3 quêtes par jour, tirées de façon déterministe depuis la date
-// (les mêmes pour tous les joueurs, comme le défi du jour).
+// 3 quêtes gratuites + 1 quête premium par jour, tirées de façon
+// déterministe depuis la date (les mêmes pour tous les joueurs).
+// La quête premium n'est visible/récompensée qu'avec le Passe du Savoir.
 export function generateQuests(dateKey: string): QuestItem[] {
   const rng = mulberry32(hashString(`gtc-quests-${dateKey}`));
   const ids: QuestId[] = ['correct', 'combo', 'continent', 'games', 'score', 'flags'];
-  return seededShuffle(ids, rng).slice(0, 3).map(id => ({
-    id,
-    target: QUEST_TARGETS[id],
-    progress: 0,
-    done: false,
-    continent: id === 'continent' ? CONTINENTS[Math.floor(rng() * CONTINENTS.length)] : undefined,
-  }));
+  const picked = seededShuffle(ids, rng).slice(0, 4);
+  return picked.map((id, i) => {
+    const premium = i === 3;
+    return {
+      id,
+      target: premium ? PREMIUM_TARGETS[id] : QUEST_TARGETS[id],
+      progress: 0,
+      done: false,
+      continent: id === 'continent' ? CONTINENTS[Math.floor(rng() * CONTINENTS.length)] : undefined,
+      premium,
+      reward: premium ? PREMIUM_QUEST_XP_REWARD : QUEST_XP_REWARD,
+    };
+  });
 }
 
-function applyGameToQuests(items: QuestItem[], g: GameSummary): { items: QuestItem[]; xpGained: number } {
+function applyGameToQuests(items: QuestItem[], g: GameSummary, isPremium: boolean): { items: QuestItem[]; xpGained: number } {
   let xpGained = 0;
   const next = items.map(q => {
     if (q.done) return q;
+    if (q.premium && !isPremium) return q; // quête premium gelée sans le Passe
     let progress = q.progress;
     switch (q.id) {
       case 'correct': progress += g.correctAnswers; break;
@@ -94,7 +114,7 @@ function applyGameToQuests(items: QuestItem[], g: GameSummary): { items: QuestIt
     }
     progress = Math.min(progress, q.target);
     const done = progress >= q.target;
-    if (done) xpGained += QUEST_XP_REWARD;
+    if (done) xpGained += q.reward ?? QUEST_XP_REWARD;
     return { ...q, progress, done };
   });
   return { items: next, xpGained };
@@ -110,7 +130,17 @@ const DEFAULT_PROGRESS: ProgressState = {
   quests: null,
   passport: [],
   badges: [],
+  continentStats: {},
+  lastFreezeWeek: '',
 };
+
+/** Clé de semaine (lundi) pour le gel hebdo offert */
+export function weekKey(date = new Date()): string {
+  const d = new Date(date);
+  const day = (d.getDay() + 6) % 7; // lundi = 0
+  d.setDate(d.getDate() - day);
+  return todayKey(d);
+}
 
 export function todayKey(date = new Date()): string {
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -179,7 +209,7 @@ export function useProgress() {
   // Tout est calculé hors setState (les updaters peuvent être rejoués par
   // React en StrictMode) ; retourne l'XP des quêtes accomplies et les
   // nouveaux succès pour la popup.
-  const registerGameEnd = useCallback((summary: GameSummary, statsCtx: StatsCtx): { questXp: number; newBadges: BadgeDef[] } => {
+  const registerGameEnd = useCallback((summary: GameSummary, statsCtx: StatsCtx, isPremium = false): { questXp: number; newBadges: BadgeDef[] } => {
     const today = todayKey();
     const streakNext = bumpStreak(progress.streak);
     const daily = summary.mode === 'daily' && progress.daily && progress.daily.date === today
@@ -188,25 +218,46 @@ export function useProgress() {
     const questBase = progress.quests && progress.quests.date === today
       ? progress.quests.items
       : generateQuests(today);
-    const { items, xpGained } = applyGameToQuests(questBase, summary);
+    const { items, xpGained } = applyGameToQuests(questBase, summary, isPremium);
     const passport = summary.correctCountries.length
       ? [...new Set([...progress.passport, ...summary.correctCountries])]
       : progress.passport;
+
+    // Cumul des bonnes réponses par continent (stats détaillées premium)
+    const continentStats = { ...progress.continentStats };
+    for (const [cont, n] of Object.entries(summary.correctByContinent)) {
+      continentStats[cont] = (continentStats[cont] ?? 0) + n;
+    }
 
     const ctx: BadgeCtx = { ...statsCtx, streak: aliveStreak(streakNext), passport, lastGame: summary };
     const newBadges = BADGES.filter(b => !progress.badges.includes(b.id) && b.check(ctx));
 
     const next: ProgressState = {
+      ...progress,
       streak: streakNext,
       daily,
       quests: { date: today, items },
       passport,
       badges: newBadges.length ? [...progress.badges, ...newBadges.map(b => b.id)] : progress.badges,
+      continentStats,
     };
     setProgress(next);
     saveProgress(next);
     return { questXp: xpGained, newBadges };
   }, [progress]);
+
+  // Passe du Savoir : un gel de streak offert chaque semaine.
+  // Retourne true si un gel vient d'être crédité.
+  const claimWeeklyFreeze = useCallback((): boolean => {
+    const wk = weekKey();
+    if (progress.lastFreezeWeek === wk || progress.streak.freezes >= MAX_FREEZES) return false;
+    update(p => ({
+      ...p,
+      lastFreezeWeek: wk,
+      streak: { ...p.streak, freezes: Math.min(MAX_FREEZES, p.streak.freezes + 1) },
+    }));
+    return true;
+  }, [progress.lastFreezeWeek, progress.streak.freezes, update]);
 
   const addFreeze = useCallback(() => {
     update(p => p.streak.freezes >= MAX_FREEZES ? p : { ...p, streak: { ...p.streak, freezes: p.streak.freezes + 1 } });
@@ -236,7 +287,9 @@ export function useProgress() {
     startDaily,
     questsToday,
     registerGameEnd,
+    claimWeeklyFreeze,
     passport: progress.passport,
     badges: progress.badges,
+    continentStats: progress.continentStats,
   };
 }

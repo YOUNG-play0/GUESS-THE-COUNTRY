@@ -1,14 +1,23 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Target, Flame, Gamepad2, Trophy, TrendingUp, Globe2, Zap } from 'lucide-react';
+import { ArrowLeft, Target, Flame, Gamepad2, Trophy, TrendingUp, Globe2, Zap, Crown, Lock } from 'lucide-react';
 import { PlayerStats } from '../types';
+import { countries } from '../data/countries';
+import { continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
+
+const CONTINENT_ORDER = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
 
 interface Props {
   stats: PlayerStats;
+  /** Bonnes réponses cumulées par continent */
+  continentStats: Record<string, number>;
+  passport: string[];
+  isPremium: boolean;
+  onPremium: () => void;
   onBack: () => void;
 }
 
-export default function StatsScreen({ stats, onBack }: Props) {
+export default function StatsScreen({ stats, continentStats, passport, isPremium, onPremium, onBack }: Props) {
   const { t } = useLanguage();
   const accuracy = stats.totalAnswers > 0 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100) : 0;
   const avgScore = stats.totalGames > 0 ? Math.round(stats.totalScore / stats.totalGames) : 0;
@@ -30,10 +39,11 @@ export default function StatsScreen({ stats, onBack }: Props) {
     { mode: 'chrono', label: t.chrono_mode, games: stats.gamesPerMode.chrono, emoji: '⏱️' },
     { mode: 'map', label: t.map_mode, games: stats.gamesPerMode.map, emoji: '🗺️' },
     { mode: 'daily', label: t.daily_challenge, games: stats.gamesPerMode.daily ?? 0, emoji: '📅' },
+    { mode: 'explorer', label: t.explorer_mode, games: stats.gamesPerMode.explorer ?? 0, emoji: '🧭' },
   ];
 
   return (
-    <div className="min-h-screen px-4 py-16">
+    <div className="min-h-screen px-4 pt-16 pb-28">
       <div className="max-w-md mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}
@@ -78,6 +88,45 @@ export default function StatsScreen({ stats, onBack }: Props) {
               );
             })}
           </div>
+        </motion.div>
+
+        {/* Stats détaillées par continent — Passe du Savoir */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
+          <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+            <Crown className="w-5 h-5 text-yellow-400" /> {t.continent_stats_title}
+          </h3>
+          {isPremium ? (
+            <div className="space-y-3">
+              {CONTINENT_ORDER.map(cont => {
+                const total = countries.filter(c => c.continent === cont).length;
+                const found = countries.filter(c => c.continent === cont && passport.includes(c.name)).length;
+                const correct = continentStats[cont] ?? 0;
+                return (
+                  <div key={cont}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-slate-300">{continentLabel(cont, t)}</span>
+                      <span className="text-xs text-slate-400">
+                        🛂 {found}/{total} · ✅ {correct}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(found / total) * 100}%` }}
+                        transition={{ duration: 0.8 }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <button onClick={onPremium} className="w-full py-6 rounded-xl border border-dashed border-yellow-500/30 bg-yellow-500/5 flex flex-col items-center gap-2 hover:bg-yellow-500/10 transition-all">
+              <Lock className="w-5 h-5 text-yellow-400/70" />
+              <span className="text-yellow-200/80 text-xs font-semibold">{t.premium_required}</span>
+            </button>
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex items-center justify-center">

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Globe2, BarChart3, User, Play, Zap, CalendarCheck } from 'lucide-react';
+import { Globe2, Play, Zap } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
-import { DailyState, QuestItem, QUEST_XP_REWARD } from '../hooks/useProgress';
+import { DailyState, QuestItem } from '../hooks/useProgress';
 import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -15,6 +15,7 @@ interface Props {
   daily: DailyState | null;
   onPlayDaily: () => void;
   quests: QuestItem[];
+  isPremium: boolean;
   onNavigate: (screen: Screen) => void;
 }
 
@@ -34,7 +35,7 @@ const QUEST_EMOJI: Record<QuestItem['id'], string> = {
   correct: '🎯', combo: '🔥', continent: '🌍', games: '🎮', score: '⚡', flags: '🚩',
 };
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, isPremium, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -43,118 +44,77 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
     : 100;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16">
-      {/* Title */}
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
+    // pb-28 : laisse la place à la barre de navigation fixe en bas
+    <div className="min-h-screen flex flex-col px-5 pt-16 pb-28 max-w-md mx-auto w-full">
+
+      {/* ——— 1. Header : logo + titre + niveau XP ——— */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="text-center mb-6"
       >
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <Globe2 className="w-12 h-12 text-indigo-400 spin-slow" />
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Globe2 className="w-9 h-9 text-indigo-400 spin-slow" />
         </div>
-        <h1 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 tracking-tight leading-tight">
           {t.home_title}
         </h1>
-        <h1 className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 tracking-tight -mt-1 leading-tight">
+        <h1 className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 tracking-tight -mt-1 leading-tight">
           COUNTRY
         </h1>
-        <p className="text-slate-400 mt-2 text-xs sm:text-sm font-medium tracking-wider uppercase">
-          {t.home_subtitle}
-        </p>
-      </motion.div>
 
-      {/* Streak de jours consécutifs */}
-      {stats.totalGames > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-4 w-full max-w-sm bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-2xl px-5 py-3 flex items-center gap-3"
-        >
-          <motion.span
-            animate={streak > 0 ? { scale: [1, 1.25, 1] } : {}}
-            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
-            className="text-3xl select-none"
+        {stats.name && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mt-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center gap-3 text-left"
           >
-            🔥
-          </motion.span>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-black text-xl leading-none">{streak}</p>
-            <p className="text-orange-300/80 text-[11px] uppercase tracking-wider">{t.day_streak}</p>
-          </div>
-          <div className="text-right shrink-0 flex items-center gap-2">
-            <span className="text-blue-200 text-sm font-semibold" title={t.streak_freezes}>
-              ❄️ ×{freezes}
-            </span>
-            {freezes < maxFreezes && (
-              <motion.button
-                whileTap={{ scale: 0.93 }}
-                onClick={onBuyFreeze}
-                disabled={stats.xp < freezeCost}
-                className="px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all bg-blue-500/15 border-blue-400/30 text-blue-200 hover:bg-blue-500/25 disabled:opacity-35"
-              >
-                {t.buy_freeze}
-              </motion.button>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Player Level Badge */}
-      {stats.name && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6 w-full max-w-sm bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-3"
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-            {stats.level}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm truncate">{stats.name}</p>
-            <p className="text-indigo-300 text-xs">{currentLevel.title}</p>
-            <div className="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${xpProgress}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+              {stats.level}
             </div>
-          </div>
-          <div className="text-right shrink-0">
-            <p className="text-yellow-400 font-bold text-xs flex items-center gap-1">
-              <Zap className="w-3 h-3" /> {stats.xp} XP
-            </p>
-          </div>
-        </motion.div>
-      )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-white font-semibold text-sm truncate">{stats.name}</p>
+                <p className="text-yellow-400 font-bold text-xs flex items-center gap-1 shrink-0">
+                  <Zap className="w-3 h-3" /> {stats.xp} XP
+                </p>
+              </div>
+              <div className="w-full h-1.5 bg-white/10 rounded-full mt-1.5 overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${xpProgress}%` }}
+                  transition={{ duration: 1, delay: 0.4 }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </motion.header>
 
-      {/* Main Menu */}
-      <motion.div
+      {/* ——— 2. Actions : JOUER + Défi du jour ——— */}
+      <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="w-full max-w-sm space-y-3"
+        transition={{ delay: 0.15 }}
+        className="space-y-3 mb-6"
       >
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => stats.name ? onNavigate('mode-select') : onNavigate('name-entry')}
-          className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:from-indigo-700 active:to-purple-700 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-3 transition-all"
+          className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-3 transition-all"
         >
           <Play className="w-6 h-6" fill="currentColor" />
           {t.play_now}
         </motion.button>
 
-        {/* Défi du jour : 5 questions identiques pour tous, 1 tentative */}
         {daily ? (
-          <div className="w-full py-3.5 px-5 bg-white/5 border border-emerald-500/25 rounded-2xl flex items-center gap-3">
-            <CalendarCheck className="w-6 h-6 text-emerald-400 shrink-0" />
-            <div className="flex-1 text-left">
-              <p className="text-white font-bold text-sm">
+          <div className="w-full py-3 px-4 bg-white/5 border border-emerald-500/25 rounded-2xl flex items-center gap-3">
+            <span className="text-xl select-none">📅</span>
+            <div className="flex-1 text-left min-w-0">
+              <p className="text-white font-bold text-sm truncate">
                 {t.daily_challenge} — {daily.correct}/{daily.total} ✅
               </p>
               <p className="text-slate-400 text-xs">{t.come_back_tomorrow}</p>
@@ -164,102 +124,138 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={onPlayDaily}
-            className="w-full py-3.5 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center gap-3 transition-all"
+            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center gap-3 transition-all"
           >
-            <span className="text-2xl select-none">📅</span>
-            <span className="flex-1 text-left">
+            <span className="text-xl select-none">📅</span>
+            <span className="flex-1 text-left min-w-0">
               <span className="block font-bold text-sm">{t.daily_challenge}</span>
-              <span className="block text-emerald-100/80 text-xs">{t.daily_desc}</span>
+              <span className="block text-emerald-100/80 text-xs truncate">{t.daily_desc}</span>
             </span>
           </motion.button>
         )}
 
-        {/* Quêtes quotidiennes */}
-        {stats.totalGames > 0 && (
-          <div className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
-            <p className="text-slate-300 text-xs font-bold uppercase tracking-wider mb-2.5">🎯 {t.daily_quests}</p>
-            <div className="space-y-2.5">
-              {quests.map(q => (
-                <div key={q.id} className={q.done ? 'opacity-60' : ''}>
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-[13px] text-slate-200 flex items-center gap-1.5 min-w-0">
-                      <span className="select-none">{QUEST_EMOJI[q.id]}</span>
-                      <span className="truncate">{questLabel(q, t)}</span>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => onNavigate('premium')}
+          className={`w-full py-2.5 px-4 rounded-2xl border flex items-center gap-3 transition-all ${
+            isPremium
+              ? 'bg-yellow-500/10 border-yellow-500/30'
+              : 'bg-gradient-to-r from-yellow-500/15 to-amber-600/10 border-yellow-500/25 hover:from-yellow-500/25'
+          }`}
+        >
+          <span className="text-lg select-none">👑</span>
+          <span className="flex-1 text-left min-w-0">
+            <span className="block text-yellow-200 font-bold text-[13px]">{t.premium_title}</span>
+            <span className="block text-yellow-100/60 text-[11px] truncate">
+              {isPremium ? t.premium_active : t.trial_cta}
+            </span>
+          </span>
+        </motion.button>
+      </motion.section>
+
+      {/* ——— 3. Progression : streak + quêtes en cards horizontales ——— */}
+      {stats.totalGames > 0 && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-6 -mx-5"
+        >
+          <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-2 px-5">
+            🎯 {t.daily_quests}
+          </p>
+          <div className="flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory [scrollbar-width:none]">
+            {/* Card streak */}
+            <div className="snap-start shrink-0 w-[150px] bg-gradient-to-b from-orange-500/15 to-red-500/5 border border-orange-500/25 rounded-2xl p-3.5 flex flex-col">
+              <motion.span
+                animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                className="text-2xl select-none w-fit"
+              >
+                🔥
+              </motion.span>
+              <p className="text-white font-black text-2xl leading-tight mt-1">{streak}</p>
+              <p className="text-orange-300/80 text-[10px] uppercase tracking-wider">{t.day_streak}</p>
+              <div className="mt-auto pt-2 flex items-center justify-between gap-1">
+                <span className="text-blue-200 text-xs font-semibold" title={t.streak_freezes}>❄️ ×{freezes}</span>
+                {freezes < maxFreezes && (
+                  <button
+                    onClick={onBuyFreeze}
+                    disabled={stats.xp < freezeCost}
+                    className="px-1.5 py-1 rounded-lg text-[9px] font-bold bg-blue-500/15 border border-blue-400/30 text-blue-200 disabled:opacity-35"
+                  >
+                    {t.buy_freeze}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cards quêtes */}
+            {quests.map(q => (
+              <div
+                key={q.id + (q.premium ? '-p' : '')}
+                className={`snap-start shrink-0 w-[170px] rounded-2xl p-3.5 border flex flex-col ${
+                  q.premium
+                    ? 'bg-gradient-to-b from-yellow-500/15 to-amber-600/5 border-yellow-500/30'
+                    : 'bg-white/5 border-white/10'
+                } ${q.done ? 'opacity-60' : ''}`}
+              >
+                <span className="text-2xl select-none">{q.premium ? '👑' : QUEST_EMOJI[q.id]}</span>
+                <p className={`text-[12px] leading-snug mt-1 line-clamp-2 ${q.premium ? 'text-yellow-100' : 'text-slate-200'}`}>
+                  {questLabel(q, t)}
+                </p>
+                <div className="mt-auto pt-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`text-[10px] font-bold ${q.done ? 'text-emerald-400' : q.premium ? 'text-yellow-400/80' : 'text-slate-400'}`}>
+                      {q.done ? '✓' : `${q.progress}/${q.target}`}
                     </span>
-                    <span className={`text-[11px] font-bold shrink-0 ${q.done ? 'text-emerald-400' : 'text-slate-400'}`}>
-                      {q.done ? `✓ +${QUEST_XP_REWARD} XP` : `${q.progress}/${q.target}`}
+                    <span className={`text-[10px] font-bold ${q.premium ? 'text-yellow-300' : 'text-indigo-300'}`}>
+                      +{q.reward ?? 30} XP
                     </span>
                   </div>
                   <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <motion.div
-                      className={`h-full rounded-full ${q.done ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
+                      className={`h-full rounded-full ${
+                        q.done ? 'bg-emerald-500' : q.premium ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                      }`}
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(100, (q.progress / q.target) * 100)}%` }}
                       transition={{ duration: 0.6 }}
                     />
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </motion.section>
+      )}
 
-        <div className="grid grid-cols-3 gap-3">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigate('stats')}
-            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
-          >
-            <BarChart3 className="w-6 h-6 text-emerald-400" />
-            <span className="text-xs font-semibold">{t.stats}</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigate('passport')}
-            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
-          >
-            <span className="text-2xl leading-6 select-none">🛂</span>
-            <span className="text-xs font-semibold">{t.passport}</span>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigate('profile')}
-            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
-          >
-            <User className="w-6 h-6 text-blue-400" />
-            <span className="text-xs font-semibold">{t.profile}</span>
-          </motion.button>
-        </div>
-      </motion.div>
-
-      {/* Quick Stats */}
+      {/* ——— 4. Stats rapides ——— */}
       {stats.totalGames > 0 && (
-        <motion.div
+        <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8 flex gap-6 text-center"
+          transition={{ delay: 0.35 }}
+          className="grid grid-cols-3 gap-3"
         >
-          <div>
-            <p className="text-2xl font-bold text-white">{stats.totalGames}</p>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">{t.games_short}</p>
-          </div>
-          <div className="w-px bg-white/10" />
-          <div>
-            <p className="text-2xl font-bold text-yellow-400">{stats.bestScore}</p>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">{t.best_short}</p>
-          </div>
-          <div className="w-px bg-white/10" />
-          <div>
-            <p className="text-2xl font-bold text-emerald-400">
-              {stats.totalAnswers > 0 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100) : 0}%
-            </p>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">{t.accuracy_short}</p>
-          </div>
-        </motion.div>
+          {[
+            { value: stats.totalGames, label: t.games_short, color: 'text-white' },
+            { value: stats.bestScore, label: t.best_short, color: 'text-yellow-400' },
+            {
+              value: `${stats.totalAnswers > 0 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100) : 0}%`,
+              label: t.accuracy_short,
+              color: 'text-emerald-400',
+            },
+          ].map(s => (
+            <div key={s.label} className="bg-white/5 border border-white/10 rounded-2xl py-3 text-center">
+              <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </motion.section>
       )}
+
+      {/* ——— 5. La barre de navigation fixe est rendue par App (BottomNav) ——— */}
     </div>
   );
 }
