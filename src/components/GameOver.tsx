@@ -11,17 +11,22 @@ interface Props {
   playerLevel: number;
   playerXP: number;
   isNewBest: boolean;
+  previousBest: number;
   onPlayAgain: () => void;
   onHome: () => void;
 }
 
-export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, onPlayAgain, onHome }: Props) {
+const NEAR_MISS_MAX_PTS = 50;
+
+export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, previousBest, onPlayAgain, onHome }: Props) {
   const { t } = useLanguage();
   const [linkCopied, setLinkCopied] = useState(false);
   const [dailyShared, setDailyShared] = useState(false);
   const accuracy = gameState.questionsAnswered > 0 ? Math.round((gameState.correctAnswers / gameState.questionsAnswered) * 100) : 0;
   const DISCORD_URL = 'https://discord.gg/wzqAHmG3jt';
   const isDaily = gameState.mode === 'daily';
+  const missingPts = previousBest - gameState.score;
+  const nearMiss = !isDaily && !isNewBest && gameState.score > 0 && missingPts > 0 && missingPts <= NEAR_MISS_MAX_PTS;
 
   const shareDaily = () => {
     const text = t.daily_share_text
@@ -103,14 +108,26 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
             {grade.text}
           </motion.h1>
           {isNewBest && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0 }} 
-              animate={{ opacity: 1, scale: 1 }} 
-              transition={{ delay: 0.5, type: 'spring' }} 
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
               className="mt-2 inline-flex items-center gap-1.5 bg-yellow-500/20 border border-yellow-500/30 px-4 py-1.5 rounded-full"
             >
               <Star className="w-4 h-4 text-yellow-400" fill="currentColor" />
               <span className="text-yellow-300 font-bold text-sm">{t.new_best_score}</span>
+            </motion.div>
+          )}
+          {nearMiss && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+              className="mt-2 inline-flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/30 px-4 py-1.5 rounded-full"
+            >
+              <span className="text-orange-300 font-bold text-sm">
+                😤 {t.almost_record.replace('{n}', String(missingPts))}
+              </span>
             </motion.div>
           )}
         </div>
@@ -232,9 +249,15 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={onPlayAgain}
-              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+              animate={nearMiss ? { scale: [1, 1.04, 1] } : {}}
+              transition={nearMiss ? { repeat: Infinity, duration: 1.2 } : {}}
+              className={`w-full py-4 text-white font-black text-lg rounded-2xl shadow-lg flex items-center justify-center gap-2 ${
+                nearMiss
+                  ? 'bg-gradient-to-r from-orange-600 to-red-600 shadow-orange-500/30'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-indigo-500/25'
+              }`}
             >
-              <RotateCcw className="w-5 h-5" /> {t.play_again}
+              <RotateCcw className="w-5 h-5" /> ⚡ {t.rematch}
             </motion.button>
           )}
           <motion.button 

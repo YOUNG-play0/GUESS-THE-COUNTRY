@@ -147,6 +147,8 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  rematch: string;
+  almost_record: string;
   badges_title: string;
   badge_unlocked: string;
   badge_perfect_name: string;
@@ -327,6 +329,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    rematch: 'REMATCH',
+    almost_record: 'So close! Only {n} pts short of your record!',
     badges_title: 'Achievements',
     badge_unlocked: 'Achievement unlocked!',
     badge_perfect_name: 'Flawless',
@@ -506,6 +510,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    rematch: 'REVANCHE',
+    almost_record: 'Record manqué de justesse ! Il te manquait {n} pts !',
     badges_title: 'Succès',
     badge_unlocked: 'Succès débloqué !',
     badge_perfect_name: 'Sans-faute',
@@ -685,6 +691,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    rematch: 'REVANCHA',
+    almost_record: '¡Por poco! ¡Te faltaron {n} pts para tu récord!',
     badges_title: 'Logros',
     badge_unlocked: '¡Logro desbloqueado!',
     badge_perfect_name: 'Impecable',
@@ -864,6 +872,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    rematch: 'REVANCHE',
+    almost_record: 'So knapp! Nur {n} Punkte unter deinem Rekord!',
     badges_title: 'Erfolge',
     badge_unlocked: 'Erfolg freigeschaltet!',
     badge_perfect_name: 'Fehlerfrei',
@@ -1043,6 +1053,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    rematch: 'REVANCHE',
+    almost_record: 'Por pouco! Faltaram {n} pts para o seu recorde!',
     badges_title: 'Conquistas',
     badge_unlocked: 'Conquista desbloqueada!',
     badge_perfect_name: 'Impecável',
@@ -1222,6 +1234,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    rematch: '再战一局',
+    almost_record: '就差一点！距离纪录只差{n}分！',
     badges_title: '成就',
     badge_unlocked: '成就解锁！',
     badge_perfect_name: '完美无缺',
@@ -1401,6 +1415,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    rematch: 'リベンジ',
+    almost_record: 'あと少し！記録まであと{n}点だった！',
     badges_title: '実績',
     badge_unlocked: '実績解除！',
     badge_perfect_name: 'パーフェクト',
@@ -1580,6 +1596,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    rematch: 'جولة الثأر',
+    almost_record: '!كنت قريبًا جدًا! ينقصك {n} نقطة فقط عن رقمك القياسي',
     badges_title: 'الإنجازات',
     badge_unlocked: '!تم فتح إنجاز',
     badge_perfect_name: 'بلا أخطاء',

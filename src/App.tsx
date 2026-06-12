@@ -32,6 +32,9 @@ function AppContent() {
   const [lastMode, setLastMode] = useState<GameMode>('classic');
   const [lastDifficulty, setLastDifficulty] = useState<Difficulty>('easy');
   const gameRecordedRef = useRef(false);
+  // Record AVANT la partie : sert au message « il te manquait X pts »
+  // (stats.bestScore est déjà écrasé quand l'écran de fin s'affiche)
+  const prevBestRef = useRef(0);
   const {
     stats,
     addXP,
@@ -106,9 +109,10 @@ function AppContent() {
     setLastMode(mode);
     setLastDifficulty(difficulty);
     gameRecordedRef.current = false;
+    prevBestRef.current = stats.bestScore;
     startGame(mode, difficulty);
     setScreen('game');
-  }, [startGame]);
+  }, [startGame, stats.bestScore]);
 
   const handleStartDaily = useCallback(() => {
     if (!stats.name) {
@@ -118,6 +122,7 @@ function AppContent() {
     const qs = generateDailyQuestions(todayKey());
     startDaily(qs.length);
     gameRecordedRef.current = false;
+    prevBestRef.current = stats.bestScore;
     startGame('daily', 'medium', qs);
     setScreen('game');
   }, [stats.name, startDaily, startGame]);
@@ -225,6 +230,7 @@ function AppContent() {
                 playerLevel={stats.level}
                 playerXP={stats.xp}
                 isNewBest={isNewBest}
+                previousBest={prevBestRef.current}
                 onPlayAgain={handlePlayAgain}
                 onHome={() => setScreen('home')}
               />
