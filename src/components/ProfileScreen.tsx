@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal, Palette } from 'lucide-react';
-import { PlayerStats, XP_LEVELS, Difficulty } from '../types';
+import { PlayerStats, XP_LEVELS } from '../types';
 import { BADGES, badgeLabel } from '../data/badges';
 import { THEMES, DEFAULT_THEME } from '../utils/themes';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -22,16 +22,10 @@ export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTh
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
   const xpProgress = nextLevel ? ((stats.xp - currentLevel.xp) / (nextLevel.xp - currentLevel.xp)) * 100 : 100;
 
-  const difficultyInfo: { id: Difficulty; name: string; emoji: string; color: string; unlockLevel: number }[] = [
-    { id: 'easy', name: t.easy, emoji: '🟢', color: 'from-emerald-500 to-green-600', unlockLevel: 1 },
-    { id: 'medium', name: t.medium, emoji: '🟡', color: 'from-yellow-500 to-amber-600', unlockLevel: 2 },
-    { id: 'hard', name: t.hard, emoji: '🔴', color: 'from-red-500 to-rose-600', unlockLevel: 4 },
-    { id: 'expert', name: t.expert, emoji: '💀', color: 'from-purple-500 to-violet-600', unlockLevel: 7 },
-  ];
 
   return (
     <div className="min-h-screen px-4 pt-16 pb-28">
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-[480px] mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}
         </button>
@@ -151,27 +145,6 @@ export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTh
           </div>
         </motion.div>
 
-        {/* Unlocked Difficulties */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
-          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-yellow-400" /> {t.unlocked_difficulties}
-          </h3>
-          <div className="space-y-3">
-            {difficultyInfo.map((diff) => {
-              const unlocked = stats.level >= diff.unlockLevel;
-              return (
-                <motion.div key={diff.id} className={`flex items-center gap-3 p-3 rounded-xl border ${unlocked ? `bg-gradient-to-r ${diff.color} border-white/10` : 'bg-white/[0.02] border-white/5 opacity-40'}`}>
-                  <span className="text-xl select-none">{diff.emoji}</span>
-                  <div className="flex-1">
-                    <p className="text-white font-bold text-sm">{diff.name}</p>
-                    {!unlocked && <p className="text-slate-400 text-xs flex items-center gap-1"><Lock className="w-3 h-3" /> {t.unlock_at_level} {diff.unlockLevel}</p>}
-                  </div>
-                  {unlocked && <Check className="w-5 h-5 text-white/70 shrink-0" />}
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
       </div>
     </div>
   );

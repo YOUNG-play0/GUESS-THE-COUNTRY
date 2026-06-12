@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { countries, getCountryDisplayName } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 import { continentLabel } from '../i18n/translations';
+import FlagImg from './FlagImg';
 
 interface Props {
   passport: string[];
@@ -19,7 +20,7 @@ export default function PassportScreen({ passport, onBack }: Props) {
 
   return (
     <div className="min-h-screen px-4 pt-16 pb-28">
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-[480px] mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}
         </button>
@@ -60,18 +61,28 @@ export default function PassportScreen({ passport, onBack }: Props) {
                     transition={{ duration: 0.8, delay: ci * 0.07 }}
                   />
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="grid grid-cols-2 gap-1.5">
                   {list.map(c => {
                     const has = unlocked.has(c.name);
                     return (
-                      <span
+                      <div
                         key={c.name}
-                        title={getCountryDisplayName(c.name, language)}
-                        className={`text-xl leading-none select-none transition-all ${has ? '' : 'opacity-25'}`}
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all ${
+                          has ? 'bg-white/[0.04] border-white/10' : 'bg-white/[0.01] border-white/5 opacity-35'
+                        }`}
                         style={has ? undefined : { filter: 'grayscale(1)' }}
                       >
-                        {c.flag}
-                      </span>
+                        <FlagImg
+                          code={c.code.toLowerCase()}
+                          emoji={c.flag}
+                          emojiSize={16}
+                          className="flag-img shrink-0"
+                          style={{ width: 22, height: 16 }}
+                        />
+                        <span className={`text-[11px] leading-tight truncate ${has ? 'text-slate-200' : 'text-slate-500'}`}>
+                          {getCountryDisplayName(c.name, language)}
+                        </span>
+                      </div>
                     );
                   })}
                 </div>

@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
-import { Screen, GameMode, Difficulty, levelForXP } from './types';
+import { Screen, GameMode, levelForXP } from './types';
+import { getAdaptiveDifficulty } from './utils/adaptive';
 import { BadgeDef } from './data/badges';
 import BadgePopup from './components/BadgePopup';
 import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
@@ -34,7 +35,6 @@ function AppContent() {
   const { isRTL } = useLanguage();
   const [screen, setScreen] = useState<Screen>('home');
   const [lastMode, setLastMode] = useState<GameMode>('classic');
-  const [lastDifficulty, setLastDifficulty] = useState<Difficulty>('easy');
   const gameRecordedRef = useRef(false);
   // Record AVANT la partie : sert au message « il te manquait X pts »
   // (stats.bestScore est déjà écrasé quand l'écran de fin s'affiche)
@@ -123,14 +123,14 @@ function AppContent() {
     }
   }, [gameState?.isActive]);
 
-  const handleStartGame = useCallback((mode: GameMode, difficulty: Difficulty) => {
+  const handleStartGame = useCallback((mode: GameMode) => {
     setLastMode(mode);
-    setLastDifficulty(difficulty);
     gameRecordedRef.current = false;
     prevBestRef.current = stats.bestScore;
     ghostRef.current = stats.bestScorePerMode?.[mode] ?? 0;
     const expCont = premium.explorerContinents();
-    startGame(mode, difficulty, undefined, {
+    // Difficulté adaptative : calculée sur les 10 dernières réponses
+    startGame(mode, getAdaptiveDifficulty(), undefined, {
       // Gratuit : 1 question monument max par partie (Passe = illimité)
       monumentCap: premium.isPremium ? undefined : 1,
       continents: mode === 'explorer' && expCont !== 'all' && expCont ? expCont : undefined,
@@ -175,8 +175,8 @@ function AppContent() {
   }, [clearTimers, endGame, gameState]);
 
   const handlePlayAgain = useCallback(() => {
-    handleStartGame(lastMode, lastDifficulty);
-  }, [handleStartGame, lastMode, lastDifficulty]);
+    handleStartGame(lastMode);
+  }, [handleStartGame, lastMode]);
 
   const handleNameSubmit = useCallback((name: string) => {
     setPlayerName(name);
@@ -195,7 +195,7 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen font-sans text-white overflow-x-hidden no-select relative"
+      className="min-h-screen w-full font-sans text-white overflow-x-hidden no-select relative"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Thèmes visuels : réservés au Passe du Savoir */}
@@ -216,7 +216,7 @@ function AppContent() {
       </button>
 
       {/* Main Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 w-full">
         <AnimatePresence mode="wait">
           {screen === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
@@ -243,7 +243,6 @@ function AppContent() {
           {screen === 'mode-select' && (
             <motion.div key="mode-select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <ModeSelect
-                stats={stats}
                 explorerUnlocked={premium.explorerContinents() !== null}
                 onStart={handleStartGame}
                 onPremium={() => setScreen('premium')}

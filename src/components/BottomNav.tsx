@@ -22,10 +22,10 @@ export default function BottomNav({ current, onNavigate }: Props) {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 bg-slate-950/80 backdrop-blur-xl border-t border-white/10"
+      className="fixed bottom-0 inset-x-0 z-50 w-full max-w-[480px] mx-auto bg-slate-950/80 backdrop-blur-xl border-t border-white/10 sm:border-x sm:rounded-t-2xl"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="max-w-md mx-auto grid grid-cols-4">
+      <div className="grid grid-cols-4">
         {tabs.map(tab => {
           const active = current === tab.id;
           const Icon = tab.icon;

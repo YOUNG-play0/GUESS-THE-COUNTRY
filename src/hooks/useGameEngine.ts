@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { GameState, GameMode, Difficulty, Question, QuestionType, DIFFICULTY_TIMERS, Country } from '../types';
 import { countries, getRandomCountries } from '../data/countries';
 import { countryShapes } from '../data/countryShapes';
+import { recordAdaptiveAnswer } from '../utils/adaptive';
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -25,7 +26,7 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
     if (country.monument && allowMonument) {
       questionTypes.push('monument');
     }
-    if (difficulty === 'hard' || difficulty === 'expert') {
+    if (difficulty === 'hard' || difficulty === 'expert' || difficulty === 'legendary') {
       questionTypes.push('hint', 'shape');
     }
     if (difficulty === 'medium') {
@@ -70,7 +71,7 @@ function generateQuestion(country: Country, difficulty: Difficulty, mode: GameMo
     // On stocke l'index : le texte est résolu à l'affichage selon la langue
     hintIndex = Math.floor(Math.random() * country.hints.length);
     if (difficulty === 'hard') blurred = true;
-    if (difficulty === 'expert') { blurred = true; zoomed = true; }
+    if (difficulty === 'expert' || difficulty === 'legendary') { blurred = true; zoomed = true; }
   }
 
   return { type, country, options, correctAnswer, hintIndex, blurred, zoomed };
@@ -83,42 +84,36 @@ export interface GameOptions {
   monumentCap?: number;
 }
 
-function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number, opts?: GameOptions): Question[] {
-  let pool: Country[];
+// Pays éligibles à un niveau de difficulté donné (mélange avec le niveau voisin)
+const DIFFICULTY_POOLS: Record<Difficulty, Difficulty[]> = {
+  easy: ['easy'],
+  medium: ['easy', 'medium'],
+  hard: ['medium', 'hard'],
+  expert: ['hard', 'expert'],
+  legendary: ['expert', 'legendary'],
+};
 
+// Tire un pays pour la difficulté COURANTE (les questions sont générées une
+// à une : la difficulté adaptative peut changer en cours de partie).
+function pickCountry(mode: GameMode, difficulty: Difficulty, used: Set<string>, opts?: GameOptions): Country {
+  let pool: Country[];
   if (mode === 'map') {
-    const shapedCountries = countries.filter(c => countryShapes[c.name]);
-    pool = shuffleArray(shapedCountries).slice(0, count);
+    pool = countries.filter(c => countryShapes[c.name]);
   } else if (mode === 'explorer') {
-    const base = opts?.continents
+    pool = opts?.continents
       ? countries.filter(c => opts.continents!.includes(c.continent))
       : countries;
-    pool = shuffleArray(base).slice(0, count);
   } else {
-    const difficultyMap: Record<Difficulty, Difficulty[]> = {
-      easy: ['easy'],
-      medium: ['easy', 'medium'],
-      hard: ['medium', 'hard'],
-      expert: ['hard', 'expert'],
-    };
-    const allowedDiffs = difficultyMap[difficulty];
-    pool = shuffleArray(
-      countries.filter(c => allowedDiffs.includes(c.difficulty))
-    ).slice(0, count);
+    pool = countries.filter(c => DIFFICULTY_POOLS[difficulty].includes(c.difficulty));
   }
 
-  if (pool.length < count && mode !== 'explorer') {
-    const extra = shuffleArray(countries.filter(c => !pool.includes(c))).slice(0, count - pool.length);
-    pool = [...pool, ...extra];
+  let available = pool.filter(c => !used.has(c.name));
+  if (available.length === 0) {
+    // Tout le niveau a été vu : on libère ce pool et on repart
+    pool.forEach(c => used.delete(c.name));
+    available = pool;
   }
-
-  let monumentsUsed = 0;
-  return pool.map(c => {
-    const allowMonument = opts?.monumentCap === undefined || monumentsUsed < opts.monumentCap;
-    const q = generateQuestion(c, difficulty, mode, allowMonument);
-    if (q.type === 'monument') monumentsUsed++;
-    return q;
-  });
+  return available[Math.floor(Math.random() * available.length)];
 }
 
 export function useGameEngine() {
@@ -134,6 +129,20 @@ export function useGameEngine() {
   const questionStartRef = useRef<number>(0);
   const answeredRef = useRef(false);
   const gameOptsRef = useRef<GameOptions | undefined>(undefined);
+  const usedCountriesRef = useRef<Set<string>>(new Set());
+  const monumentsUsedRef = useRef(0);
+  // Défi du jour : questions imposées, pas d'adaptation de difficulté
+  const isPresetRef = useRef(false);
+
+  const makeQuestion = useCallback((mode: GameMode, difficulty: Difficulty): Question => {
+    const country = pickCountry(mode, difficulty, usedCountriesRef.current, gameOptsRef.current);
+    usedCountriesRef.current.add(country.name);
+    const cap = gameOptsRef.current?.monumentCap;
+    const allowMonument = cap === undefined || monumentsUsedRef.current < cap;
+    const q = generateQuestion(country, difficulty, mode, allowMonument);
+    if (q.type === 'monument') monumentsUsedRef.current++;
+    return q;
+  }, []);
 
   const clearTimers = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
@@ -148,10 +157,17 @@ export function useGameEngine() {
   const startGame = useCallback((mode: GameMode, difficulty: Difficulty, presetQuestions?: Question[], opts?: GameOptions) => {
     clearTimers();
     gameOptsRef.current = opts;
-    // presetQuestions : questions imposées (défi du jour, déterministe)
-    const totalQ = presetQuestions ? presetQuestions.length : mode === 'chrono' ? 50 : mode === 'survival' ? 50 : 15;
+    usedCountriesRef.current = new Set();
+    monumentsUsedRef.current = 0;
+    isPresetRef.current = !!presetQuestions;
+
+    // Survie et Chrono n'ont pas de fin fixe (vies / temps) ; les questions
+    // sont générées à la volée selon la difficulté adaptative courante.
+    const totalQ = presetQuestions
+      ? presetQuestions.length
+      : mode === 'chrono' || mode === 'survival' ? Number.POSITIVE_INFINITY : 15;
     const maxTime = DIFFICULTY_TIMERS[difficulty];
-    const qs = presetQuestions ?? generateQuestions(mode, difficulty, totalQ, opts);
+    const qs = presetQuestions ?? [makeQuestion(mode, difficulty)];
 
     const state: GameState = {
       mode,
@@ -188,7 +204,7 @@ export function useGameEngine() {
     if (mode === 'chrono') {
       setChronoTimeLeft(30);
     }
-  }, [clearTimers]);
+  }, [clearTimers, makeQuestion]);
 
   // Per-question countdown timer (désactivé en Chrono : seul le chrono global compte)
   useEffect(() => {
@@ -235,6 +251,11 @@ export function useGameEngine() {
     setShowResult(true);
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
 
+    // Un timeout compte comme une erreur pour la difficulté adaptative
+    const nextDifficulty = isPresetRef.current
+      ? gameState.difficulty
+      : recordAdaptiveAnswer(false).difficulty;
+
     setGameState(prev => {
       if (!prev) return prev;
       const newLives = prev.mode === 'survival' ? prev.lives - 1 : prev.lives;
@@ -244,8 +265,11 @@ export function useGameEngine() {
         multiplier: 1,
         questionsAnswered: prev.questionsAnswered + 1,
         lives: newLives,
+        difficulty: nextDifficulty,
+        maxTime: DIFFICULTY_TIMERS[nextDifficulty],
       };
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.timeLeft, gameState?.isActive]);
 
   // Handle chrono end
@@ -264,6 +288,11 @@ export function useGameEngine() {
     const speedBonus = correct ? Math.max(0, Math.floor((gameState.maxTime - timeElapsed) * 2)) : 0;
     const answeredCountry = currentQuestion.country;
     const wasFlagQuestion = currentQuestion.type === 'flag';
+
+    // Difficulté adaptative : suit les 10 dernières réponses, monte/descend en direct
+    const nextDifficulty = isPresetRef.current
+      ? gameState.difficulty
+      : recordAdaptiveAnswer(correct).difficulty;
 
     setSelectedAnswer(answer);
     setIsCorrect(correct);
@@ -295,6 +324,8 @@ export function useGameEngine() {
         correctAnswers: prev.correctAnswers + (correct ? 1 : 0),
         xpEarned: prev.xpEarned + xpGain,
         lives: newLives,
+        difficulty: nextDifficulty,
+        maxTime: DIFFICULTY_TIMERS[nextDifficulty],
         correctCountries: correct ? [...prev.correctCountries, answeredCountry.name] : prev.correctCountries,
         correctByContinent: correct
           ? { ...prev.correctByContinent, [answeredCountry.continent]: (prev.correctByContinent[answeredCountry.continent] ?? 0) + 1 }
@@ -316,14 +347,14 @@ export function useGameEngine() {
     const nextIdx = gameState.currentQuestion + 1;
     let qs = questions;
 
-    // En Survie, la partie ne s'arrête qu'à 0 vie : on régénère des
-    // questions à la volée quand on approche de la fin du tableau.
-    if (gameState.mode === 'survival' && nextIdx >= qs.length - 5) {
-      qs = [...qs, ...generateQuestions(gameState.mode, gameState.difficulty, 25, gameOptsRef.current)];
+    // Génération paresseuse : la question suivante est créée au moment voulu,
+    // avec la difficulté adaptative COURANTE.
+    if (!isPresetRef.current && nextIdx >= qs.length && nextIdx < gameState.totalQuestions) {
+      qs = [...qs, makeQuestion(gameState.mode, gameState.difficulty)];
       setQuestions(qs);
     }
 
-    if (nextIdx >= qs.length) {
+    if (nextIdx >= qs.length || nextIdx >= gameState.totalQuestions) {
       endGame();
       return;
     }
@@ -339,7 +370,7 @@ export function useGameEngine() {
     setIsCorrect(null);
     setShowResult(false);
     questionStartRef.current = Date.now();
-  }, [gameState, questions, endGame]);
+  }, [gameState, questions, endGame, makeQuestion]);
 
   return {
     gameState,

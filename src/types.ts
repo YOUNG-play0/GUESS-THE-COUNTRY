@@ -1,4 +1,7 @@
-export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'legendary';
+
+/** Échelle des difficultés, du plus simple au plus dur */
+export const DIFFICULTY_LADDER: Difficulty[] = ['easy', 'medium', 'hard', 'expert', 'legendary'];
 export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily' | 'explorer';
 export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint'
@@ -84,15 +87,20 @@ export interface GameState {
 
 export const XP_LEVELS = [
   { level: 1, xp: 0, title: 'Novice' },
-  { level: 2, xp: 100, title: 'Explorer' },
-  { level: 3, xp: 250, title: 'Voyageur' },
-  { level: 4, xp: 500, title: 'Globe-Trotter' },
-  { level: 5, xp: 800, title: 'Cartographer' },
-  { level: 6, xp: 1200, title: 'Navigator' },
-  { level: 7, xp: 1800, title: 'World Expert' },
-  { level: 8, xp: 2500, title: 'Geography Master' },
-  { level: 9, xp: 3500, title: 'Atlas Legend' },
-  { level: 10, xp: 5000, title: 'World Dominator' },
+  { level: 2, xp: 150, title: 'Curieux' },
+  { level: 3, xp: 350, title: 'Explorateur' },
+  { level: 4, xp: 600, title: 'Voyageur' },
+  { level: 5, xp: 1000, title: 'Globe-Trotter' },
+  { level: 6, xp: 1500, title: 'Cartographe' },
+  { level: 7, xp: 2200, title: 'Navigateur' },
+  { level: 8, xp: 3000, title: 'Géographe' },
+  { level: 9, xp: 4000, title: 'Expert mondial' },
+  { level: 10, xp: 5500, title: "Maître de l'Atlas" },
+  { level: 11, xp: 7500, title: 'Légende' },
+  { level: 12, xp: 10000, title: 'Grand Explorateur' },
+  { level: 13, xp: 14000, title: 'Maître du Monde' },
+  { level: 14, xp: 20000, title: 'Dominateur' },
+  { level: 15, xp: 30000, title: 'Dieu de la Géographie' },
 ];
 
 export function levelForXP(xp: number): number {
@@ -108,4 +116,5 @@ export const DIFFICULTY_TIMERS: Record<Difficulty, number> = {
   medium: 10,
   hard: 8,
   expert: 6,
+  legendary: 5,
 };
