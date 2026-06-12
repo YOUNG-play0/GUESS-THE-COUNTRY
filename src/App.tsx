@@ -116,9 +116,14 @@ function AppContent() {
     gameRecordedRef.current = false;
     prevBestRef.current = stats.bestScore;
     ghostRef.current = stats.bestScorePerMode?.[mode] ?? 0;
-    startGame(mode, difficulty);
+    const expCont = premium.explorerContinents();
+    startGame(mode, difficulty, undefined, {
+      // Gratuit : 1 question monument max par partie (Passe = illimité)
+      monumentCap: premium.isPremium ? undefined : 1,
+      continents: mode === 'explorer' && expCont !== 'all' && expCont ? expCont : undefined,
+    });
     setScreen('game');
-  }, [startGame, stats.bestScore, stats.bestScorePerMode]);
+  }, [startGame, stats.bestScore, stats.bestScorePerMode, premium]);
 
   const handleStartDaily = useCallback(() => {
     if (!stats.name) {
@@ -222,7 +227,13 @@ function AppContent() {
           )}
           {screen === 'mode-select' && (
             <motion.div key="mode-select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <ModeSelect stats={stats} onStart={handleStartGame} onBack={() => setScreen('home')} />
+              <ModeSelect
+                stats={stats}
+                explorerUnlocked={premium.explorerContinents() !== null}
+                onStart={handleStartGame}
+                onPremium={() => setScreen('premium')}
+                onBack={() => setScreen('home')}
+              />
             </motion.div>
           )}
           {screen === 'game' && gameState && (

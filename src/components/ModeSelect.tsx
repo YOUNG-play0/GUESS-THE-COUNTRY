@@ -1,16 +1,19 @@
 import { motion } from 'framer-motion';
-import { Gamepad2, Heart, Timer, Map, ArrowLeft, Lock, ChevronRight } from 'lucide-react';
+import { Gamepad2, Heart, Timer, Map, Compass, ArrowLeft, Lock, ChevronRight, Crown } from 'lucide-react';
 import { useState } from 'react';
 import { GameMode, Difficulty, PlayerStats } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   stats: PlayerStats;
+  /** Mode Explorateur accessible (Passe du Savoir ou Pack Continent) */
+  explorerUnlocked: boolean;
   onStart: (mode: GameMode, difficulty: Difficulty) => void;
+  onPremium: () => void;
   onBack: () => void;
 }
 
-export default function ModeSelect({ stats, onStart, onBack }: Props) {
+export default function ModeSelect({ stats, explorerUnlocked, onStart, onPremium, onBack }: Props) {
   const { t } = useLanguage();
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
 
@@ -19,6 +22,7 @@ export default function ModeSelect({ stats, onStart, onBack }: Props) {
     { id: 'survival' as GameMode, name: t.survival_mode, desc: t.survival_desc, icon: Heart, color: 'from-red-500 to-rose-600', shadow: 'shadow-red-500/25' },
     { id: 'chrono' as GameMode, name: t.chrono_mode, desc: t.chrono_desc, icon: Timer, color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
     { id: 'map' as GameMode, name: t.map_mode, desc: t.map_desc, icon: Map, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
+    { id: 'explorer' as GameMode, name: t.explorer_mode, desc: t.explorer_desc, icon: Compass, color: 'from-yellow-500 to-amber-600', shadow: 'shadow-yellow-500/25', premium: true },
   ];
 
   const difficulties: { id: Difficulty; name: string; emoji: string; color: string; minLevel: number }[] = [
@@ -81,6 +85,7 @@ export default function ModeSelect({ stats, onStart, onBack }: Props) {
         <div className="space-y-3">
           {modes.map((mode, i) => {
             const Icon = mode.icon;
+            const lockedPremium = mode.premium && !explorerUnlocked;
             return (
               <motion.button
                 key={mode.id}
@@ -88,17 +93,20 @@ export default function ModeSelect({ stats, onStart, onBack }: Props) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => setSelectedMode(mode.id)}
-                className={`w-full p-4 bg-gradient-to-r ${mode.color} rounded-2xl shadow-lg ${mode.shadow} flex items-center gap-4 transition-all hover:brightness-110 active:brightness-90`}
+                onClick={() => lockedPremium ? onPremium() : setSelectedMode(mode.id)}
+                className={`w-full p-4 bg-gradient-to-r ${mode.color} rounded-2xl shadow-lg ${mode.shadow} flex items-center gap-4 transition-all hover:brightness-110 active:brightness-90 ${lockedPremium ? 'opacity-80 saturate-50' : ''}`}
               >
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-left min-w-0">
-                  <p className="text-white font-bold text-lg">{mode.name}</p>
-                  <p className="text-white/70 text-xs truncate">{mode.desc}</p>
+                  <p className="text-white font-bold text-lg flex items-center gap-2">
+                    {mode.name}
+                    {mode.premium && <Crown className="w-4 h-4 text-yellow-200 shrink-0" />}
+                  </p>
+                  <p className="text-white/70 text-xs truncate">{lockedPremium ? t.premium_required : mode.desc}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-white/50 shrink-0" />
+                {lockedPremium ? <Lock className="w-5 h-5 text-white/70 shrink-0" /> : <ChevronRight className="w-5 h-5 text-white/50 shrink-0" />}
               </motion.button>
             );
           })}

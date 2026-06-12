@@ -30,6 +30,7 @@ export default function StatsScreen({ stats, onBack }: Props) {
     { mode: 'chrono', label: t.chrono_mode, games: stats.gamesPerMode.chrono, emoji: '⏱️' },
     { mode: 'map', label: t.map_mode, games: stats.gamesPerMode.map, emoji: '🗺️' },
     { mode: 'daily', label: t.daily_challenge, games: stats.gamesPerMode.daily ?? 0, emoji: '📅' },
+    { mode: 'explorer', label: t.explorer_mode, games: stats.gamesPerMode.explorer ?? 0, emoji: '🧭' },
   ];
 
   return (

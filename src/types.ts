@@ -1,7 +1,9 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
-export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily';
+export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily' | 'explorer';
 export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium';
-export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint';
+export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint'
+  // Mode Explorateur (Passe du Savoir)
+  | 'currency' | 'language' | 'population' | 'area';
 
 export interface Country {
   name: string;
@@ -12,6 +14,13 @@ export interface Country {
   capital: string;
   continent: string;
   difficulty: Difficulty;
+  /** Mode Explorateur : monnaie, langue principale, population (millions), superficie (km²) */
+  currency: string;
+  currencyFr: string;
+  language: string;
+  languageFr: string;
+  population: number;
+  area: number;
   hints: string[];
   /** Indices en français (même ordre que hints) */
   hintsFr?: string[];

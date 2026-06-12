@@ -175,6 +175,49 @@ export default function GameScreen({
             </motion.div>
           </div>
         );
+      case 'currency':
+      case 'language': {
+        const value = q.type === 'currency'
+          ? (language === 'fr' ? q.country.currencyFr : q.country.currency)
+          : (language === 'fr' ? q.country.languageFr : q.country.language);
+        return (
+          <div className="text-center">
+            <p className="text-slate-400 text-xs mb-3 flex items-center justify-center gap-1.5 uppercase tracking-wider font-medium">
+              <HelpCircle className="w-4 h-4" /> {q.type === 'currency' ? t.which_currency : t.which_language}
+            </p>
+            <motion.div
+              key={`exp-${gameState.currentQuestion}`}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 150 }}
+              className="my-5"
+            >
+              <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                <span className="text-3xl select-none">{q.type === 'currency' ? '💰' : '🗣️'}</span>
+                <span className="text-2xl font-bold text-white">{value}</span>
+              </div>
+            </motion.div>
+          </div>
+        );
+      }
+      case 'population':
+      case 'area':
+        return (
+          <div className="text-center">
+            <p className="text-slate-400 text-xs mb-3 flex items-center justify-center gap-1.5 uppercase tracking-wider font-medium">
+              <HelpCircle className="w-4 h-4" /> {q.type === 'population' ? t.which_population : t.which_area}
+            </p>
+            <motion.div
+              key={`cmp-${gameState.currentQuestion}`}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 150 }}
+              className="my-5"
+            >
+              <span className="text-6xl select-none">{q.type === 'population' ? '👥' : '📏'}</span>
+            </motion.div>
+          </div>
+        );
       case 'hint':
         return (
           <div className="text-center">
