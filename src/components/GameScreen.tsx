@@ -452,40 +452,40 @@ export default function GameScreen({
             })}
           </div>
 
-          {/* Dramatic Result Overlay */}
+          {/* Bandeau de résultat NON bloquant : petit toast en haut qui
+              s'estompe tout seul — le jeu reste visible et cliquable
+              (bouton « suivant » accessible immédiatement). */}
           <AnimatePresence>
             {showResult && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isCorrect ? 0.85 : 0.75 }}
+                key={`burst-${gameState.currentQuestion}`}
+                initial={{ opacity: 0, y: -24, scale: 0.85 }}
+                animate={{ opacity: [0, 1, 1, 0], y: 0, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className={`fixed inset-0 z-40 flex items-center justify-center pointer-events-none ${
-                  isCorrect ? 'bg-emerald-500/90' : selectedAnswer === '__timeout__' ? 'bg-yellow-500/85' : 'bg-red-500/90'
-                }`}
+                transition={{ duration: 1.4, times: [0, 0.12, 0.7, 1] }}
+                className="fixed top-14 inset-x-0 z-30 flex justify-center pointer-events-none px-4"
               >
-                <motion.div
-                  initial={{ scale: 0.2, rotate: isCorrect ? -12 : 12 }}
-                  animate={{ scale: 1, rotate: 0, transition: { type: 'spring', bounce: 0.4, duration: 0.6 } }}
-                  className="text-center px-8"
+                <div
+                  className={`px-5 py-2.5 rounded-2xl backdrop-blur-md border shadow-xl flex items-center gap-2.5 ${
+                    isCorrect
+                      ? 'bg-emerald-600/85 border-emerald-300/40'
+                      : selectedAnswer === '__timeout__'
+                        ? 'bg-yellow-600/85 border-yellow-300/40'
+                        : 'bg-red-600/85 border-red-300/40'
+                  }`}
                 >
-                  <div className="text-[100px] mb-2 drop-shadow-2xl select-none">
+                  <span className="text-2xl select-none">
                     {isCorrect ? '🎉' : selectedAnswer === '__timeout__' ? '⏰' : '💥'}
-                  </div>
-                  <motion.p initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-4xl font-black tracking-tighter mb-2 drop-shadow-xl text-white">
+                  </span>
+                  <span className="text-white font-black text-lg tracking-tight">
                     {isCorrect ? t.excellent : selectedAnswer === '__timeout__' ? t.times_up : t.incorrect}
-                  </motion.p>
+                  </span>
                   {isCorrect && gameState.multiplier > 1 && (
-                    <motion.div
-                      initial={{ scale: 0.6, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="inline-block bg-white/20 backdrop-blur-md px-6 py-1.5 rounded-3xl text-white font-bold text-xl border border-white/30"
-                    >
+                    <span className="bg-white/20 px-2.5 py-0.5 rounded-xl text-white font-bold text-sm border border-white/30">
                       ×{gameState.multiplier} {t.combo_text} 🔥
-                    </motion.div>
+                    </span>
                   )}
-                </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
