@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { Trophy, Zap, Target, Flame, Star, Home, RotateCcw, Copy, Check, Share2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameState, XP_LEVELS } from '../types';
+import { playFanfare } from '../utils/sound';
+import { haptics } from '../utils/haptics';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -52,6 +54,15 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
       setTimeout(() => setLinkCopied(false), 2000);
     });
   };
+  // Fanfare sur nouveau record
+  useEffect(() => {
+    if (isNewBest) {
+      playFanfare();
+      haptics.celebrate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const currentLevelData = XP_LEVELS.find(l => l.level === playerLevel) || XP_LEVELS[0];
   const nextLevelData = XP_LEVELS.find(l => l.level === playerLevel + 1);
   const xpProgress = nextLevelData ? ((playerXP - currentLevelData.xp) / (nextLevelData.xp - currentLevelData.xp)) * 100 : 100;

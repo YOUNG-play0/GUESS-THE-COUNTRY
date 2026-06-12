@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BadgeDef, badgeLabel } from '../data/badges';
+import { playFanfare } from '../utils/sound';
+import { haptics } from '../utils/haptics';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -11,6 +14,13 @@ interface Props {
 // viennent d'être débloqués.
 export default function BadgePopup({ badges, onClose }: Props) {
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (badges.length > 0) {
+      playFanfare();
+      haptics.celebrate();
+    }
+  }, [badges.length]);
 
   return (
     <AnimatePresence>

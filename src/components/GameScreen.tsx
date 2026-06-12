@@ -1,5 +1,7 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playCorrect, playWrong, playTick } from '../utils/sound';
+import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
@@ -66,13 +68,34 @@ export default function GameScreen({
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
     onAnswer(answer);
-    if (navigator.vibrate) {
-      // Vibrate after answer - we check correctness from the answer matching
-      const correct = currentQuestion?.correctAnswer === answer;
-      if (!correct) navigator.vibrate([50, 30, 50]);
-      else navigator.vibrate(15);
-    }
   };
+
+  // Son + vibration au résultat (réponse cliquée OU temps écoulé)
+  useEffect(() => {
+    if (!showResult || isCorrect === null) return;
+    if (isCorrect) {
+      playCorrect(gameState.combo);
+      haptics.correct();
+    } else {
+      playWrong();
+      haptics.wrong();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResult]);
+
+  // Tic-tac dramatique sous 3 s (timer par question ; en Chrono : 5 dernières s du global)
+  const questionSec = Math.ceil(gameState.timeLeft);
+  const chronoSec = Math.ceil(chronoTimeLeft);
+  useEffect(() => {
+    if (!gameState.isActive || showResult || gameState.mode === 'chrono') return;
+    if (questionSec <= 3 && questionSec > 0) playTick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionSec]);
+  useEffect(() => {
+    if (!gameState.isActive || gameState.mode !== 'chrono') return;
+    if (chronoSec <= 5 && chronoSec > 0) playTick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chronoSec]);
 
   if (!currentQuestion) return null;
 

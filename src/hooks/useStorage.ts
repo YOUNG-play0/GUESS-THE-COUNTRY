@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { PlayerStats, GameMode } from '../types';
+import { PlayerStats, GameMode, levelForXP } from '../types';
 
 const DEFAULT_STATS: PlayerStats = {
   name: '',
@@ -55,14 +55,7 @@ export function useStorage() {
   const addXP = useCallback((amount: number) => {
     setStats(prev => {
       const newXP = prev.xp + amount;
-      const XP_LEVELS = [0, 100, 250, 500, 800, 1200, 1800, 2500, 3500, 5000];
-      let newLevel = 1;
-      for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
-        if (newXP >= XP_LEVELS[i]) {
-          newLevel = i + 1;
-          break;
-        }
-      }
+      const newLevel = Math.max(prev.level, levelForXP(newXP));
       const unlockedDiffs = prev.unlockedDifficulties.slice();
       if (newLevel >= 2 && !unlockedDiffs.includes('medium')) unlockedDiffs.push('medium');
       if (newLevel >= 4 && !unlockedDiffs.includes('hard')) unlockedDiffs.push('hard');

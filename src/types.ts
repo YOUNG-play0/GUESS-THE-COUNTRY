@@ -84,6 +84,14 @@ export const XP_LEVELS = [
   { level: 10, xp: 5000, title: 'World Dominator' },
 ];
 
+export function levelForXP(xp: number): number {
+  let level = 1;
+  for (const l of XP_LEVELS) {
+    if (xp >= l.xp) level = l.level;
+  }
+  return level;
+}
+
 export const DIFFICULTY_TIMERS: Record<Difficulty, number> = {
   easy: 12,
   medium: 10,

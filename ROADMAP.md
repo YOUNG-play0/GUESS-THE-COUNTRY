@@ -58,8 +58,8 @@
 - [x] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
 
 ### 3C. Le "juice" (ressenti)
-- [ ] **3.6** 🔊 **Sons** : ding croissant en pitch sur le combo, tic-tac dramatique sous 3 s, fanfare de niveau (Web Audio API, pas de fichiers lourds)
-- [ ] **3.7** 📳 **Vibrations** (`navigator.vibrate`) : courte sur bonne réponse, double sur erreur
+- [x] **3.6** 🔊 **Sons** : ding croissant en pitch sur le combo, tic-tac dramatique sous 3 s, fanfare de niveau (Web Audio API, pas de fichiers lourds)
+- [x] **3.7** 📳 **Vibrations** (`navigator.vibrate`) : courte sur bonne réponse, double sur erreur
 - [ ] **3.8** ⚡ **Bouton REVANCHE** en 1 tap sur l'écran Game Over + message "Record battu de justesse ! Il te manquait 40 pts"
 - [ ] **3.9** 👻 **Duel fantôme** : barre de progression de ton record en temps réel pendant la partie (aucun serveur nécessaire)
 
