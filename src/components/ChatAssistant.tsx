@@ -21,19 +21,18 @@ export default function ChatAssistant() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Bouton flottant : en HAUT à droite, sous le sélecteur de langue
+          (en bas il masquait le contenu et gênait la BottomNav sur mobile) */}
       <motion.button
         onClick={() => setIsOpen(true)}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-2xl shadow-2xl shadow-indigo-500/30 border border-white/20 font-medium text-sm"
-        initial={{ opacity: 0, y: 20 }}
+        aria-label={t.chat_title}
+        className="fixed top-16 right-3 z-40 w-10 h-10 flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg shadow-indigo-500/30 border border-white/20"
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
       >
-        <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-          <MessageCircle className="w-4 h-4" />
-        </div>
-        <span className="hidden sm:inline">{t.chat_title}</span>
+        <MessageCircle className="w-5 h-5" />
       </motion.button>
 
       {/* Modal */}
