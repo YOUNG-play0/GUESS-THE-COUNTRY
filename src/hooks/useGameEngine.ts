@@ -98,11 +98,12 @@ export function useGameEngine() {
     setGameState(prev => prev ? { ...prev, isActive: false } : prev);
   }, [clearTimers]);
 
-  const startGame = useCallback((mode: GameMode, difficulty: Difficulty) => {
+  const startGame = useCallback((mode: GameMode, difficulty: Difficulty, presetQuestions?: Question[]) => {
     clearTimers();
-    const totalQ = mode === 'chrono' ? 50 : mode === 'survival' ? 50 : 15;
+    // presetQuestions : questions imposées (défi du jour, déterministe)
+    const totalQ = presetQuestions ? presetQuestions.length : mode === 'chrono' ? 50 : mode === 'survival' ? 50 : 15;
     const maxTime = DIFFICULTY_TIMERS[difficulty];
-    const qs = generateQuestions(mode, difficulty, totalQ);
+    const qs = presetQuestions ?? generateQuestions(mode, difficulty, totalQ);
 
     const state: GameState = {
       mode,

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Trophy, Zap, Target, Flame, Star, Home, RotateCcw, Copy, Check } from 'lucide-react';
+import { Trophy, Zap, Target, Flame, Star, Home, RotateCcw, Copy, Check, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { GameState, XP_LEVELS } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -16,8 +16,24 @@ interface Props {
 export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, onPlayAgain, onHome }: Props) {
   const { t } = useLanguage();
   const [linkCopied, setLinkCopied] = useState(false);
+  const [dailyShared, setDailyShared] = useState(false);
   const accuracy = gameState.questionsAnswered > 0 ? Math.round((gameState.correctAnswers / gameState.questionsAnswered) * 100) : 0;
   const DISCORD_URL = 'https://discord.gg/wzqAHmG3jt';
+  const isDaily = gameState.mode === 'daily';
+
+  const shareDaily = () => {
+    const text = t.daily_share_text
+      .replace('{score}', String(gameState.correctAnswers))
+      .replace('{total}', String(gameState.totalQuestions));
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+      return;
+    }
+    navigator.clipboard?.writeText(text).then(() => {
+      setDailyShared(true);
+      setTimeout(() => setDailyShared(false), 2000);
+    }).catch(() => {});
+  };
 
   const copyDiscordLink = () => {
     navigator.clipboard.writeText(DISCORD_URL).then(() => {
@@ -96,14 +112,16 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
           className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-4"
         >
           <div className="text-center mb-4">
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t.final_score}</p>
-            <motion.p 
-              initial={{ scale: 0.5 }} 
-              animate={{ scale: 1 }} 
-              transition={{ delay: 0.6, type: 'spring' }} 
+            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">
+              {isDaily ? `📅 ${t.daily_challenge}` : t.final_score}
+            </p>
+            <motion.p
+              initial={{ scale: 0.5 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6, type: 'spring' }}
               className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400"
             >
-              {gameState.score}
+              {isDaily ? `${gameState.correctAnswers}/${gameState.totalQuestions}` : gameState.score}
             </motion.p>
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -190,13 +208,24 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
           transition={{ delay: 0.9 }} 
           className="space-y-3"
         >
-          <motion.button 
-            whileTap={{ scale: 0.97 }} 
-            onClick={onPlayAgain} 
-            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
-          >
-            <RotateCcw className="w-5 h-5" /> {t.play_again}
-          </motion.button>
+          {isDaily ? (
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={shareDaily}
+              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
+            >
+              {dailyShared ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
+              {dailyShared ? t.copied_clipboard : t.share_score}
+            </motion.button>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={onPlayAgain}
+              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+            >
+              <RotateCcw className="w-5 h-5" /> {t.play_again}
+            </motion.button>
+          )}
           <motion.button 
             whileTap={{ scale: 0.96 }} 
             onClick={onHome} 

@@ -9,8 +9,16 @@ export interface StreakState {
   freezes: number;
 }
 
+export interface DailyState {
+  date: string;   // YYYY-MM-DD du défi tenté
+  correct: number;
+  total: number;
+  finished: boolean;
+}
+
 export interface ProgressState {
   streak: StreakState;
+  daily: DailyState | null;
 }
 
 const STORAGE_KEY = 'gtc_progress';
@@ -19,6 +27,7 @@ export const MAX_FREEZES = 2;
 
 const DEFAULT_PROGRESS: ProgressState = {
   streak: { count: 0, lastDay: '', freezes: 0 },
+  daily: null,
 };
 
 export function todayKey(date = new Date()): string {
@@ -92,6 +101,21 @@ export function useProgress() {
     update(p => p.streak.freezes >= MAX_FREEZES ? p : { ...p, streak: { ...p.streak, freezes: p.streak.freezes + 1 } });
   }, [update]);
 
+  // L'unique tentative du jour est consommée dès le lancement du défi
+  // (quitter en cours de route ne permet pas de retenter).
+  const startDaily = useCallback((total: number) => {
+    update(p => ({ ...p, daily: { date: todayKey(), correct: 0, total, finished: false } }));
+  }, [update]);
+
+  const finishDaily = useCallback((correct: number) => {
+    update(p => p.daily && p.daily.date === todayKey()
+      ? { ...p, daily: { ...p.daily, correct, finished: true } }
+      : p);
+  }, [update]);
+
+  const dailyToday: DailyState | null =
+    progress.daily && progress.daily.date === todayKey() ? progress.daily : null;
+
   return {
     progress,
     update,
@@ -99,5 +123,8 @@ export function useProgress() {
     freezes: progress.streak.freezes,
     touchStreak,
     addFreeze,
+    dailyToday,
+    startDaily,
+    finishDaily,
   };
 }

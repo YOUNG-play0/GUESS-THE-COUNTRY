@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { Globe2, BarChart3, User, Play, Zap } from 'lucide-react';
+import { Globe2, BarChart3, User, Play, Zap, CalendarCheck } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
+import { DailyState } from '../hooks/useProgress';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -10,10 +11,12 @@ interface Props {
   maxFreezes: number;
   freezeCost: number;
   onBuyFreeze: () => void;
+  daily: DailyState | null;
+  onPlayDaily: () => void;
   onNavigate: (screen: Screen) => void;
 }
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -127,6 +130,31 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           <Play className="w-6 h-6" fill="currentColor" />
           {t.play_now}
         </motion.button>
+
+        {/* Défi du jour : 5 questions identiques pour tous, 1 tentative */}
+        {daily ? (
+          <div className="w-full py-3.5 px-5 bg-white/5 border border-emerald-500/25 rounded-2xl flex items-center gap-3">
+            <CalendarCheck className="w-6 h-6 text-emerald-400 shrink-0" />
+            <div className="flex-1 text-left">
+              <p className="text-white font-bold text-sm">
+                {t.daily_challenge} — {daily.correct}/{daily.total} ✅
+              </p>
+              <p className="text-slate-400 text-xs">{t.come_back_tomorrow}</p>
+            </div>
+          </div>
+        ) : (
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={onPlayDaily}
+            className="w-full py-3.5 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center gap-3 transition-all"
+          >
+            <span className="text-2xl select-none">📅</span>
+            <span className="flex-1 text-left">
+              <span className="block font-bold text-sm">{t.daily_challenge}</span>
+              <span className="block text-emerald-100/80 text-xs">{t.daily_desc}</span>
+            </span>
+          </motion.button>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <motion.button

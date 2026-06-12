@@ -147,6 +147,10 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  daily_challenge: string;
+  daily_desc: string;
+  come_back_tomorrow: string;
+  daily_share_text: string;
   day_streak: string;
   streak_freezes: string;
   buy_freeze: string;
@@ -286,6 +290,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    daily_challenge: 'Daily Challenge',
+    daily_desc: '5 questions, one attempt — same for everyone!',
+    come_back_tomorrow: 'Come back tomorrow!',
+    daily_share_text: '🌍 {score}/{total} on today\'s GeoQuiz daily challenge! Can you do better?',
     day_streak: 'day streak',
     streak_freezes: 'Streak freezes',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -424,6 +432,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    daily_challenge: 'Défi du jour',
+    daily_desc: '5 questions, une seule tentative — les mêmes pour tous !',
+    come_back_tomorrow: 'Reviens demain !',
+    daily_share_text: '🌍 {score}/{total} au GeoQuiz du jour ! Tu peux faire mieux ?',
     day_streak: 'jours de suite',
     streak_freezes: 'Gels de série',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -562,6 +574,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    daily_challenge: 'Desafío del día',
+    daily_desc: '5 preguntas, un solo intento — ¡las mismas para todos!',
+    come_back_tomorrow: '¡Vuelve mañana!',
+    daily_share_text: '🌍 ¡{score}/{total} en el GeoQuiz del día! ¿Puedes superarlo?',
     day_streak: 'días seguidos',
     streak_freezes: 'Congelaciones de racha',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -700,6 +716,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    daily_challenge: 'Tages-Challenge',
+    daily_desc: '5 Fragen, ein Versuch — für alle gleich!',
+    come_back_tomorrow: 'Komm morgen wieder!',
+    daily_share_text: '🌍 {score}/{total} bei der GeoQuiz-Tages-Challenge! Schaffst du mehr?',
     day_streak: 'Tage in Folge',
     streak_freezes: 'Serien-Schutz',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -838,6 +858,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    daily_challenge: 'Desafio do dia',
+    daily_desc: '5 perguntas, uma tentativa — as mesmas para todos!',
+    come_back_tomorrow: 'Volte amanhã!',
+    daily_share_text: '🌍 {score}/{total} no GeoQuiz do dia! Consegue fazer melhor?',
     day_streak: 'dias seguidos',
     streak_freezes: 'Congelamentos de sequência',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -976,6 +1000,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    daily_challenge: '每日挑战',
+    daily_desc: '5道题，仅一次机会——所有人题目相同！',
+    come_back_tomorrow: '明天再来！',
+    daily_share_text: '🌍 今日GeoQuiz挑战 {score}/{total}！你能更好吗？',
     day_streak: '连续天数',
     streak_freezes: '连胜冻结',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -1114,6 +1142,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    daily_challenge: 'デイリーチャレンジ',
+    daily_desc: '5問、挑戦は1回だけ — みんな同じ問題！',
+    come_back_tomorrow: 'また明日！',
+    daily_share_text: '🌍 今日のGeoQuizで{score}/{total}！君はもっとできる？',
     day_streak: '日連続',
     streak_freezes: 'ストリーク保護',
     buy_freeze: '+1 ❄️ (200 XP)',
@@ -1252,6 +1284,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    daily_challenge: 'تحدي اليوم',
+    daily_desc: '5 أسئلة، محاولة واحدة — نفس الأسئلة للجميع!',
+    come_back_tomorrow: '!عُد غدًا',
+    daily_share_text: '🌍 {score}/{total} في تحدي GeoQuiz اليومي! هل يمكنك التفوق؟',
     day_streak: 'أيام متتالية',
     streak_freezes: 'تجميد السلسلة',
     buy_freeze: '+1 ❄️ (200 XP)',

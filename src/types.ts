@@ -1,5 +1,5 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
-export type GameMode = 'classic' | 'survival' | 'chrono' | 'map';
+export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily';
 export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint';
 

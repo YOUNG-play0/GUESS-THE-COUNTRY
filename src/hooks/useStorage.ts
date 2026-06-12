@@ -11,14 +11,23 @@ const DEFAULT_STATS: PlayerStats = {
   totalAnswers: 0,
   xp: 0,
   level: 1,
-  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0 },
+  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0, daily: 0 },
   unlockedDifficulties: ['easy'],
 };
 
 function loadStats(): PlayerStats {
   try {
     const raw = localStorage.getItem('gtc_stats');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      // Fusion avec les valeurs par défaut : les données enregistrées par
+      // d'anciennes versions n'ont pas forcément tous les champs (ex: daily)
+      const parsed = JSON.parse(raw);
+      return {
+        ...DEFAULT_STATS,
+        ...parsed,
+        gamesPerMode: { ...DEFAULT_STATS.gamesPerMode, ...parsed.gamesPerMode },
+      };
+    }
   } catch {}
   return { ...DEFAULT_STATS };
 }
@@ -75,7 +84,7 @@ export function useStorage() {
         bestCombo: Math.max(prev.bestCombo, combo),
         correctAnswers: prev.correctAnswers + correct,
         totalAnswers: prev.totalAnswers + total,
-        gamesPerMode: { ...prev.gamesPerMode, [mode]: prev.gamesPerMode[mode] + 1 },
+        gamesPerMode: { ...prev.gamesPerMode, [mode]: (prev.gamesPerMode[mode] ?? 0) + 1 },
       };
       saveStats(next);
       return next;

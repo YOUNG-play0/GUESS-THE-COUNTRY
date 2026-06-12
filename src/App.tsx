@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Screen, GameMode, Difficulty } from './types';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
-import { useProgress, FREEZE_COST_XP, MAX_FREEZES } from './hooks/useProgress';
+import { useProgress, FREEZE_COST_XP, MAX_FREEZES, todayKey } from './hooks/useProgress';
+import { generateDailyQuestions } from './utils/daily';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import WorldBackground from './components/WorldBackground';
 import HomeScreen from './components/HomeScreen';
@@ -34,7 +35,7 @@ function AppContent() {
     setPlayerName,
   } = useStorage();
 
-  const { streak, freezes, touchStreak, addFreeze } = useProgress();
+  const { streak, freezes, touchStreak, addFreeze, dailyToday, startDaily, finishDaily } = useProgress();
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -66,6 +67,7 @@ function AppContent() {
         gameState.questionsAnswered
       );
       touchStreak();
+      if (gameState.mode === 'daily') finishDaily(gameState.correctAnswers);
       setScreen('game-over');
     }
   }, [gameState?.isActive]);
@@ -77,6 +79,18 @@ function AppContent() {
     startGame(mode, difficulty);
     setScreen('game');
   }, [startGame]);
+
+  const handleStartDaily = useCallback(() => {
+    if (!stats.name) {
+      setScreen('name-entry');
+      return;
+    }
+    const qs = generateDailyQuestions(todayKey());
+    startDaily(qs.length);
+    gameRecordedRef.current = false;
+    startGame('daily', 'medium', qs);
+    setScreen('game');
+  }, [stats.name, startDaily, startGame]);
 
   const handleQuitGame = useCallback(() => {
     clearTimers();
@@ -133,6 +147,8 @@ function AppContent() {
                 maxFreezes={MAX_FREEZES}
                 freezeCost={FREEZE_COST_XP}
                 onBuyFreeze={handleBuyFreeze}
+                daily={dailyToday}
+                onPlayDaily={handleStartDaily}
                 onNavigate={setScreen}
               />
             </motion.div>
