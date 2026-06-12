@@ -216,11 +216,11 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => onNavigate('stats')}
-            className="py-4 px-3 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
+            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
           >
             <BarChart3 className="w-6 h-6 text-emerald-400" />
             <span className="text-xs font-semibold">{t.stats}</span>
@@ -228,8 +228,17 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
 
           <motion.button
             whileTap={{ scale: 0.95 }}
+            onClick={() => onNavigate('passport')}
+            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
+          >
+            <span className="text-2xl leading-6 select-none">🛂</span>
+            <span className="text-xs font-semibold">{t.passport}</span>
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => onNavigate('profile')}
-            className="py-4 px-3 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
+            className="py-4 px-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 active:bg-white/15 text-white rounded-2xl flex flex-col items-center gap-2 transition-all"
           >
             <User className="w-6 h-6 text-blue-400" />
             <span className="text-xs font-semibold">{t.profile}</span>

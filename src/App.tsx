@@ -14,6 +14,7 @@ import GameScreen from './components/GameScreen';
 import GameOver from './components/GameOver';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
+import PassportScreen from './components/PassportScreen';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
@@ -38,7 +39,7 @@ function AppContent() {
   const {
     streak, freezes, touchStreak, addFreeze,
     dailyToday, startDaily, finishDaily,
-    questsToday, applyGameSummary,
+    questsToday, applyGameSummary, passport,
   } = useProgress();
 
   const handleBuyFreeze = useCallback(() => {
@@ -208,6 +209,11 @@ function AppContent() {
           {screen === 'stats' && (
             <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <StatsScreen stats={stats} onBack={() => setScreen('home')} />
+            </motion.div>
+          )}
+          {screen === 'passport' && (
+            <motion.div key="passport" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <PassportScreen passport={passport} onBack={() => setScreen('home')} />
             </motion.div>
           )}
           {screen === 'profile' && (

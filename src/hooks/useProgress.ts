@@ -43,6 +43,8 @@ export interface ProgressState {
   streak: StreakState;
   daily: DailyState | null;
   quests: { date: string; items: QuestItem[] } | null;
+  /** Passeport : noms (EN) des pays correctement devinés au moins une fois */
+  passport: string[];
 }
 
 export const QUEST_XP_REWARD = 30;
@@ -94,6 +96,7 @@ const DEFAULT_PROGRESS: ProgressState = {
   streak: { count: 0, lastDay: '', freezes: 0 },
   daily: null,
   quests: null,
+  passport: [],
 };
 
 export function todayKey(date = new Date()): string {
@@ -196,7 +199,13 @@ export function useProgress() {
       ? progress.quests.items
       : generateQuests(today);
     const { items, xpGained } = applyGameToQuests(base, summary);
-    update(p => ({ ...p, quests: { date: today, items } }));
+    update(p => ({
+      ...p,
+      quests: { date: today, items },
+      passport: summary.correctCountries.length
+        ? [...new Set([...p.passport, ...summary.correctCountries])]
+        : p.passport,
+    }));
     return xpGained;
   }, [progress.quests, update]);
 
@@ -212,5 +221,6 @@ export function useProgress() {
     finishDaily,
     questsToday,
     applyGameSummary,
+    passport: progress.passport,
   };
 }

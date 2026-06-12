@@ -54,7 +54,7 @@
 - [x] **3.3** 🎯 **3 quêtes quotidiennes** ("10 questions sur l'Afrique", "Combo x5"...) avec récompenses XP
 
 ### 3B. Collection et progression
-- [ ] **3.4** 🛂 **Le Passeport** : chaque pays correctement deviné se débloque (drapeau coloré vs grisé), progression par continent "Europe 24/44"
+- [x] **3.4** 🛂 **Le Passeport** : chaque pays correctement deviné se débloque (drapeau coloré vs grisé), progression par continent "Europe 24/44"
 - [ ] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
 
 ### 3C. Le "juice" (ressenti)

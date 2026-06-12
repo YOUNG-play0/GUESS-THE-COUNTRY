@@ -147,6 +147,8 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  passport: string;
+  passport_desc: string;
   daily_quests: string;
   quest_correct: string;
   quest_combo: string;
@@ -303,6 +305,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    passport: 'Passport',
+    passport_desc: 'Every country you guess right gets stamped',
     daily_quests: 'Daily quests',
     quest_correct: '{n} correct answers',
     quest_combo: 'Reach a x{n} combo',
@@ -458,6 +462,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    passport: 'Passeport',
+    passport_desc: 'Chaque pays correctement deviné est tamponné',
     daily_quests: 'Quêtes du jour',
     quest_correct: '{n} bonnes réponses',
     quest_combo: 'Atteins un combo x{n}',
@@ -613,6 +619,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    passport: 'Pasaporte',
+    passport_desc: 'Cada país que aciertas queda sellado',
     daily_quests: 'Misiones del día',
     quest_correct: '{n} respuestas correctas',
     quest_combo: 'Logra un combo x{n}',
@@ -768,6 +776,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    passport: 'Reisepass',
+    passport_desc: 'Jedes richtig erratene Land wird gestempelt',
     daily_quests: 'Tagesquests',
     quest_correct: '{n} richtige Antworten',
     quest_combo: 'Erreiche eine x{n}-Combo',
@@ -923,6 +933,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    passport: 'Passaporte',
+    passport_desc: 'Cada país que você acerta é carimbado',
     daily_quests: 'Missões do dia',
     quest_correct: '{n} respostas corretas',
     quest_combo: 'Alcance um combo x{n}',
@@ -1078,6 +1090,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    passport: '护照',
+    passport_desc: '每答对一个国家就盖一个章',
     daily_quests: '每日任务',
     quest_correct: '答对{n}题',
     quest_combo: '达成x{n}连击',
@@ -1233,6 +1247,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    passport: 'パスポート',
+    passport_desc: '正解した国にスタンプが押される',
     daily_quests: 'デイリークエスト',
     quest_correct: '{n}問正解する',
     quest_combo: 'コンボx{n}を達成',
@@ -1388,6 +1404,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    passport: 'جواز السفر',
+    passport_desc: 'كل دولة تخمنها بشكل صحيح تُختم',
     daily_quests: 'مهام اليوم',
     quest_correct: '{n} إجابات صحيحة',
     quest_combo: 'حقّق كومبو x{n}',
