@@ -97,7 +97,14 @@
 - [ ] **6.2** Répondre aux avis utilisateurs
 - [ ] **6.3** Mises à jour régulières (astuce : comme c'est une TWA, le contenu web se met à jour SANS repasser par le Play Store — seules les modifs du manifest nécessitent un nouvel .aab)
 - [ ] **6.4** Ajouter le backend (notifications + classement, phase 3D)
-- [ ] **6.5** Envisager la monétisation douce (pas de pub agressive : ça tue la rétention)
+### 6.5 💎 Monétisation douce — le « Passe du Savoir » (pas de pub agressive : ça tue la rétention)
+
+- [ ] **6.5.1** 💳 Mettre en place le **système d'abonnement via Google Play Billing** (l'app est une TWA : passer par la Digital Goods API + Play Billing, activer `playBilling` dans le package PWABuilder)
+- [ ] **6.5.2** 🆓 **Version gratuite** (le cœur du jeu reste complet) : les 4 modes, les 195 pays, le streak, le défi du jour, le passeport de base
+- [ ] **6.5.3** 💎 **Passe du Savoir** (contenu premium) : Mode Explorateur, questions monuments illimitées, thèmes visuels, statistiques détaillées, gel de streak offert 1/semaine, quêtes premium, badges dorés
+- [ ] **6.5.4** 🗺️ **Pack Continent** : achat unique à 0,99 € (déblocage définitif d'un continent premium au choix)
+- [ ] **6.5.5** ✨ **Écran de présentation du Passe du Savoir** dans l'app (avantages, prix, bouton d'essai — accessible depuis l'accueil et le profil, jamais en interruption de partie)
+- [ ] **6.5.6** 💶 **Prix** : 2,99 €/mois ou 14,99 €/an, avec **7 jours d'essai gratuit**
 
 ---
 
