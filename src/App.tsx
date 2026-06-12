@@ -8,6 +8,7 @@ import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
 import { useProgress, FREEZE_COST_XP, MAX_FREEZES, todayKey } from './hooks/useProgress';
+import { usePremium } from './hooks/usePremium';
 import { generateDailyQuestions } from './utils/daily';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import WorldBackground from './components/WorldBackground';
@@ -19,6 +20,7 @@ import GameOver from './components/GameOver';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import PassportScreen from './components/PassportScreen';
+import PremiumScreen from './components/PremiumScreen';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
@@ -52,6 +54,7 @@ function AppContent() {
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
+  const premium = usePremium();
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -259,6 +262,20 @@ function AppContent() {
           {screen === 'passport' && (
             <motion.div key="passport" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <PassportScreen passport={passport} onBack={() => setScreen('home')} />
+            </motion.div>
+          )}
+          {screen === 'premium' && (
+            <motion.div key="premium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <PremiumScreen
+                plan={premium.plan}
+                trialDaysLeft={premium.trialDaysLeft}
+                trialUsed={premium.trialUsed}
+                continentPacks={premium.continentPacks}
+                onStartTrial={premium.startTrial}
+                onSubscribe={premium.subscribe}
+                onBuyPack={premium.buyContinentPack}
+                onBack={() => setScreen('home')}
+              />
             </motion.div>
           )}
           {screen === 'profile' && (

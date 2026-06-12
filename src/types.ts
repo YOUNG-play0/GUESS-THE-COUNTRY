@@ -1,6 +1,6 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily';
-export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport';
+export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint';
 
 export interface Country {
