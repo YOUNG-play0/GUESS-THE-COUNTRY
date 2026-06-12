@@ -63,6 +63,12 @@ export interface GameState {
   correctAnswers: number;
   isActive: boolean;
   isPaused: boolean;
+  /** Pays correctement devinés pendant la partie (passeport) */
+  correctCountries: string[];
+  /** Bonnes réponses par continent (quêtes) */
+  correctByContinent: Record<string, number>;
+  /** Bonnes réponses aux questions drapeau (quêtes) */
+  correctFlags: number;
 }
 
 export const XP_LEVELS = [

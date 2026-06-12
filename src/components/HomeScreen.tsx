@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Globe2, BarChart3, User, Play, Zap, CalendarCheck } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
-import { DailyState } from '../hooks/useProgress';
+import { DailyState, QuestItem, QUEST_XP_REWARD } from '../hooks/useProgress';
+import { Translations } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -13,10 +14,39 @@ interface Props {
   onBuyFreeze: () => void;
   daily: DailyState | null;
   onPlayDaily: () => void;
+  quests: QuestItem[];
   onNavigate: (screen: Screen) => void;
 }
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, onNavigate }: Props) {
+export function continentLabel(continent: string, t: Translations): string {
+  switch (continent) {
+    case 'Europe': return t.continent_europe;
+    case 'Asia': return t.continent_asia;
+    case 'Africa': return t.continent_africa;
+    case 'North America': return t.continent_north_america;
+    case 'South America': return t.continent_south_america;
+    case 'Oceania': return t.continent_oceania;
+    default: return continent;
+  }
+}
+
+function questLabel(q: QuestItem, t: Translations): string {
+  const n = String(q.target);
+  switch (q.id) {
+    case 'correct': return t.quest_correct.replace('{n}', n);
+    case 'combo': return t.quest_combo.replace('{n}', n);
+    case 'continent': return t.quest_continent.replace('{n}', n).replace('{continent}', continentLabel(q.continent ?? '', t));
+    case 'games': return t.quest_games.replace('{n}', n);
+    case 'score': return t.quest_score.replace('{n}', n);
+    case 'flags': return t.quest_flags.replace('{n}', n);
+  }
+}
+
+const QUEST_EMOJI: Record<QuestItem['id'], string> = {
+  correct: '🎯', combo: '🔥', continent: '🌍', games: '🎮', score: '⚡', flags: '🚩',
+};
+
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -154,6 +184,36 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
               <span className="block text-emerald-100/80 text-xs">{t.daily_desc}</span>
             </span>
           </motion.button>
+        )}
+
+        {/* Quêtes quotidiennes */}
+        {stats.totalGames > 0 && (
+          <div className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
+            <p className="text-slate-300 text-xs font-bold uppercase tracking-wider mb-2.5">🎯 {t.daily_quests}</p>
+            <div className="space-y-2.5">
+              {quests.map(q => (
+                <div key={q.id} className={q.done ? 'opacity-60' : ''}>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[13px] text-slate-200 flex items-center gap-1.5 min-w-0">
+                      <span className="select-none">{QUEST_EMOJI[q.id]}</span>
+                      <span className="truncate">{questLabel(q, t)}</span>
+                    </span>
+                    <span className={`text-[11px] font-bold shrink-0 ${q.done ? 'text-emerald-400' : 'text-slate-400'}`}>
+                      {q.done ? `✓ +${QUEST_XP_REWARD} XP` : `${q.progress}/${q.target}`}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${q.done ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(100, (q.progress / q.target) * 100)}%` }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         <div className="grid grid-cols-2 gap-3">

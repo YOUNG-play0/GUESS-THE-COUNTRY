@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { GameMode } from '../types';
+import { hashString, mulberry32, seededShuffle } from '../utils/daily';
 
 // Progression « méta » du joueur (hors stats de parties) : série de jours,
 // défi du jour, quêtes, passeport, succès. Tout est local (localStorage).
@@ -16,9 +18,72 @@ export interface DailyState {
   finished: boolean;
 }
 
+export type QuestId = 'correct' | 'combo' | 'continent' | 'games' | 'score' | 'flags';
+
+export interface QuestItem {
+  id: QuestId;
+  target: number;
+  progress: number;
+  done: boolean;
+  continent?: string;
+}
+
+/** Résumé d'une partie terminée, transmis par App à la fin de chaque jeu */
+export interface GameSummary {
+  mode: GameMode;
+  score: number;
+  bestCombo: number;
+  correctAnswers: number;
+  correctByContinent: Record<string, number>;
+  correctFlags: number;
+  correctCountries: string[];
+}
+
 export interface ProgressState {
   streak: StreakState;
   daily: DailyState | null;
+  quests: { date: string; items: QuestItem[] } | null;
+}
+
+export const QUEST_XP_REWARD = 30;
+const CONTINENTS = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
+const QUEST_TARGETS: Record<QuestId, number> = {
+  correct: 15, combo: 5, continent: 8, games: 3, score: 300, flags: 10,
+};
+
+// 3 quêtes par jour, tirées de façon déterministe depuis la date
+// (les mêmes pour tous les joueurs, comme le défi du jour).
+export function generateQuests(dateKey: string): QuestItem[] {
+  const rng = mulberry32(hashString(`gtc-quests-${dateKey}`));
+  const ids: QuestId[] = ['correct', 'combo', 'continent', 'games', 'score', 'flags'];
+  return seededShuffle(ids, rng).slice(0, 3).map(id => ({
+    id,
+    target: QUEST_TARGETS[id],
+    progress: 0,
+    done: false,
+    continent: id === 'continent' ? CONTINENTS[Math.floor(rng() * CONTINENTS.length)] : undefined,
+  }));
+}
+
+function applyGameToQuests(items: QuestItem[], g: GameSummary): { items: QuestItem[]; xpGained: number } {
+  let xpGained = 0;
+  const next = items.map(q => {
+    if (q.done) return q;
+    let progress = q.progress;
+    switch (q.id) {
+      case 'correct': progress += g.correctAnswers; break;
+      case 'combo': progress = Math.max(progress, g.bestCombo); break;
+      case 'continent': progress += g.correctByContinent[q.continent ?? ''] ?? 0; break;
+      case 'games': progress += 1; break;
+      case 'score': progress = Math.max(progress, g.score); break;
+      case 'flags': progress += g.correctFlags; break;
+    }
+    progress = Math.min(progress, q.target);
+    const done = progress >= q.target;
+    if (done) xpGained += QUEST_XP_REWARD;
+    return { ...q, progress, done };
+  });
+  return { items: next, xpGained };
 }
 
 const STORAGE_KEY = 'gtc_progress';
@@ -28,6 +93,7 @@ export const MAX_FREEZES = 2;
 const DEFAULT_PROGRESS: ProgressState = {
   streak: { count: 0, lastDay: '', freezes: 0 },
   daily: null,
+  quests: null,
 };
 
 export function todayKey(date = new Date()): string {
@@ -116,6 +182,24 @@ export function useProgress() {
   const dailyToday: DailyState | null =
     progress.daily && progress.daily.date === todayKey() ? progress.daily : null;
 
+  const questsToday: QuestItem[] =
+    progress.quests && progress.quests.date === todayKey()
+      ? progress.quests.items
+      : generateQuests(todayKey());
+
+  // Met à jour les quêtes avec le résumé de la partie et retourne l'XP
+  // gagné par les quêtes nouvellement accomplies (calcul hors setState :
+  // les updaters peuvent être rejoués par React en StrictMode).
+  const applyGameSummary = useCallback((summary: GameSummary): number => {
+    const today = todayKey();
+    const base = progress.quests && progress.quests.date === today
+      ? progress.quests.items
+      : generateQuests(today);
+    const { items, xpGained } = applyGameToQuests(base, summary);
+    update(p => ({ ...p, quests: { date: today, items } }));
+    return xpGained;
+  }, [progress.quests, update]);
+
   return {
     progress,
     update,
@@ -126,5 +210,7 @@ export function useProgress() {
     dailyToday,
     startDaily,
     finishDaily,
+    questsToday,
+    applyGameSummary,
   };
 }

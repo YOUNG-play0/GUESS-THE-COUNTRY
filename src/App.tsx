@@ -35,7 +35,11 @@ function AppContent() {
     setPlayerName,
   } = useStorage();
 
-  const { streak, freezes, touchStreak, addFreeze, dailyToday, startDaily, finishDaily } = useProgress();
+  const {
+    streak, freezes, touchStreak, addFreeze,
+    dailyToday, startDaily, finishDaily,
+    questsToday, applyGameSummary,
+  } = useProgress();
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -68,6 +72,16 @@ function AppContent() {
       );
       touchStreak();
       if (gameState.mode === 'daily') finishDaily(gameState.correctAnswers);
+      const questXp = applyGameSummary({
+        mode: gameState.mode,
+        score: gameState.score,
+        bestCombo: gameState.bestCombo,
+        correctAnswers: gameState.correctAnswers,
+        correctByContinent: gameState.correctByContinent,
+        correctFlags: gameState.correctFlags,
+        correctCountries: gameState.correctCountries,
+      });
+      if (questXp > 0) addXP(questXp);
       setScreen('game-over');
     }
   }, [gameState?.isActive]);
@@ -149,6 +163,7 @@ function AppContent() {
                 onBuyFreeze={handleBuyFreeze}
                 daily={dailyToday}
                 onPlayDaily={handleStartDaily}
+                quests={questsToday}
                 onNavigate={setScreen}
               />
             </motion.div>

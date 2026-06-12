@@ -123,6 +123,9 @@ export function useGameEngine() {
       correctAnswers: 0,
       isActive: true,
       isPaused: false,
+      correctCountries: [],
+      correctByContinent: {},
+      correctFlags: 0,
     };
 
     setGameState(state);
@@ -211,6 +214,8 @@ export function useGameEngine() {
     const correct = answer === currentQuestion.correctAnswer;
     const timeElapsed = (Date.now() - questionStartRef.current) / 1000;
     const speedBonus = correct ? Math.max(0, Math.floor((gameState.maxTime - timeElapsed) * 2)) : 0;
+    const answeredCountry = currentQuestion.country;
+    const wasFlagQuestion = currentQuestion.type === 'flag';
 
     setSelectedAnswer(answer);
     setIsCorrect(correct);
@@ -242,6 +247,11 @@ export function useGameEngine() {
         correctAnswers: prev.correctAnswers + (correct ? 1 : 0),
         xpEarned: prev.xpEarned + xpGain,
         lives: newLives,
+        correctCountries: correct ? [...prev.correctCountries, answeredCountry.name] : prev.correctCountries,
+        correctByContinent: correct
+          ? { ...prev.correctByContinent, [answeredCountry.continent]: (prev.correctByContinent[answeredCountry.continent] ?? 0) + 1 }
+          : prev.correctByContinent,
+        correctFlags: prev.correctFlags + (correct && wasFlagQuestion ? 1 : 0),
       };
     });
   }, [gameState, currentQuestion, showResult]);
