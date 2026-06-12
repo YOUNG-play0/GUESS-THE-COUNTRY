@@ -73,9 +73,9 @@
 
 - [x] **4.1** Déployer la version corrigée sur GitHub Pages (HTTPS) et vérifier le score **Lighthouse PWA** (viser 100 % installable)
 - [x] **4.2** Tester l'installation "Ajouter à l'écran d'accueil" sur un vrai téléphone Android
-- [ ] **4.3** Générer le package Android (`.aab`) avec **PWABuilder** (pwabuilder.com)
-- [ ] **4.4** Héberger le fichier `assetlinks.json` dans `public/.well-known/` (fourni par PWABuilder) → supprime la barre d'adresse dans l'app
-- [ ] **4.5** ⚠️ Conserver précieusement la **clé de signature** (.keystore) générée — sans elle, impossible de mettre à jour l'app plus tard
+- [x] **4.3** Générer le package Android (`.aab`) avec **PWABuilder** (pwabuilder.com)
+- [x] **4.4** Héberger le fichier `assetlinks.json` dans `public/.well-known/` (fourni par PWABuilder) → supprime la barre d'adresse dans l'app
+- [x] **4.5** ⚠️ Conserver précieusement la **clé de signature** (.keystore) générée — sans elle, impossible de mettre à jour l'app plus tard
 
 ---
 

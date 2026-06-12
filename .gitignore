@@ -18,3 +18,7 @@ npm-debug.log*
 # Environnement local
 .env
 .env.local
+
+# Clés de signature Android — à ne JAMAIS committer (voir PUBLISHING.md)
+*.keystore
+signing-key-info.txt
