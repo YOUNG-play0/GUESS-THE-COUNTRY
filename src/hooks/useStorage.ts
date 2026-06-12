@@ -27,6 +27,8 @@ function loadStats(): PlayerStats {
         ...DEFAULT_STATS,
         ...parsed,
         gamesPerMode: { ...DEFAULT_STATS.gamesPerMode, ...parsed.gamesPerMode },
+        // Nouvelle échelle de niveaux (15 titres) : recalcul depuis l'XP
+        level: levelForXP(parsed.xp ?? 0),
       };
     }
   } catch {}
