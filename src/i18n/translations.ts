@@ -147,6 +147,7 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  nav_home: string;
   themes_title: string;
   continent_stats_title: string;
   explorer_mode: string;
@@ -365,6 +366,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    nav_home: 'Home',
     themes_title: 'Visual theme',
     continent_stats_title: 'Stats by continent',
     explorer_mode: 'Explorer',
@@ -582,6 +584,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    nav_home: 'Accueil',
     themes_title: 'Thème visuel',
     continent_stats_title: 'Stats par continent',
     explorer_mode: 'Explorateur',
@@ -799,6 +802,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    nav_home: 'Inicio',
     themes_title: 'Tema visual',
     continent_stats_title: 'Estadísticas por continente',
     explorer_mode: 'Explorador',
@@ -1016,6 +1020,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    nav_home: 'Start',
     themes_title: 'Visuelles Theme',
     continent_stats_title: 'Statistik pro Kontinent',
     explorer_mode: 'Entdecker',
@@ -1233,6 +1238,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    nav_home: 'Início',
     themes_title: 'Tema visual',
     continent_stats_title: 'Estatísticas por continente',
     explorer_mode: 'Explorador',
@@ -1450,6 +1456,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    nav_home: '首页',
     themes_title: '视觉主题',
     continent_stats_title: '各大洲统计',
     explorer_mode: '探索',
@@ -1667,6 +1674,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    nav_home: 'ホーム',
     themes_title: 'ビジュアルテーマ',
     continent_stats_title: '大陸別統計',
     explorer_mode: '探検',
@@ -1884,6 +1892,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    nav_home: 'الرئيسية',
     themes_title: 'السمة البصرية',
     continent_stats_title: 'إحصاءات حسب القارة',
     explorer_mode: 'المستكشف',

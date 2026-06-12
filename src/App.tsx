@@ -22,6 +22,7 @@ import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import PassportScreen from './components/PassportScreen';
 import PremiumScreen from './components/PremiumScreen';
+import BottomNav from './components/BottomNav';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
@@ -325,6 +326,11 @@ function AppContent() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Barre de navigation fixe (écrans hub uniquement) */}
+      {(['home', 'passport', 'stats', 'profile'] as Screen[]).includes(screen) && (
+        <BottomNav current={screen} onNavigate={setScreen} />
+      )}
 
       {/* Popup de succès débloqués (après une partie) */}
       <BadgePopup
