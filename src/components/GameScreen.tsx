@@ -1,5 +1,6 @@
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FlagImg from './FlagImg';
 import { playCorrect, playWrong, playTick } from '../utils/sound';
 import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
@@ -9,31 +10,6 @@ import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
 import MonumentImage from './MonumentImage';
-
-// Drapeau : image flagcdn en priorité (rendu identique partout),
-// repli sur l'emoji si l'image ne charge pas (hors-ligne, CDN bloqué...).
-function FlagImg({ code, emoji, cdnWidth = 80, emojiSize = 24, className, style }: {
-  code: string;
-  emoji: string;
-  cdnWidth?: 80 | 160 | 320;
-  emojiSize?: number;
-  className?: string;
-  style?: CSSProperties;
-}) {
-  const [failedCode, setFailedCode] = useState<string | null>(null);
-  if (!code || failedCode === code) {
-    return <span className="select-none" style={{ fontSize: emojiSize }}>{emoji}</span>;
-  }
-  return (
-    <img
-      src={`https://flagcdn.com/w${cdnWidth}/${code}.png`}
-      alt="Flag"
-      className={className}
-      style={style}
-      onError={() => setFailedCode(code)}
-    />
-  );
-}
 
 function CountryFlag({ name, size = 24 }: { name: string; size?: number }) {
   const country = countries.find(c => c.name === name);
