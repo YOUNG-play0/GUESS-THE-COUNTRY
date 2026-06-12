@@ -1,18 +1,22 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal } from 'lucide-react';
+import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal, Palette } from 'lucide-react';
 import { PlayerStats, XP_LEVELS, Difficulty } from '../types';
 import { BADGES, badgeLabel } from '../data/badges';
+import { THEMES, DEFAULT_THEME } from '../utils/themes';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   stats: PlayerStats;
   badges: string[];
-  /** Passe du Savoir : badges débloqués affichés en doré */
+  /** Passe du Savoir : badges dorés + thèmes visuels */
   isPremium: boolean;
+  theme: string;
+  onSetTheme: (id: string) => void;
+  onPremium: () => void;
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, isPremium, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTheme, onPremium, onBack }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -80,6 +84,34 @@ export default function ProfileScreen({ stats, badges, isPremium, onBack }: Prop
                   </div>
                   {isCurrent && <Check className="w-5 h-5 text-indigo-400 shrink-0" />}
                 </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Thèmes visuels — Passe du Savoir */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
+          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+            <Palette className="w-5 h-5 text-pink-400" /> {t.themes_title}
+            {!isPremium && <Lock className="w-4 h-4 text-yellow-400/70 ml-auto" />}
+          </h3>
+          <div className="grid grid-cols-4 gap-2.5">
+            {THEMES.map(th => {
+              const active = (isPremium ? theme : DEFAULT_THEME) === th.id;
+              const locked = !isPremium && th.id !== DEFAULT_THEME;
+              return (
+                <button
+                  key={th.id}
+                  onClick={() => locked ? onPremium() : onSetTheme(th.id)}
+                  className={`rounded-2xl border p-3 flex flex-col items-center gap-1.5 transition-all ${
+                    active ? 'border-indigo-400/60 bg-indigo-500/15' : 'border-white/10 bg-white/[0.03] hover:bg-white/10'
+                  } ${locked ? 'opacity-50' : ''}`}
+                >
+                  <span className={`w-8 h-8 rounded-full bg-gradient-to-br ${th.gradient} border border-white/20 flex items-center justify-center text-sm select-none`}>
+                    {locked ? '👑' : th.emoji}
+                  </span>
+                  {active && <Check className="w-3.5 h-3.5 text-indigo-300" />}
+                </button>
               );
             })}
           </div>

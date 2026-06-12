@@ -5,6 +5,7 @@ import { Screen, GameMode, Difficulty, levelForXP } from './types';
 import { BadgeDef } from './data/badges';
 import BadgePopup from './components/BadgePopup';
 import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
+import { getStoredTheme, storeTheme, themeGradient, DEFAULT_THEME } from './utils/themes';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
 import { useProgress, FREEZE_COST_XP, MAX_FREEZES, todayKey } from './hooks/useProgress';
@@ -54,7 +55,13 @@ function AppContent() {
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
+  const [theme, setTheme] = useState(getStoredTheme);
   const premium = usePremium();
+
+  const handleSetTheme = useCallback((id: string) => {
+    setTheme(id);
+    storeTheme(id);
+  }, []);
 
   // Passe du Savoir : gel de streak offert chaque semaine
   useEffect(() => {
@@ -190,7 +197,8 @@ function AppContent() {
       className="min-h-screen font-sans text-white overflow-x-hidden no-select relative"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <WorldBackground />
+      {/* Thèmes visuels : réservés au Passe du Savoir */}
+      <WorldBackground gradient={themeGradient(premium.isPremium ? theme : DEFAULT_THEME)} />
 
       {/* Language Selector */}
       <div className="fixed top-3 right-3 z-50">
@@ -304,7 +312,15 @@ function AppContent() {
           )}
           {screen === 'profile' && (
             <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <ProfileScreen stats={stats} badges={badges} isPremium={premium.isPremium} onBack={() => setScreen('home')} />
+              <ProfileScreen
+                stats={stats}
+                badges={badges}
+                isPremium={premium.isPremium}
+                theme={theme}
+                onSetTheme={handleSetTheme}
+                onPremium={() => setScreen('premium')}
+                onBack={() => setScreen('home')}
+              />
             </motion.div>
           )}
         </AnimatePresence>

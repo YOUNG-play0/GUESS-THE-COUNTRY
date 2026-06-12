@@ -147,6 +147,7 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  themes_title: string;
   continent_stats_title: string;
   explorer_mode: string;
   explorer_desc: string;
@@ -364,6 +365,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    themes_title: 'Visual theme',
     continent_stats_title: 'Stats by continent',
     explorer_mode: 'Explorer',
     explorer_desc: 'Languages, currencies, populations, areas',
@@ -580,6 +582,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    themes_title: 'Thème visuel',
     continent_stats_title: 'Stats par continent',
     explorer_mode: 'Explorateur',
     explorer_desc: 'Langues, monnaies, populations, superficies',
@@ -796,6 +799,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    themes_title: 'Tema visual',
     continent_stats_title: 'Estadísticas por continente',
     explorer_mode: 'Explorador',
     explorer_desc: 'Idiomas, monedas, poblaciones, superficies',
@@ -1012,6 +1016,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    themes_title: 'Visuelles Theme',
     continent_stats_title: 'Statistik pro Kontinent',
     explorer_mode: 'Entdecker',
     explorer_desc: 'Sprachen, Währungen, Bevölkerung, Fläche',
@@ -1228,6 +1233,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    themes_title: 'Tema visual',
     continent_stats_title: 'Estatísticas por continente',
     explorer_mode: 'Explorador',
     explorer_desc: 'Idiomas, moedas, populações, áreas',
@@ -1444,6 +1450,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    themes_title: '视觉主题',
     continent_stats_title: '各大洲统计',
     explorer_mode: '探索',
     explorer_desc: '语言、货币、人口、面积',
@@ -1660,6 +1667,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    themes_title: 'ビジュアルテーマ',
     continent_stats_title: '大陸別統計',
     explorer_mode: '探検',
     explorer_desc: '言語・通貨・人口・面積',
@@ -1876,6 +1884,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    themes_title: 'السمة البصرية',
     continent_stats_title: 'إحصاءات حسب القارة',
     explorer_mode: 'المستكشف',
     explorer_desc: 'لغات، عملات، سكان، مساحات',

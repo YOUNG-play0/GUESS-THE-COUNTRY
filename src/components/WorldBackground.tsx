@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 
-export default function WorldBackground() {
+export default function WorldBackground({ gradient = 'from-slate-950 via-indigo-950 to-slate-900' }: { gradient?: string }) {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
       
       {/* Animated floating dots */}
       {Array.from({ length: 40 }).map((_, i) => (
