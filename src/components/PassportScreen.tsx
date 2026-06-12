@@ -19,7 +19,7 @@ export default function PassportScreen({ passport, onBack }: Props) {
   const unlocked = new Set(passport);
 
   return (
-    <div className="min-h-screen px-4 pt-16 pb-28">
+    <div className="min-h-screen px-4 pt-16 pb-36">
       <div className="w-full max-w-[480px] mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}
