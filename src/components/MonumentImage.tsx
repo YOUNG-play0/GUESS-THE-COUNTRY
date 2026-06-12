@@ -25,9 +25,11 @@ function saveCache() {
 export default function MonumentImage({ title }: { title: string }) {
   const [src, setSrc] = useState<string | null>(() => cache[title] || null);
   const [broken, setBroken] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setBroken(false);
+    setLoaded(false);
     if (cache[title] !== undefined) {
       setSrc(cache[title] || null);
       return;
@@ -57,12 +59,27 @@ export default function MonumentImage({ title }: { title: string }) {
 
   if (!src || broken) return null;
   return (
-    <img
-      src={src}
-      alt={title}
-      onError={() => setBroken(true)}
-      className="mx-auto mb-4 rounded-2xl border border-white/10 shadow-2xl object-cover"
-      style={{ maxWidth: 'min(280px, 70vw)', maxHeight: 180 }}
-    />
+    // ⚠️ Aucun texte ici (pas de alt, pas de title) : pendant le chargement,
+    // le navigateur afficherait le nom du monument et révélerait la réponse.
+    // Tant que l'image n'est pas chargée : spinner neutre uniquement.
+    <div className="relative mx-auto mb-4" style={{ maxWidth: 'min(280px, 70vw)' }}>
+      {!loaded && (
+        <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5" style={{ height: 140 }}>
+          <span
+            aria-hidden
+            className="w-7 h-7 rounded-full border-2 border-white/15 border-t-indigo-400 animate-spin"
+          />
+        </div>
+      )}
+      <img
+        src={src}
+        alt=""
+        aria-hidden
+        onLoad={() => setLoaded(true)}
+        onError={() => setBroken(true)}
+        className={`mx-auto rounded-2xl border border-white/10 shadow-2xl object-cover ${loaded ? '' : 'absolute inset-0 opacity-0 pointer-events-none'}`}
+        style={{ maxWidth: '100%', maxHeight: 180 }}
+      />
+    </div>
   );
 }
