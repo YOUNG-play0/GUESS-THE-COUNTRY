@@ -147,6 +147,7 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  continent_stats_title: string;
   explorer_mode: string;
   explorer_desc: string;
   premium_required: string;
@@ -363,6 +364,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    continent_stats_title: 'Stats by continent',
     explorer_mode: 'Explorer',
     explorer_desc: 'Languages, currencies, populations, areas',
     premium_required: 'Knowledge Pass or Continent Pack required',
@@ -578,6 +580,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    continent_stats_title: 'Stats par continent',
     explorer_mode: 'Explorateur',
     explorer_desc: 'Langues, monnaies, populations, superficies',
     premium_required: 'Passe du Savoir ou Pack Continent requis',
@@ -793,6 +796,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    continent_stats_title: 'Estadísticas por continente',
     explorer_mode: 'Explorador',
     explorer_desc: 'Idiomas, monedas, poblaciones, superficies',
     premium_required: 'Requiere Pase del Saber o Pack Continente',
@@ -1008,6 +1012,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    continent_stats_title: 'Statistik pro Kontinent',
     explorer_mode: 'Entdecker',
     explorer_desc: 'Sprachen, Währungen, Bevölkerung, Fläche',
     premium_required: 'Wissens-Pass oder Kontinent-Paket nötig',
@@ -1223,6 +1228,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    continent_stats_title: 'Estatísticas por continente',
     explorer_mode: 'Explorador',
     explorer_desc: 'Idiomas, moedas, populações, áreas',
     premium_required: 'Requer Passe do Saber ou Pacote Continente',
@@ -1438,6 +1444,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    continent_stats_title: '各大洲统计',
     explorer_mode: '探索',
     explorer_desc: '语言、货币、人口、面积',
     premium_required: '需要知识通行证或大洲礼包',
@@ -1653,6 +1660,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    continent_stats_title: '大陸別統計',
     explorer_mode: '探検',
     explorer_desc: '言語・通貨・人口・面積',
     premium_required: 'ナレッジパスか大陸パックが必要',
@@ -1868,6 +1876,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    continent_stats_title: 'إحصاءات حسب القارة',
     explorer_mode: 'المستكشف',
     explorer_desc: 'لغات، عملات، سكان، مساحات',
     premium_required: 'يتطلب بطاقة المعرفة أو حزمة القارة',

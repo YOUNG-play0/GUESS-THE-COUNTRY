@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Globe2, BarChart3, User, Play, Zap, CalendarCheck } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
-import { DailyState, QuestItem, QUEST_XP_REWARD } from '../hooks/useProgress';
+import { DailyState, QuestItem } from '../hooks/useProgress';
 import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -15,6 +15,7 @@ interface Props {
   daily: DailyState | null;
   onPlayDaily: () => void;
   quests: QuestItem[];
+  isPremium: boolean;
   onNavigate: (screen: Screen) => void;
 }
 
@@ -34,7 +35,7 @@ const QUEST_EMOJI: Record<QuestItem['id'], string> = {
   correct: '🎯', combo: '🔥', continent: '🌍', games: '🎮', score: '⚡', flags: '🚩',
 };
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, isPremium, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -180,19 +181,21 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
             <p className="text-slate-300 text-xs font-bold uppercase tracking-wider mb-2.5">🎯 {t.daily_quests}</p>
             <div className="space-y-2.5">
               {quests.map(q => (
-                <div key={q.id} className={q.done ? 'opacity-60' : ''}>
+                <div key={q.id + (q.premium ? '-p' : '')} className={q.done ? 'opacity-60' : ''}>
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-[13px] text-slate-200 flex items-center gap-1.5 min-w-0">
-                      <span className="select-none">{QUEST_EMOJI[q.id]}</span>
+                    <span className={`text-[13px] flex items-center gap-1.5 min-w-0 ${q.premium ? 'text-yellow-200' : 'text-slate-200'}`}>
+                      <span className="select-none">{q.premium ? '👑' : QUEST_EMOJI[q.id]}</span>
                       <span className="truncate">{questLabel(q, t)}</span>
                     </span>
-                    <span className={`text-[11px] font-bold shrink-0 ${q.done ? 'text-emerald-400' : 'text-slate-400'}`}>
-                      {q.done ? `✓ +${QUEST_XP_REWARD} XP` : `${q.progress}/${q.target}`}
+                    <span className={`text-[11px] font-bold shrink-0 ${q.done ? 'text-emerald-400' : q.premium ? 'text-yellow-400/80' : 'text-slate-400'}`}>
+                      {q.done ? `✓ +${q.reward ?? 30} XP` : `${q.progress}/${q.target}`}
                     </span>
                   </div>
                   <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <motion.div
-                      className={`h-full rounded-full ${q.done ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
+                      className={`h-full rounded-full ${
+                        q.done ? 'bg-emerald-500' : q.premium ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                      }`}
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(100, (q.progress / q.target) * 100)}%` }}
                       transition={{ duration: 0.6 }}
@@ -203,6 +206,25 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
             </div>
           </div>
         )}
+
+        {/* Passe du Savoir */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => onNavigate('premium')}
+          className={`w-full py-3 px-4 rounded-2xl border flex items-center gap-3 transition-all ${
+            isPremium
+              ? 'bg-yellow-500/10 border-yellow-500/30'
+              : 'bg-gradient-to-r from-yellow-500/15 to-amber-600/10 border-yellow-500/25 hover:from-yellow-500/25'
+          }`}
+        >
+          <span className="text-xl select-none">👑</span>
+          <span className="flex-1 text-left">
+            <span className="block text-yellow-200 font-bold text-sm">{t.premium_title}</span>
+            <span className="block text-yellow-100/60 text-[11px]">
+              {isPremium ? t.premium_active : t.trial_cta}
+            </span>
+          </span>
+        </motion.button>
 
         <div className="grid grid-cols-3 gap-3">
           <motion.button

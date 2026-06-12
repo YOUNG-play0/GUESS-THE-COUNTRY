@@ -7,10 +7,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface Props {
   stats: PlayerStats;
   badges: string[];
+  /** Passe du Savoir : badges débloqués affichés en doré */
+  isPremium: boolean;
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, isPremium, onBack }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -98,7 +100,11 @@ export default function ProfileScreen({ stats, badges, onBack }: Props) {
                   key={b.id}
                   title={`${name} — ${desc}`}
                   className={`rounded-2xl border p-2.5 text-center ${
-                    unlocked ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-white/[0.02] border-white/5 opacity-40'
+                    unlocked
+                      ? isPremium
+                        ? 'bg-gradient-to-b from-yellow-500/25 to-amber-600/10 border-yellow-400/50 shadow-lg shadow-yellow-500/10'
+                        : 'bg-yellow-500/10 border-yellow-500/25'
+                      : 'bg-white/[0.02] border-white/5 opacity-40'
                   }`}
                 >
                   <span className={`text-2xl select-none ${unlocked ? '' : 'grayscale'}`} style={unlocked ? undefined : { filter: 'grayscale(1)' }}>

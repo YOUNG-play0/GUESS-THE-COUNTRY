@@ -50,11 +50,16 @@ function AppContent() {
   const {
     streak, freezes, addFreeze,
     dailyToday, startDaily,
-    questsToday, registerGameEnd, passport, badges,
+    questsToday, registerGameEnd, claimWeeklyFreeze, passport, badges, continentStats,
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
   const premium = usePremium();
+
+  // Passe du Savoir : gel de streak offert chaque semaine
+  useEffect(() => {
+    if (premium.isPremium) claimWeeklyFreeze();
+  }, [premium.isPremium, claimWeeklyFreeze]);
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -99,7 +104,7 @@ function AppContent() {
         bestCombo: Math.max(stats.bestCombo, gameState.bestCombo),
         bestScore: Math.max(stats.bestScore, gameState.score),
         level: stats.level,
-      });
+      }, premium.isPremium);
       if (questXp > 0) addXP(questXp);
       setNewBadges(unlocked);
       // Fanfare de niveau gagné (XP de la partie + XP des quêtes)
@@ -215,7 +220,8 @@ function AppContent() {
                 onBuyFreeze={handleBuyFreeze}
                 daily={dailyToday}
                 onPlayDaily={handleStartDaily}
-                quests={questsToday}
+                quests={premium.isPremium ? questsToday : questsToday.filter(q => !q.premium)}
+                isPremium={premium.isPremium}
                 onNavigate={setScreen}
               />
             </motion.div>
@@ -267,7 +273,14 @@ function AppContent() {
           )}
           {screen === 'stats' && (
             <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <StatsScreen stats={stats} onBack={() => setScreen('home')} />
+              <StatsScreen
+                stats={stats}
+                continentStats={continentStats}
+                passport={passport}
+                isPremium={premium.isPremium}
+                onPremium={() => setScreen('premium')}
+                onBack={() => setScreen('home')}
+              />
             </motion.div>
           )}
           {screen === 'passport' && (
@@ -291,7 +304,7 @@ function AppContent() {
           )}
           {screen === 'profile' && (
             <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <ProfileScreen stats={stats} badges={badges} onBack={() => setScreen('home')} />
+              <ProfileScreen stats={stats} badges={badges} isPremium={premium.isPremium} onBack={() => setScreen('home')} />
             </motion.div>
           )}
         </AnimatePresence>
