@@ -45,7 +45,7 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
 
   return (
     // pb-28 : laisse la place à la barre de navigation fixe en bas
-    <div className="min-h-screen w-full max-w-[480px] mx-auto flex flex-col px-5 pt-16 pb-36">
+    <div className="h-dvh overflow-y-auto w-full max-w-[480px] mx-auto flex flex-col px-5 pt-16 pb-36">
 
       {/* ——— 1. Header : logo + titre + niveau XP ——— */}
       <motion.header

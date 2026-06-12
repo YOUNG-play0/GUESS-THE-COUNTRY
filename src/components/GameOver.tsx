@@ -82,7 +82,7 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
   const grade = getGrade();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+    <div className="h-dvh overflow-y-auto flex flex-col items-center px-4 py-16">
       <motion.div 
         initial={{ opacity: 0, scale: 0.8 }} 
         animate={{ opacity: 1, scale: 1 }} 
