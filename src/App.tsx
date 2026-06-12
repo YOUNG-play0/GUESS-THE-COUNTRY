@@ -35,6 +35,8 @@ function AppContent() {
   // Record AVANT la partie : sert au message « il te manquait X pts »
   // (stats.bestScore est déjà écrasé quand l'écran de fin s'affiche)
   const prevBestRef = useRef(0);
+  // Duel fantôme : record du mode joué, figé au lancement de la partie
+  const ghostRef = useRef(0);
   const {
     stats,
     addXP,
@@ -110,9 +112,10 @@ function AppContent() {
     setLastDifficulty(difficulty);
     gameRecordedRef.current = false;
     prevBestRef.current = stats.bestScore;
+    ghostRef.current = stats.bestScorePerMode?.[mode] ?? 0;
     startGame(mode, difficulty);
     setScreen('game');
-  }, [startGame, stats.bestScore]);
+  }, [startGame, stats.bestScore, stats.bestScorePerMode]);
 
   const handleStartDaily = useCallback(() => {
     if (!stats.name) {
@@ -123,6 +126,7 @@ function AppContent() {
     startDaily(qs.length);
     gameRecordedRef.current = false;
     prevBestRef.current = stats.bestScore;
+    ghostRef.current = stats.bestScorePerMode?.daily ?? 0;
     startGame('daily', 'medium', qs);
     setScreen('game');
   }, [stats.name, startDaily, startGame]);
@@ -217,6 +221,7 @@ function AppContent() {
                 isCorrect={isCorrect}
                 showResult={showResult}
                 chronoTimeLeft={chronoTimeLeft}
+                ghostScore={ghostRef.current}
                 onAnswer={handleAnswer}
                 onNext={handleNext}
                 onQuit={handleQuitGame}

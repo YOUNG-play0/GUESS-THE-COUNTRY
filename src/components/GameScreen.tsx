@@ -54,6 +54,8 @@ interface Props {
   isCorrect: boolean | null;
   showResult: boolean;
   chronoTimeLeft: number;
+  /** Duel fantôme : record du mode à battre (0 = pas encore de record) */
+  ghostScore: number;
   onAnswer: (answer: string) => void;
   onNext: () => void;
   onQuit: () => void;
@@ -61,7 +63,7 @@ interface Props {
 
 export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
-  chronoTimeLeft, onAnswer, onNext, onQuit,
+  chronoTimeLeft, ghostScore, onAnswer, onNext, onQuit,
 }: Props) {
   const { t, language } = useLanguage();
 
@@ -291,6 +293,25 @@ export default function GameScreen({
           )}
         </div>
       </div>
+
+      {/* Duel fantôme : ton record du mode, en temps réel */}
+      {ghostScore > 0 && (
+        <div className="mb-2">
+          <div className="flex justify-between items-center text-[10px] mb-0.5">
+            <span className={gameState.score > ghostScore ? 'text-emerald-400 font-bold' : 'text-violet-300/80'}>
+              👻 {gameState.score > ghostScore ? t.ghost_beaten : t.ghost_record}
+            </span>
+            <span className="text-slate-500 tabular-nums">{gameState.score} / {ghostScore}</span>
+          </div>
+          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full ${gameState.score > ghostScore ? 'bg-emerald-500' : 'bg-violet-500'}`}
+              animate={{ width: `${Math.min(100, (gameState.score / ghostScore) * 100)}%` }}
+              transition={{ duration: 0.4 }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Question Progress */}
       {gameState.mode !== 'chrono' && gameState.mode !== 'survival' && (

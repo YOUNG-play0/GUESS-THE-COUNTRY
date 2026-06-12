@@ -43,6 +43,8 @@ export interface PlayerStats {
   xp: number;
   level: number;
   gamesPerMode: Record<GameMode, number>;
+  /** Meilleur score par mode — le « fantôme » à battre pendant la partie */
+  bestScorePerMode: Partial<Record<GameMode, number>>;
   unlockedDifficulties: Difficulty[];
 }
 

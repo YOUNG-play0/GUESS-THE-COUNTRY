@@ -12,6 +12,7 @@ const DEFAULT_STATS: PlayerStats = {
   xp: 0,
   level: 1,
   gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0, daily: 0 },
+  bestScorePerMode: {},
   unlockedDifficulties: ['easy'],
 };
 
@@ -78,6 +79,7 @@ export function useStorage() {
         correctAnswers: prev.correctAnswers + correct,
         totalAnswers: prev.totalAnswers + total,
         gamesPerMode: { ...prev.gamesPerMode, [mode]: (prev.gamesPerMode[mode] ?? 0) + 1 },
+        bestScorePerMode: { ...prev.bestScorePerMode, [mode]: Math.max(prev.bestScorePerMode?.[mode] ?? 0, score) },
       };
       saveStats(next);
       return next;

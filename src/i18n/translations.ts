@@ -147,6 +147,8 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  ghost_record: string;
+  ghost_beaten: string;
   rematch: string;
   almost_record: string;
   badges_title: string;
@@ -329,6 +331,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    ghost_record: 'Your record',
+    ghost_beaten: 'Record beaten!',
     rematch: 'REMATCH',
     almost_record: 'So close! Only {n} pts short of your record!',
     badges_title: 'Achievements',
@@ -510,6 +514,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    ghost_record: 'Ton record',
+    ghost_beaten: 'Record battu !',
     rematch: 'REVANCHE',
     almost_record: 'Record manqué de justesse ! Il te manquait {n} pts !',
     badges_title: 'Succès',
@@ -691,6 +697,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    ghost_record: 'Tu récord',
+    ghost_beaten: '¡Récord superado!',
     rematch: 'REVANCHA',
     almost_record: '¡Por poco! ¡Te faltaron {n} pts para tu récord!',
     badges_title: 'Logros',
@@ -872,6 +880,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    ghost_record: 'Dein Rekord',
+    ghost_beaten: 'Rekord geschlagen!',
     rematch: 'REVANCHE',
     almost_record: 'So knapp! Nur {n} Punkte unter deinem Rekord!',
     badges_title: 'Erfolge',
@@ -1053,6 +1063,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    ghost_record: 'Seu recorde',
+    ghost_beaten: 'Recorde batido!',
     rematch: 'REVANCHE',
     almost_record: 'Por pouco! Faltaram {n} pts para o seu recorde!',
     badges_title: 'Conquistas',
@@ -1234,6 +1246,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    ghost_record: '你的纪录',
+    ghost_beaten: '纪录已破！',
     rematch: '再战一局',
     almost_record: '就差一点！距离纪录只差{n}分！',
     badges_title: '成就',
@@ -1415,6 +1429,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    ghost_record: '自己ベスト',
+    ghost_beaten: '記録更新！',
     rematch: 'リベンジ',
     almost_record: 'あと少し！記録まであと{n}点だった！',
     badges_title: '実績',
@@ -1596,6 +1612,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    ghost_record: 'رقمك القياسي',
+    ghost_beaten: '!تم تحطيم الرقم القياسي',
     rematch: 'جولة الثأر',
     almost_record: '!كنت قريبًا جدًا! ينقصك {n} نقطة فقط عن رقمك القياسي',
     badges_title: 'الإنجازات',
