@@ -23,6 +23,7 @@ import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import PassportScreen from './components/PassportScreen';
 import PremiumScreen from './components/PremiumScreen';
+import DailyScreen from './components/DailyScreen';
 import BottomNav from './components/BottomNav';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
@@ -227,10 +228,7 @@ function AppContent() {
                 maxFreezes={MAX_FREEZES}
                 freezeCost={FREEZE_COST_XP}
                 onBuyFreeze={handleBuyFreeze}
-                daily={dailyToday}
-                onPlayDaily={handleStartDaily}
                 quests={premium.isPremium ? questsToday : questsToday.filter(q => !q.premium)}
-                isPremium={premium.isPremium}
                 onNavigate={setScreen}
               />
             </motion.div>
@@ -296,6 +294,11 @@ function AppContent() {
               <PassportScreen passport={passport} onBack={() => setScreen('home')} />
             </motion.div>
           )}
+          {screen === 'daily' && (
+            <motion.div key="daily" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <DailyScreen daily={dailyToday} onPlay={handleStartDaily} />
+            </motion.div>
+          )}
           {screen === 'premium' && (
             <motion.div key="premium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <PremiumScreen
@@ -319,6 +322,7 @@ function AppContent() {
                 theme={theme}
                 onSetTheme={handleSetTheme}
                 onPremium={() => setScreen('premium')}
+                onStats={() => setScreen('stats')}
                 onBack={() => setScreen('home')}
               />
             </motion.div>
@@ -327,7 +331,7 @@ function AppContent() {
       </div>
 
       {/* Barre de navigation fixe (écrans hub uniquement) */}
-      {(['home', 'passport', 'stats', 'profile'] as Screen[]).includes(screen) && (
+      {(['home', 'passport', 'daily', 'premium', 'stats', 'profile'] as Screen[]).includes(screen) && (
         <BottomNav current={screen} onNavigate={setScreen} />
       )}
 

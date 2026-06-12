@@ -147,6 +147,8 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  nav_daily: string;
+  nav_pass: string;
   legendary_diff: string;
   adaptive_difficulty_info: string;
   nav_home: string;
@@ -368,6 +370,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    nav_daily: 'Daily',
+    nav_pass: 'Pass',
     legendary_diff: 'Legendary',
     adaptive_difficulty_info: 'Difficulty adapts to you: it follows your last 10 answers and rises or falls in real time during the game.',
     nav_home: 'Home',
@@ -588,6 +592,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    nav_daily: 'Défi',
+    nav_pass: 'Passe',
     legendary_diff: 'Légendaire',
     adaptive_difficulty_info: 'La difficulté s\'adapte à toi : elle suit tes 10 dernières réponses et monte ou descend en temps réel pendant la partie.',
     nav_home: 'Accueil',
@@ -808,6 +814,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    nav_daily: 'Reto',
+    nav_pass: 'Pase',
     legendary_diff: 'Legendario',
     adaptive_difficulty_info: 'La dificultad se adapta a ti: sigue tus últimas 10 respuestas y sube o baja en tiempo real durante la partida.',
     nav_home: 'Inicio',
@@ -1028,6 +1036,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    nav_daily: 'Daily',
+    nav_pass: 'Pass',
     legendary_diff: 'Legendär',
     adaptive_difficulty_info: 'Die Schwierigkeit passt sich dir an: Sie folgt deinen letzten 10 Antworten und steigt oder sinkt in Echtzeit im Spiel.',
     nav_home: 'Start',
@@ -1248,6 +1258,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    nav_daily: 'Desafio',
+    nav_pass: 'Passe',
     legendary_diff: 'Lendário',
     adaptive_difficulty_info: 'A dificuldade se adapta a você: segue suas últimas 10 respostas e sobe ou desce em tempo real durante a partida.',
     nav_home: 'Início',
@@ -1468,6 +1480,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    nav_daily: '挑战',
+    nav_pass: '通行证',
     legendary_diff: '传奇',
     adaptive_difficulty_info: '难度会自动适应你：根据你最近10次作答实时升降。',
     nav_home: '首页',
@@ -1688,6 +1702,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    nav_daily: 'デイリー',
+    nav_pass: 'パス',
     legendary_diff: '伝説',
     adaptive_difficulty_info: '難易度は自動調整：直近10問の正答に応じてゲーム中にリアルタイムで上下します。',
     nav_home: 'ホーム',
@@ -1908,6 +1924,8 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    nav_daily: 'التحدي',
+    nav_pass: 'البطاقة',
     legendary_diff: 'أسطوري',
     adaptive_difficulty_info: 'الصعوبة تتكيف معك: تتبع آخر 10 إجابات وترتفع أو تنخفض في الوقت الفعلي أثناء اللعب.',
     nav_home: 'الرئيسية',

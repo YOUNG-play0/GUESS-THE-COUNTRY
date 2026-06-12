@@ -13,10 +13,11 @@ interface Props {
   theme: string;
   onSetTheme: (id: string) => void;
   onPremium: () => void;
+  onStats: () => void;
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTheme, onPremium, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTheme, onPremium, onStats, onBack }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -51,6 +52,18 @@ export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTh
             {nextLevel && <p className="text-slate-500 text-xs mt-1">{nextLevel.xp - stats.xp} XP to {t.level_title} {nextLevel.level}</p>}
           </div>
         </motion.div>
+
+        {/* Statistiques détaillées (plus d'onglet dédié dans la nav) */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onStats}
+          className="w-full mb-6 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all"
+        >
+          📊 {t.statistics}
+        </motion.button>
 
         {/* Level Progress */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
