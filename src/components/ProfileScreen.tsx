@@ -8,6 +8,9 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface Props {
   stats: PlayerStats;
   badges: string[];
+  /** Récompenses cosmétiques du Passe de Combat (voie premium) */
+  passTitles: string[];
+  passFrames: string[];
   /** Passe du Savoir : badges dorés + thèmes visuels */
   isPremium: boolean;
   theme: string;
@@ -17,7 +20,10 @@ interface Props {
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTheme, onPremium, onStats, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, passTitles, passFrames, isPremium, theme, onSetTheme, onPremium, onStats, onBack }: Props) {
+  // Cosmétiques premium : cadre doré autour de l'avatar + dernier titre gagné
+  const goldFrame = isPremium && passFrames.length > 0;
+  const passTitle = isPremium && passTitles.length > 0 ? passTitles[passTitles.length - 1] : null;
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -33,7 +39,7 @@ export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTh
 
         {/* Profile Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-3xl p-6 mb-6 text-center">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-500/25 relative">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className={`w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center relative shadow-lg ${goldFrame ? "border-4 border-yellow-400 shadow-yellow-500/40" : "shadow-indigo-500/25"}`}>
             <span className="text-4xl font-black text-white">{stats.level}</span>
             <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
               <Star className="w-4 h-4 text-white" fill="currentColor" />
@@ -41,6 +47,9 @@ export default function ProfileScreen({ stats, badges, isPremium, theme, onSetTh
           </motion.div>
           <h2 className="text-2xl font-bold text-white">{stats.name || 'Player'}</h2>
           <p className="text-indigo-300 font-medium">{currentLevel.title}</p>
+          {passTitle && (
+            <p className="text-yellow-300 text-sm font-bold mt-0.5">📜 {passTitle}</p>
+          )}
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm mb-1">
               <span className="text-slate-400 flex items-center gap-1"><Zap className="w-3 h-3 text-yellow-400" /> {stats.xp} XP</span>
