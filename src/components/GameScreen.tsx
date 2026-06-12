@@ -290,7 +290,7 @@ export default function GameScreen({
   };
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-4 pt-14 max-w-lg mx-auto">
+    <div className="min-h-screen w-full max-w-[480px] mx-auto flex flex-col px-4 py-4 pt-14">
       {/* Flash overlay */}
       <AnimatePresence>
         {showResult && isCorrect !== null && (

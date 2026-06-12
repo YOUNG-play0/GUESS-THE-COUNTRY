@@ -195,7 +195,7 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen font-sans text-white overflow-x-hidden no-select relative"
+      className="min-h-screen w-full font-sans text-white overflow-x-hidden no-select relative"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Thèmes visuels : réservés au Passe du Savoir */}
@@ -216,7 +216,7 @@ function AppContent() {
       </button>
 
       {/* Main Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 w-full">
         <AnimatePresence mode="wait">
           {screen === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>

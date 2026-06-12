@@ -18,6 +18,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Le jeu doit occuper tout l'écran : fond pleine largeur, contenu centré
+   (max 480px sur grand écran, géré par les conteneurs des écrans). */
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 body {
   font-family: var(--font-sans);
   background: #0a0a1a;
