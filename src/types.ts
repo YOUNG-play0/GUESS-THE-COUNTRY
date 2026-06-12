@@ -1,6 +1,6 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
-export type GameMode = 'classic' | 'survival' | 'chrono' | 'map';
-export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry';
+export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily';
+export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint';
 
 export interface Country {
@@ -43,6 +43,8 @@ export interface PlayerStats {
   xp: number;
   level: number;
   gamesPerMode: Record<GameMode, number>;
+  /** Meilleur score par mode — le « fantôme » à battre pendant la partie */
+  bestScorePerMode: Partial<Record<GameMode, number>>;
   unlockedDifficulties: Difficulty[];
 }
 
@@ -63,6 +65,12 @@ export interface GameState {
   correctAnswers: number;
   isActive: boolean;
   isPaused: boolean;
+  /** Pays correctement devinés pendant la partie (passeport) */
+  correctCountries: string[];
+  /** Bonnes réponses par continent (quêtes) */
+  correctByContinent: Record<string, number>;
+  /** Bonnes réponses aux questions drapeau (quêtes) */
+  correctFlags: number;
 }
 
 export const XP_LEVELS = [
@@ -77,6 +85,14 @@ export const XP_LEVELS = [
   { level: 9, xp: 3500, title: 'Atlas Legend' },
   { level: 10, xp: 5000, title: 'World Dominator' },
 ];
+
+export function levelForXP(xp: number): number {
+  let level = 1;
+  for (const l of XP_LEVELS) {
+    if (xp >= l.xp) level = l.level;
+  }
+  return level;
+}
 
 export const DIFFICULTY_TIMERS: Record<Difficulty, number> = {
   easy: 12,

@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
-import { Trophy, Zap, Target, Flame, Star, Home, RotateCcw, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import { Trophy, Zap, Target, Flame, Star, Home, RotateCcw, Copy, Check, Share2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { GameState, XP_LEVELS } from '../types';
+import { playFanfare } from '../utils/sound';
+import { haptics } from '../utils/haptics';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -9,15 +11,36 @@ interface Props {
   playerLevel: number;
   playerXP: number;
   isNewBest: boolean;
+  previousBest: number;
   onPlayAgain: () => void;
   onHome: () => void;
 }
 
-export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, onPlayAgain, onHome }: Props) {
+const NEAR_MISS_MAX_PTS = 50;
+
+export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, previousBest, onPlayAgain, onHome }: Props) {
   const { t } = useLanguage();
   const [linkCopied, setLinkCopied] = useState(false);
+  const [dailyShared, setDailyShared] = useState(false);
   const accuracy = gameState.questionsAnswered > 0 ? Math.round((gameState.correctAnswers / gameState.questionsAnswered) * 100) : 0;
   const DISCORD_URL = 'https://discord.gg/wzqAHmG3jt';
+  const isDaily = gameState.mode === 'daily';
+  const missingPts = previousBest - gameState.score;
+  const nearMiss = !isDaily && !isNewBest && gameState.score > 0 && missingPts > 0 && missingPts <= NEAR_MISS_MAX_PTS;
+
+  const shareDaily = () => {
+    const text = t.daily_share_text
+      .replace('{score}', String(gameState.correctAnswers))
+      .replace('{total}', String(gameState.totalQuestions));
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+      return;
+    }
+    navigator.clipboard?.writeText(text).then(() => {
+      setDailyShared(true);
+      setTimeout(() => setDailyShared(false), 2000);
+    }).catch(() => {});
+  };
 
   const copyDiscordLink = () => {
     navigator.clipboard.writeText(DISCORD_URL).then(() => {
@@ -36,6 +59,15 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
       setTimeout(() => setLinkCopied(false), 2000);
     });
   };
+  // Fanfare sur nouveau record
+  useEffect(() => {
+    if (isNewBest) {
+      playFanfare();
+      haptics.celebrate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const currentLevelData = XP_LEVELS.find(l => l.level === playerLevel) || XP_LEVELS[0];
   const nextLevelData = XP_LEVELS.find(l => l.level === playerLevel + 1);
   const xpProgress = nextLevelData ? ((playerXP - currentLevelData.xp) / (nextLevelData.xp - currentLevelData.xp)) * 100 : 100;
@@ -76,14 +108,26 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
             {grade.text}
           </motion.h1>
           {isNewBest && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0 }} 
-              animate={{ opacity: 1, scale: 1 }} 
-              transition={{ delay: 0.5, type: 'spring' }} 
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
               className="mt-2 inline-flex items-center gap-1.5 bg-yellow-500/20 border border-yellow-500/30 px-4 py-1.5 rounded-full"
             >
               <Star className="w-4 h-4 text-yellow-400" fill="currentColor" />
               <span className="text-yellow-300 font-bold text-sm">{t.new_best_score}</span>
+            </motion.div>
+          )}
+          {nearMiss && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+              className="mt-2 inline-flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/30 px-4 py-1.5 rounded-full"
+            >
+              <span className="text-orange-300 font-bold text-sm">
+                😤 {t.almost_record.replace('{n}', String(missingPts))}
+              </span>
             </motion.div>
           )}
         </div>
@@ -96,14 +140,16 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
           className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-4"
         >
           <div className="text-center mb-4">
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t.final_score}</p>
-            <motion.p 
-              initial={{ scale: 0.5 }} 
-              animate={{ scale: 1 }} 
-              transition={{ delay: 0.6, type: 'spring' }} 
+            <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">
+              {isDaily ? `📅 ${t.daily_challenge}` : t.final_score}
+            </p>
+            <motion.p
+              initial={{ scale: 0.5 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6, type: 'spring' }}
               className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400"
             >
-              {gameState.score}
+              {isDaily ? `${gameState.correctAnswers}/${gameState.totalQuestions}` : gameState.score}
             </motion.p>
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -190,13 +236,30 @@ export default function GameOver({ gameState, playerLevel, playerXP, isNewBest, 
           transition={{ delay: 0.9 }} 
           className="space-y-3"
         >
-          <motion.button 
-            whileTap={{ scale: 0.97 }} 
-            onClick={onPlayAgain} 
-            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
-          >
-            <RotateCcw className="w-5 h-5" /> {t.play_again}
-          </motion.button>
+          {isDaily ? (
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={shareDaily}
+              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
+            >
+              {dailyShared ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
+              {dailyShared ? t.copied_clipboard : t.share_score}
+            </motion.button>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={onPlayAgain}
+              animate={nearMiss ? { scale: [1, 1.04, 1] } : {}}
+              transition={nearMiss ? { repeat: Infinity, duration: 1.2 } : {}}
+              className={`w-full py-4 text-white font-black text-lg rounded-2xl shadow-lg flex items-center justify-center gap-2 ${
+                nearMiss
+                  ? 'bg-gradient-to-r from-orange-600 to-red-600 shadow-orange-500/30'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-indigo-500/25'
+              }`}
+            >
+              <RotateCcw className="w-5 h-5" /> ⚡ {t.rematch}
+            </motion.button>
+          )}
           <motion.button 
             whileTap={{ scale: 0.96 }} 
             onClick={onHome} 

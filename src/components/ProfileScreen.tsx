@@ -1,14 +1,16 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Star, Lock, Check, Zap } from 'lucide-react';
+import { ArrowLeft, Shield, Star, Lock, Check, Zap, Medal } from 'lucide-react';
 import { PlayerStats, XP_LEVELS, Difficulty } from '../types';
+import { BADGES, badgeLabel } from '../data/badges';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   stats: PlayerStats;
+  badges: string[];
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, onBack }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -76,6 +78,36 @@ export default function ProfileScreen({ stats, onBack }: Props) {
                   </div>
                   {isCurrent && <Check className="w-5 h-5 text-indigo-400 shrink-0" />}
                 </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Succès */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">
+          <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+            <Medal className="w-5 h-5 text-yellow-400" /> {t.badges_title}
+            <span className="ml-auto text-xs text-slate-400 font-semibold">{badges.length}/{BADGES.length}</span>
+          </h3>
+          <div className="grid grid-cols-3 gap-2.5">
+            {BADGES.map(b => {
+              const unlocked = badges.includes(b.id);
+              const { name, desc } = badgeLabel(b, t);
+              return (
+                <div
+                  key={b.id}
+                  title={`${name} — ${desc}`}
+                  className={`rounded-2xl border p-2.5 text-center ${
+                    unlocked ? 'bg-yellow-500/10 border-yellow-500/25' : 'bg-white/[0.02] border-white/5 opacity-40'
+                  }`}
+                >
+                  <span className={`text-2xl select-none ${unlocked ? '' : 'grayscale'}`} style={unlocked ? undefined : { filter: 'grayscale(1)' }}>
+                    {unlocked ? b.emoji : '🔒'}
+                  </span>
+                  <p className={`mt-1 text-[10px] leading-tight font-semibold ${unlocked ? 'text-yellow-200' : 'text-slate-500'}`}>
+                    {name}
+                  </p>
+                </div>
               );
             })}
           </div>

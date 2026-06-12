@@ -49,19 +49,19 @@
 ## 🔥 PHASE 3 — Mécaniques d'addiction (par ordre d'impact)
 
 ### 3A. Rétention quotidienne — LE plus important
-- [ ] **3.1** 🔥 **Streak de jours consécutifs** : compteur en évidence sur l'accueil, animation de flamme, "gel de streak" achetable en XP
-- [ ] **3.2** 📅 **Défi du jour** : 5 questions identiques pour tous (générées depuis la date), 1 seule tentative, résultat partageable ("4/5 au GeoQuiz du jour 🌍")
-- [ ] **3.3** 🎯 **3 quêtes quotidiennes** ("10 questions sur l'Afrique", "Combo x5"...) avec récompenses XP
+- [x] **3.1** 🔥 **Streak de jours consécutifs** : compteur en évidence sur l'accueil, animation de flamme, "gel de streak" achetable en XP
+- [x] **3.2** 📅 **Défi du jour** : 5 questions identiques pour tous (générées depuis la date), 1 seule tentative, résultat partageable ("4/5 au GeoQuiz du jour 🌍")
+- [x] **3.3** 🎯 **3 quêtes quotidiennes** ("10 questions sur l'Afrique", "Combo x5"...) avec récompenses XP
 
 ### 3B. Collection et progression
-- [ ] **3.4** 🛂 **Le Passeport** : chaque pays correctement deviné se débloque (drapeau coloré vs grisé), progression par continent "Europe 24/44"
-- [ ] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
+- [x] **3.4** 🛂 **Le Passeport** : chaque pays correctement deviné se débloque (drapeau coloré vs grisé), progression par continent "Europe 24/44"
+- [x] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
 
 ### 3C. Le "juice" (ressenti)
-- [ ] **3.6** 🔊 **Sons** : ding croissant en pitch sur le combo, tic-tac dramatique sous 3 s, fanfare de niveau (Web Audio API, pas de fichiers lourds)
-- [ ] **3.7** 📳 **Vibrations** (`navigator.vibrate`) : courte sur bonne réponse, double sur erreur
-- [ ] **3.8** ⚡ **Bouton REVANCHE** en 1 tap sur l'écran Game Over + message "Record battu de justesse ! Il te manquait 40 pts"
-- [ ] **3.9** 👻 **Duel fantôme** : barre de progression de ton record en temps réel pendant la partie (aucun serveur nécessaire)
+- [x] **3.6** 🔊 **Sons** : ding croissant en pitch sur le combo, tic-tac dramatique sous 3 s, fanfare de niveau (Web Audio API, pas de fichiers lourds)
+- [x] **3.7** 📳 **Vibrations** (`navigator.vibrate`) : courte sur bonne réponse, double sur erreur
+- [x] **3.8** ⚡ **Bouton REVANCHE** en 1 tap sur l'écran Game Over + message "Record battu de justesse ! Il te manquait 40 pts"
+- [x] **3.9** 👻 **Duel fantôme** : barre de progression de ton record en temps réel pendant la partie (aucun serveur nécessaire)
 
 ### 3D. Plus tard (nécessite un backend)
 - [ ] **3.10** 🔔 Notifications push ("Ta série de 6 jours expire dans 3 h !")

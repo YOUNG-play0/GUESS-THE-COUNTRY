@@ -1,5 +1,7 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playCorrect, playWrong, playTick } from '../utils/sound';
+import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
 import { GameState, Question } from '../types';
 import { countryShapes } from '../data/countryShapes';
@@ -52,6 +54,8 @@ interface Props {
   isCorrect: boolean | null;
   showResult: boolean;
   chronoTimeLeft: number;
+  /** Duel fantôme : record du mode à battre (0 = pas encore de record) */
+  ghostScore: number;
   onAnswer: (answer: string) => void;
   onNext: () => void;
   onQuit: () => void;
@@ -59,20 +63,41 @@ interface Props {
 
 export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
-  chronoTimeLeft, onAnswer, onNext, onQuit,
+  chronoTimeLeft, ghostScore, onAnswer, onNext, onQuit,
 }: Props) {
   const { t, language } = useLanguage();
 
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
     onAnswer(answer);
-    if (navigator.vibrate) {
-      // Vibrate after answer - we check correctness from the answer matching
-      const correct = currentQuestion?.correctAnswer === answer;
-      if (!correct) navigator.vibrate([50, 30, 50]);
-      else navigator.vibrate(15);
-    }
   };
+
+  // Son + vibration au résultat (réponse cliquée OU temps écoulé)
+  useEffect(() => {
+    if (!showResult || isCorrect === null) return;
+    if (isCorrect) {
+      playCorrect(gameState.combo);
+      haptics.correct();
+    } else {
+      playWrong();
+      haptics.wrong();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResult]);
+
+  // Tic-tac dramatique sous 3 s (timer par question ; en Chrono : 5 dernières s du global)
+  const questionSec = Math.ceil(gameState.timeLeft);
+  const chronoSec = Math.ceil(chronoTimeLeft);
+  useEffect(() => {
+    if (!gameState.isActive || showResult || gameState.mode === 'chrono') return;
+    if (questionSec <= 3 && questionSec > 0) playTick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionSec]);
+  useEffect(() => {
+    if (!gameState.isActive || gameState.mode !== 'chrono') return;
+    if (chronoSec <= 5 && chronoSec > 0) playTick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chronoSec]);
 
   if (!currentQuestion) return null;
 
@@ -268,6 +293,25 @@ export default function GameScreen({
           )}
         </div>
       </div>
+
+      {/* Duel fantôme : ton record du mode, en temps réel */}
+      {ghostScore > 0 && (
+        <div className="mb-2">
+          <div className="flex justify-between items-center text-[10px] mb-0.5">
+            <span className={gameState.score > ghostScore ? 'text-emerald-400 font-bold' : 'text-violet-300/80'}>
+              👻 {gameState.score > ghostScore ? t.ghost_beaten : t.ghost_record}
+            </span>
+            <span className="text-slate-500 tabular-nums">{gameState.score} / {ghostScore}</span>
+          </div>
+          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full ${gameState.score > ghostScore ? 'bg-emerald-500' : 'bg-violet-500'}`}
+              animate={{ width: `${Math.min(100, (gameState.score / ghostScore) * 100)}%` }}
+              transition={{ duration: 0.4 }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Question Progress */}
       {gameState.mode !== 'chrono' && gameState.mode !== 'survival' && (

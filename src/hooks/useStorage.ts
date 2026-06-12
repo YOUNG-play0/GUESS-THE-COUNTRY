@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { PlayerStats, GameMode } from '../types';
+import { PlayerStats, GameMode, levelForXP } from '../types';
 
 const DEFAULT_STATS: PlayerStats = {
   name: '',
@@ -11,14 +11,24 @@ const DEFAULT_STATS: PlayerStats = {
   totalAnswers: 0,
   xp: 0,
   level: 1,
-  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0 },
+  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0, daily: 0 },
+  bestScorePerMode: {},
   unlockedDifficulties: ['easy'],
 };
 
 function loadStats(): PlayerStats {
   try {
     const raw = localStorage.getItem('gtc_stats');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      // Fusion avec les valeurs par défaut : les données enregistrées par
+      // d'anciennes versions n'ont pas forcément tous les champs (ex: daily)
+      const parsed = JSON.parse(raw);
+      return {
+        ...DEFAULT_STATS,
+        ...parsed,
+        gamesPerMode: { ...DEFAULT_STATS.gamesPerMode, ...parsed.gamesPerMode },
+      };
+    }
   } catch {}
   return { ...DEFAULT_STATS };
 }
@@ -46,14 +56,7 @@ export function useStorage() {
   const addXP = useCallback((amount: number) => {
     setStats(prev => {
       const newXP = prev.xp + amount;
-      const XP_LEVELS = [0, 100, 250, 500, 800, 1200, 1800, 2500, 3500, 5000];
-      let newLevel = 1;
-      for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
-        if (newXP >= XP_LEVELS[i]) {
-          newLevel = i + 1;
-          break;
-        }
-      }
+      const newLevel = Math.max(prev.level, levelForXP(newXP));
       const unlockedDiffs = prev.unlockedDifficulties.slice();
       if (newLevel >= 2 && !unlockedDiffs.includes('medium')) unlockedDiffs.push('medium');
       if (newLevel >= 4 && !unlockedDiffs.includes('hard')) unlockedDiffs.push('hard');
@@ -75,12 +78,23 @@ export function useStorage() {
         bestCombo: Math.max(prev.bestCombo, combo),
         correctAnswers: prev.correctAnswers + correct,
         totalAnswers: prev.totalAnswers + total,
-        gamesPerMode: { ...prev.gamesPerMode, [mode]: prev.gamesPerMode[mode] + 1 },
+        gamesPerMode: { ...prev.gamesPerMode, [mode]: (prev.gamesPerMode[mode] ?? 0) + 1 },
+        bestScorePerMode: { ...prev.bestScorePerMode, [mode]: Math.max(prev.bestScorePerMode?.[mode] ?? 0, score) },
       };
       saveStats(next);
       return next;
     });
   }, []);
+
+  // Dépense d'XP (gel de série...). Le niveau et les difficultés débloquées
+  // ne redescendent jamais : l'XP sert aussi de monnaie.
+  const spendXP = useCallback((amount: number): boolean => {
+    if (stats.xp < amount) return false;
+    const next = { ...stats, xp: stats.xp - amount };
+    setStats(next);
+    saveStats(next);
+    return true;
+  }, [stats]);
 
   const setPlayerName = useCallback((name: string) => {
     updateStats({ name });
@@ -90,6 +104,7 @@ export function useStorage() {
     stats,
     updateStats,
     addXP,
+    spendXP,
     recordGame,
     setPlayerName,
   };

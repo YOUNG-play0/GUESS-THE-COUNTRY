@@ -25,10 +25,11 @@ export default function StatsScreen({ stats, onBack }: Props) {
   ];
 
   const modeStats = [
-    { mode: 'classic', games: stats.gamesPerMode.classic, emoji: '🎮' },
-    { mode: 'survival', games: stats.gamesPerMode.survival, emoji: '❤️' },
-    { mode: 'chrono', games: stats.gamesPerMode.chrono, emoji: '⏱️' },
-    { mode: 'map', games: stats.gamesPerMode.map, emoji: '🗺️' },
+    { mode: 'classic', label: t.classic_mode, games: stats.gamesPerMode.classic, emoji: '🎮' },
+    { mode: 'survival', label: t.survival_mode, games: stats.gamesPerMode.survival, emoji: '❤️' },
+    { mode: 'chrono', label: t.chrono_mode, games: stats.gamesPerMode.chrono, emoji: '⏱️' },
+    { mode: 'map', label: t.map_mode, games: stats.gamesPerMode.map, emoji: '🗺️' },
+    { mode: 'daily', label: t.daily_challenge, games: stats.gamesPerMode.daily ?? 0, emoji: '📅' },
   ];
 
   return (
@@ -64,11 +65,10 @@ export default function StatsScreen({ stats, onBack }: Props) {
             {modeStats.map(ms => {
               const total = stats.totalGames || 1;
               const pct = Math.round((ms.games / total) * 100);
-              const modeLabel = t[ms.mode as keyof typeof t] || ms.mode;
               return (
                 <div key={ms.mode}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-slate-300">{ms.emoji} {modeLabel as string}</span>
+                    <span className="text-sm text-slate-300">{ms.emoji} {ms.label}</span>
                     <span className="text-sm text-slate-400">{ms.games}</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden">

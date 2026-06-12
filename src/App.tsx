@@ -1,8 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Screen, GameMode, Difficulty } from './types';
+import { Volume2, VolumeX } from 'lucide-react';
+import { Screen, GameMode, Difficulty, levelForXP } from './types';
+import { BadgeDef } from './data/badges';
+import BadgePopup from './components/BadgePopup';
+import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
+import { useProgress, FREEZE_COST_XP, MAX_FREEZES, todayKey } from './hooks/useProgress';
+import { generateDailyQuestions } from './utils/daily';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import WorldBackground from './components/WorldBackground';
 import HomeScreen from './components/HomeScreen';
@@ -12,6 +18,7 @@ import GameScreen from './components/GameScreen';
 import GameOver from './components/GameOver';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
+import PassportScreen from './components/PassportScreen';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
@@ -25,12 +32,30 @@ function AppContent() {
   const [lastMode, setLastMode] = useState<GameMode>('classic');
   const [lastDifficulty, setLastDifficulty] = useState<Difficulty>('easy');
   const gameRecordedRef = useRef(false);
+  // Record AVANT la partie : sert au message « il te manquait X pts »
+  // (stats.bestScore est déjà écrasé quand l'écran de fin s'affiche)
+  const prevBestRef = useRef(0);
+  // Duel fantôme : record du mode joué, figé au lancement de la partie
+  const ghostRef = useRef(0);
   const {
     stats,
     addXP,
+    spendXP,
     recordGame,
     setPlayerName,
   } = useStorage();
+
+  const {
+    streak, freezes, addFreeze,
+    dailyToday, startDaily,
+    questsToday, registerGameEnd, passport, badges,
+  } = useProgress();
+  const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
+  const [soundOn, setSoundOn] = useState(isSoundEnabled);
+
+  const handleBuyFreeze = useCallback(() => {
+    if (spendXP(FREEZE_COST_XP)) addFreeze();
+  }, [spendXP, addFreeze]);
 
   const {
     gameState,
@@ -57,6 +82,27 @@ function AppContent() {
         gameState.correctAnswers,
         gameState.questionsAnswered
       );
+      const { questXp, newBadges: unlocked } = registerGameEnd({
+        mode: gameState.mode,
+        score: gameState.score,
+        bestCombo: gameState.bestCombo,
+        correctAnswers: gameState.correctAnswers,
+        questionsAnswered: gameState.questionsAnswered,
+        correctByContinent: gameState.correctByContinent,
+        correctFlags: gameState.correctFlags,
+        correctCountries: gameState.correctCountries,
+      }, {
+        totalGames: stats.totalGames + 1,
+        bestCombo: Math.max(stats.bestCombo, gameState.bestCombo),
+        bestScore: Math.max(stats.bestScore, gameState.score),
+        level: stats.level,
+      });
+      if (questXp > 0) addXP(questXp);
+      setNewBadges(unlocked);
+      // Fanfare de niveau gagné (XP de la partie + XP des quêtes)
+      if (levelForXP(stats.xp + gameState.xpEarned + questXp) > stats.level) {
+        playFanfare();
+      }
       setScreen('game-over');
     }
   }, [gameState?.isActive]);
@@ -65,9 +111,25 @@ function AppContent() {
     setLastMode(mode);
     setLastDifficulty(difficulty);
     gameRecordedRef.current = false;
+    prevBestRef.current = stats.bestScore;
+    ghostRef.current = stats.bestScorePerMode?.[mode] ?? 0;
     startGame(mode, difficulty);
     setScreen('game');
-  }, [startGame]);
+  }, [startGame, stats.bestScore, stats.bestScorePerMode]);
+
+  const handleStartDaily = useCallback(() => {
+    if (!stats.name) {
+      setScreen('name-entry');
+      return;
+    }
+    const qs = generateDailyQuestions(todayKey());
+    startDaily(qs.length);
+    gameRecordedRef.current = false;
+    prevBestRef.current = stats.bestScore;
+    ghostRef.current = stats.bestScorePerMode?.daily ?? 0;
+    startGame('daily', 'medium', qs);
+    setScreen('game');
+  }, [stats.name, startDaily, startGame]);
 
   const handleQuitGame = useCallback(() => {
     clearTimers();
@@ -112,12 +174,32 @@ function AppContent() {
         <LanguageSelector />
       </div>
 
+      {/* Interrupteur son */}
+      <button
+        onClick={() => { setSoundEnabled(!soundOn); setSoundOn(!soundOn); }}
+        aria-label={soundOn ? 'Mute' : 'Unmute'}
+        className="fixed top-3 left-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+      >
+        {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+      </button>
+
       {/* Main Content */}
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {screen === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <HomeScreen stats={stats} onNavigate={setScreen} />
+              <HomeScreen
+                stats={stats}
+                streak={streak}
+                freezes={freezes}
+                maxFreezes={MAX_FREEZES}
+                freezeCost={FREEZE_COST_XP}
+                onBuyFreeze={handleBuyFreeze}
+                daily={dailyToday}
+                onPlayDaily={handleStartDaily}
+                quests={questsToday}
+                onNavigate={setScreen}
+              />
             </motion.div>
           )}
           {screen === 'name-entry' && (
@@ -139,6 +221,7 @@ function AppContent() {
                 isCorrect={isCorrect}
                 showResult={showResult}
                 chronoTimeLeft={chronoTimeLeft}
+                ghostScore={ghostRef.current}
                 onAnswer={handleAnswer}
                 onNext={handleNext}
                 onQuit={handleQuitGame}
@@ -152,6 +235,7 @@ function AppContent() {
                 playerLevel={stats.level}
                 playerXP={stats.xp}
                 isNewBest={isNewBest}
+                previousBest={prevBestRef.current}
                 onPlayAgain={handlePlayAgain}
                 onHome={() => setScreen('home')}
               />
@@ -162,13 +246,24 @@ function AppContent() {
               <StatsScreen stats={stats} onBack={() => setScreen('home')} />
             </motion.div>
           )}
+          {screen === 'passport' && (
+            <motion.div key="passport" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <PassportScreen passport={passport} onBack={() => setScreen('home')} />
+            </motion.div>
+          )}
           {screen === 'profile' && (
             <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <ProfileScreen stats={stats} onBack={() => setScreen('home')} />
+              <ProfileScreen stats={stats} badges={badges} onBack={() => setScreen('home')} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Popup de succès débloqués (après une partie) */}
+      <BadgePopup
+        badges={screen === 'game-over' ? newBadges : []}
+        onClose={() => setNewBadges([])}
+      />
 
       {/* Chat Assistant - always visible */}
       <ChatAssistant />
