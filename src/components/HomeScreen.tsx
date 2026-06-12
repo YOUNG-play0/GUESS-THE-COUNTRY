@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Globe2, BarChart3, User, Play, Zap, CalendarCheck } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
 import { DailyState, QuestItem, QUEST_XP_REWARD } from '../hooks/useProgress';
-import { Translations } from '../i18n/translations';
+import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
@@ -16,18 +16,6 @@ interface Props {
   onPlayDaily: () => void;
   quests: QuestItem[];
   onNavigate: (screen: Screen) => void;
-}
-
-export function continentLabel(continent: string, t: Translations): string {
-  switch (continent) {
-    case 'Europe': return t.continent_europe;
-    case 'Asia': return t.continent_asia;
-    case 'Africa': return t.continent_africa;
-    case 'North America': return t.continent_north_america;
-    case 'South America': return t.continent_south_america;
-    case 'Oceania': return t.continent_oceania;
-    default: return continent;
-  }
 }
 
 function questLabel(q: QuestItem, t: Translations): string {

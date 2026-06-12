@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { countries, getCountryDisplayName } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
-import { continentLabel } from './HomeScreen';
+import { continentLabel } from '../i18n/translations';
 
 interface Props {
   passport: string[];

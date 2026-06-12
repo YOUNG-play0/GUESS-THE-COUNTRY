@@ -55,7 +55,7 @@
 
 ### 3B. Collection et progression
 - [x] **3.4** 🛂 **Le Passeport** : chaque pays correctement deviné se débloque (drapeau coloré vs grisé), progression par continent "Europe 24/44"
-- [ ] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
+- [x] **3.5** 🏅 **Badges/Succès** : "Sans-faute", "Combo x10", "Maître de l'Asie", "100 parties"... avec popup de déblocage. Les stats nécessaires existent déjà dans `PlayerStats`
 
 ### 3C. Le "juice" (ressenti)
 - [ ] **3.6** 🔊 **Sons** : ding croissant en pitch sur le combo, tic-tac dramatique sous 3 s, fanfare de niveau (Web Audio API, pas de fichiers lourds)

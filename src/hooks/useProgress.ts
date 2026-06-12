@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { GameMode } from '../types';
 import { hashString, mulberry32, seededShuffle } from '../utils/daily';
+import { BADGES, BadgeCtx, BadgeDef } from '../data/badges';
 
 // Progression « méta » du joueur (hors stats de parties) : série de jours,
 // défi du jour, quêtes, passeport, succès. Tout est local (localStorage).
@@ -34,9 +35,18 @@ export interface GameSummary {
   score: number;
   bestCombo: number;
   correctAnswers: number;
+  questionsAnswered: number;
   correctByContinent: Record<string, number>;
   correctFlags: number;
   correctCountries: string[];
+}
+
+/** Stats globales déjà mises à jour avec la partie, fournies par App */
+export interface StatsCtx {
+  totalGames: number;
+  bestCombo: number;
+  bestScore: number;
+  level: number;
 }
 
 export interface ProgressState {
@@ -45,6 +55,8 @@ export interface ProgressState {
   quests: { date: string; items: QuestItem[] } | null;
   /** Passeport : noms (EN) des pays correctement devinés au moins une fois */
   passport: string[];
+  /** Identifiants des succès débloqués */
+  badges: string[];
 }
 
 export const QUEST_XP_REWARD = 30;
@@ -97,6 +109,7 @@ const DEFAULT_PROGRESS: ProgressState = {
   daily: null,
   quests: null,
   passport: [],
+  badges: [],
 };
 
 export function todayKey(date = new Date()): string {
@@ -161,10 +174,39 @@ export function useProgress() {
     });
   }, []);
 
-  // À appeler à chaque partie terminée (n'importe quel mode)
-  const touchStreak = useCallback(() => {
-    update(p => ({ ...p, streak: bumpStreak(p.streak) }));
-  }, [update]);
+  // À appeler une fois à chaque fin de partie : met à jour streak, défi du
+  // jour, quêtes, passeport et succès en une seule transition d'état.
+  // Tout est calculé hors setState (les updaters peuvent être rejoués par
+  // React en StrictMode) ; retourne l'XP des quêtes accomplies et les
+  // nouveaux succès pour la popup.
+  const registerGameEnd = useCallback((summary: GameSummary, statsCtx: StatsCtx): { questXp: number; newBadges: BadgeDef[] } => {
+    const today = todayKey();
+    const streakNext = bumpStreak(progress.streak);
+    const daily = summary.mode === 'daily' && progress.daily && progress.daily.date === today
+      ? { ...progress.daily, correct: summary.correctAnswers, finished: true }
+      : progress.daily;
+    const questBase = progress.quests && progress.quests.date === today
+      ? progress.quests.items
+      : generateQuests(today);
+    const { items, xpGained } = applyGameToQuests(questBase, summary);
+    const passport = summary.correctCountries.length
+      ? [...new Set([...progress.passport, ...summary.correctCountries])]
+      : progress.passport;
+
+    const ctx: BadgeCtx = { ...statsCtx, streak: aliveStreak(streakNext), passport, lastGame: summary };
+    const newBadges = BADGES.filter(b => !progress.badges.includes(b.id) && b.check(ctx));
+
+    const next: ProgressState = {
+      streak: streakNext,
+      daily,
+      quests: { date: today, items },
+      passport,
+      badges: newBadges.length ? [...progress.badges, ...newBadges.map(b => b.id)] : progress.badges,
+    };
+    setProgress(next);
+    saveProgress(next);
+    return { questXp: xpGained, newBadges };
+  }, [progress]);
 
   const addFreeze = useCallback(() => {
     update(p => p.streak.freezes >= MAX_FREEZES ? p : { ...p, streak: { ...p.streak, freezes: p.streak.freezes + 1 } });
@@ -176,12 +218,6 @@ export function useProgress() {
     update(p => ({ ...p, daily: { date: todayKey(), correct: 0, total, finished: false } }));
   }, [update]);
 
-  const finishDaily = useCallback((correct: number) => {
-    update(p => p.daily && p.daily.date === todayKey()
-      ? { ...p, daily: { ...p.daily, correct, finished: true } }
-      : p);
-  }, [update]);
-
   const dailyToday: DailyState | null =
     progress.daily && progress.daily.date === todayKey() ? progress.daily : null;
 
@@ -190,37 +226,17 @@ export function useProgress() {
       ? progress.quests.items
       : generateQuests(todayKey());
 
-  // Met à jour les quêtes avec le résumé de la partie et retourne l'XP
-  // gagné par les quêtes nouvellement accomplies (calcul hors setState :
-  // les updaters peuvent être rejoués par React en StrictMode).
-  const applyGameSummary = useCallback((summary: GameSummary): number => {
-    const today = todayKey();
-    const base = progress.quests && progress.quests.date === today
-      ? progress.quests.items
-      : generateQuests(today);
-    const { items, xpGained } = applyGameToQuests(base, summary);
-    update(p => ({
-      ...p,
-      quests: { date: today, items },
-      passport: summary.correctCountries.length
-        ? [...new Set([...p.passport, ...summary.correctCountries])]
-        : p.passport,
-    }));
-    return xpGained;
-  }, [progress.quests, update]);
-
   return {
     progress,
     update,
     streak: aliveStreak(progress.streak),
     freezes: progress.streak.freezes,
-    touchStreak,
     addFreeze,
     dailyToday,
     startDaily,
-    finishDaily,
     questsToday,
-    applyGameSummary,
+    registerGameEnd,
     passport: progress.passport,
+    badges: progress.badges,
   };
 }

@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Screen, GameMode, Difficulty } from './types';
+import { BadgeDef } from './data/badges';
+import BadgePopup from './components/BadgePopup';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
 import { useProgress, FREEZE_COST_XP, MAX_FREEZES, todayKey } from './hooks/useProgress';
@@ -37,10 +39,11 @@ function AppContent() {
   } = useStorage();
 
   const {
-    streak, freezes, touchStreak, addFreeze,
-    dailyToday, startDaily, finishDaily,
-    questsToday, applyGameSummary, passport,
+    streak, freezes, addFreeze,
+    dailyToday, startDaily,
+    questsToday, registerGameEnd, passport, badges,
   } = useProgress();
+  const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -71,18 +74,23 @@ function AppContent() {
         gameState.correctAnswers,
         gameState.questionsAnswered
       );
-      touchStreak();
-      if (gameState.mode === 'daily') finishDaily(gameState.correctAnswers);
-      const questXp = applyGameSummary({
+      const { questXp, newBadges: unlocked } = registerGameEnd({
         mode: gameState.mode,
         score: gameState.score,
         bestCombo: gameState.bestCombo,
         correctAnswers: gameState.correctAnswers,
+        questionsAnswered: gameState.questionsAnswered,
         correctByContinent: gameState.correctByContinent,
         correctFlags: gameState.correctFlags,
         correctCountries: gameState.correctCountries,
+      }, {
+        totalGames: stats.totalGames + 1,
+        bestCombo: Math.max(stats.bestCombo, gameState.bestCombo),
+        bestScore: Math.max(stats.bestScore, gameState.score),
+        level: stats.level,
       });
       if (questXp > 0) addXP(questXp);
+      setNewBadges(unlocked);
       setScreen('game-over');
     }
   }, [gameState?.isActive]);
@@ -218,11 +226,17 @@ function AppContent() {
           )}
           {screen === 'profile' && (
             <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <ProfileScreen stats={stats} onBack={() => setScreen('home')} />
+              <ProfileScreen stats={stats} badges={badges} onBack={() => setScreen('home')} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Popup de succès débloqués (après une partie) */}
+      <BadgePopup
+        badges={screen === 'game-over' ? newBadges : []}
+        onClose={() => setNewBadges([])}
+      />
 
       {/* Chat Assistant - always visible */}
       <ChatAssistant />
