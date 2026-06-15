@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Globe2, Play, Zap } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
-import { DailyState, QuestItem } from '../hooks/useProgress';
+import { QuestItem } from '../hooks/useProgress';
 import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -12,10 +12,7 @@ interface Props {
   maxFreezes: number;
   freezeCost: number;
   onBuyFreeze: () => void;
-  daily: DailyState | null;
-  onPlayDaily: () => void;
   quests: QuestItem[];
-  isPremium: boolean;
   onNavigate: (screen: Screen) => void;
 }
 
@@ -35,7 +32,7 @@ const QUEST_EMOJI: Record<QuestItem['id'], string> = {
   correct: '🎯', combo: '🔥', continent: '🌍', games: '🎮', score: '⚡', flags: '🚩',
 };
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, daily, onPlayDaily, quests, isPremium, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, quests, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -45,7 +42,7 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
 
   return (
     // pb-28 : laisse la place à la barre de navigation fixe en bas
-    <div className="min-h-screen w-full max-w-[480px] mx-auto flex flex-col px-5 pt-16 pb-36">
+    <div className="h-dvh overflow-y-auto w-full max-w-[480px] mx-auto flex flex-col px-5 pt-16 pb-36">
 
       {/* ——— 1. Header : logo + titre + niveau XP ——— */}
       <motion.header
@@ -110,47 +107,6 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           {t.play_now}
         </motion.button>
 
-        {daily ? (
-          <div className="w-full py-3 px-4 bg-white/5 border border-emerald-500/25 rounded-2xl flex items-center gap-3">
-            <span className="text-xl select-none">📅</span>
-            <div className="flex-1 text-left min-w-0">
-              <p className="text-white font-bold text-sm truncate">
-                {t.daily_challenge} — {daily.correct}/{daily.total} ✅
-              </p>
-              <p className="text-slate-400 text-xs">{t.come_back_tomorrow}</p>
-            </div>
-          </div>
-        ) : (
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={onPlayDaily}
-            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center gap-3 transition-all"
-          >
-            <span className="text-xl select-none">📅</span>
-            <span className="flex-1 text-left min-w-0">
-              <span className="block font-bold text-sm">{t.daily_challenge}</span>
-              <span className="block text-emerald-100/80 text-xs truncate">{t.daily_desc}</span>
-            </span>
-          </motion.button>
-        )}
-
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => onNavigate('premium')}
-          className={`w-full py-2.5 px-4 rounded-2xl border flex items-center gap-3 transition-all ${
-            isPremium
-              ? 'bg-yellow-500/10 border-yellow-500/30'
-              : 'bg-gradient-to-r from-yellow-500/15 to-amber-600/10 border-yellow-500/25 hover:from-yellow-500/25'
-          }`}
-        >
-          <span className="text-lg select-none">👑</span>
-          <span className="flex-1 text-left min-w-0">
-            <span className="block text-yellow-200 font-bold text-[13px]">{t.premium_title}</span>
-            <span className="block text-yellow-100/60 text-[11px] truncate">
-              {isPremium ? t.premium_active : t.trial_cta}
-            </span>
-          </span>
-        </motion.button>
       </motion.section>
 
       {/* ——— 3. Progression : streak + quêtes en cards horizontales ——— */}

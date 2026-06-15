@@ -22,7 +22,8 @@ import GameOver from './components/GameOver';
 import StatsScreen from './components/StatsScreen';
 import ProfileScreen from './components/ProfileScreen';
 import PassportScreen from './components/PassportScreen';
-import PremiumScreen from './components/PremiumScreen';
+import BattlePassScreen from './components/BattlePassScreen';
+import DailyScreen from './components/DailyScreen';
 import BottomNav from './components/BottomNav';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
@@ -53,6 +54,7 @@ function AppContent() {
     streak, freezes, addFreeze,
     dailyToday, startDaily,
     questsToday, registerGameEnd, claimWeeklyFreeze, passport, badges, continentStats,
+    passPoints, passTitles, passFrames, syncPassPremium,
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
@@ -64,10 +66,14 @@ function AppContent() {
     storeTheme(id);
   }, []);
 
-  // Passe du Savoir : gel de streak offert chaque semaine
+  // Passe du Savoir : gel de streak offert chaque semaine + récompenses
+  // premium du Passe de Combat accordées rétroactivement à l'abonnement
   useEffect(() => {
-    if (premium.isPremium) claimWeeklyFreeze();
-  }, [premium.isPremium, claimWeeklyFreeze]);
+    if (!premium.isPremium) return;
+    claimWeeklyFreeze();
+    const retroXp = syncPassPremium();
+    if (retroXp > 0) addXP(retroXp);
+  }, [premium.isPremium, claimWeeklyFreeze, syncPassPremium, addXP]);
 
   const handleBuyFreeze = useCallback(() => {
     if (spendXP(FREEZE_COST_XP)) addFreeze();
@@ -98,7 +104,7 @@ function AppContent() {
         gameState.correctAnswers,
         gameState.questionsAnswered
       );
-      const { questXp, newBadges: unlocked } = registerGameEnd({
+      const { questXp, passXp, newBadges: unlocked } = registerGameEnd({
         mode: gameState.mode,
         score: gameState.score,
         bestCombo: gameState.bestCombo,
@@ -113,10 +119,10 @@ function AppContent() {
         bestScore: Math.max(stats.bestScore, gameState.score),
         level: stats.level,
       }, premium.isPremium);
-      if (questXp > 0) addXP(questXp);
+      if (questXp + passXp > 0) addXP(questXp + passXp);
       setNewBadges(unlocked);
-      // Fanfare de niveau gagné (XP de la partie + XP des quêtes)
-      if (levelForXP(stats.xp + gameState.xpEarned + questXp) > stats.level) {
+      // Fanfare de niveau gagné (XP de la partie + quêtes + Passe)
+      if (levelForXP(stats.xp + gameState.xpEarned + questXp + passXp) > stats.level) {
         playFanfare();
       }
       setScreen('game-over');
@@ -227,10 +233,7 @@ function AppContent() {
                 maxFreezes={MAX_FREEZES}
                 freezeCost={FREEZE_COST_XP}
                 onBuyFreeze={handleBuyFreeze}
-                daily={dailyToday}
-                onPlayDaily={handleStartDaily}
                 quests={premium.isPremium ? questsToday : questsToday.filter(q => !q.premium)}
-                isPremium={premium.isPremium}
                 onNavigate={setScreen}
               />
             </motion.div>
@@ -296,9 +299,15 @@ function AppContent() {
               <PassportScreen passport={passport} onBack={() => setScreen('home')} />
             </motion.div>
           )}
+          {screen === 'daily' && (
+            <motion.div key="daily" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <DailyScreen daily={dailyToday} onPlay={handleStartDaily} />
+            </motion.div>
+          )}
           {screen === 'premium' && (
             <motion.div key="premium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              <PremiumScreen
+              <BattlePassScreen
+                passPoints={passPoints}
                 plan={premium.plan}
                 trialDaysLeft={premium.trialDaysLeft}
                 trialUsed={premium.trialUsed}
@@ -306,7 +315,6 @@ function AppContent() {
                 onStartTrial={premium.startTrial}
                 onSubscribe={premium.subscribe}
                 onBuyPack={premium.buyContinentPack}
-                onBack={() => setScreen('home')}
               />
             </motion.div>
           )}
@@ -315,10 +323,13 @@ function AppContent() {
               <ProfileScreen
                 stats={stats}
                 badges={badges}
+                passTitles={passTitles}
+                passFrames={passFrames}
                 isPremium={premium.isPremium}
                 theme={theme}
                 onSetTheme={handleSetTheme}
                 onPremium={() => setScreen('premium')}
+                onStats={() => setScreen('stats')}
                 onBack={() => setScreen('home')}
               />
             </motion.div>
@@ -327,7 +338,7 @@ function AppContent() {
       </div>
 
       {/* Barre de navigation fixe (écrans hub uniquement) */}
-      {(['home', 'passport', 'stats', 'profile'] as Screen[]).includes(screen) && (
+      {(['home', 'passport', 'daily', 'premium', 'stats', 'profile'] as Screen[]).includes(screen) && (
         <BottomNav current={screen} onNavigate={setScreen} />
       )}
 

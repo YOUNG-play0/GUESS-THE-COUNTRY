@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { GameMode } from '../types';
 import { hashString, mulberry32, seededShuffle } from '../utils/daily';
 import { BADGES, BadgeCtx, BadgeDef } from '../data/badges';
+import { PP_PER_CORRECT, PP_PER_GAME, PP_PER_QUEST, PP_DAILY_BONUS, passLevelForPoints, FREE_TRACK, PREMIUM_TRACK, PassReward } from '../data/battlePass';
 
 // Progression « méta » du joueur (hors stats de parties) : série de jours,
 // défi du jour, quêtes, passeport, succès. Tout est local (localStorage).
@@ -64,6 +65,12 @@ export interface ProgressState {
   continentStats: Record<string, number>;
   /** Semaine du dernier gel hebdo offert (Passe du Savoir) */
   lastFreezeWeek: string;
+  /** Passe de Combat : points accumulés et récompenses déjà accordées */
+  passPoints: number;
+  passFreeGranted: number;
+  passPremiumGranted: number;
+  passTitles: string[];
+  passFrames: string[];
 }
 
 export const QUEST_XP_REWARD = 30;
@@ -98,8 +105,9 @@ export function generateQuests(dateKey: string): QuestItem[] {
   });
 }
 
-function applyGameToQuests(items: QuestItem[], g: GameSummary, isPremium: boolean): { items: QuestItem[]; xpGained: number } {
+function applyGameToQuests(items: QuestItem[], g: GameSummary, isPremium: boolean): { items: QuestItem[]; xpGained: number; completedCount: number } {
   let xpGained = 0;
+  let completedCount = 0;
   const next = items.map(q => {
     if (q.done) return q;
     if (q.premium && !isPremium) return q; // quête premium gelée sans le Passe
@@ -114,10 +122,26 @@ function applyGameToQuests(items: QuestItem[], g: GameSummary, isPremium: boolea
     }
     progress = Math.min(progress, q.target);
     const done = progress >= q.target;
-    if (done) xpGained += q.reward ?? QUEST_XP_REWARD;
+    if (done) {
+      xpGained += q.reward ?? QUEST_XP_REWARD;
+      completedCount++;
+    }
     return { ...q, progress, done };
   });
-  return { items: next, xpGained };
+  return { items: next, xpGained, completedCount };
+}
+
+// Applique une liste de récompenses du Passe : retourne l'XP gagné et les
+// mutations à reporter dans l'état (gels, badges, titres, cadres).
+function applyPassRewards(rewards: PassReward[], acc: { xp: number; freezes: number; badges: string[]; titles: string[]; frames: string[] }) {
+  for (const r of rewards) {
+    if (r.type === 'xp') acc.xp += r.amount;
+    else if (r.type === 'freeze') acc.freezes++;
+    else if (r.type === 'badge') acc.badges.push(r.id);
+    else if (r.type === 'title') acc.titles.push(r.title);
+    else if (r.type === 'frame') acc.frames.push(r.id);
+    // type 'theme' : informatif (les thèmes sont utilisables avec le premium)
+  }
 }
 
 const STORAGE_KEY = 'gtc_progress';
@@ -132,6 +156,11 @@ const DEFAULT_PROGRESS: ProgressState = {
   badges: [],
   continentStats: {},
   lastFreezeWeek: '',
+  passPoints: 0,
+  passFreeGranted: 0,
+  passPremiumGranted: 0,
+  passTitles: [],
+  passFrames: [],
 };
 
 /** Clé de semaine (lundi) pour le gel hebdo offert */
@@ -209,7 +238,7 @@ export function useProgress() {
   // Tout est calculé hors setState (les updaters peuvent être rejoués par
   // React en StrictMode) ; retourne l'XP des quêtes accomplies et les
   // nouveaux succès pour la popup.
-  const registerGameEnd = useCallback((summary: GameSummary, statsCtx: StatsCtx, isPremium = false): { questXp: number; newBadges: BadgeDef[] } => {
+  const registerGameEnd = useCallback((summary: GameSummary, statsCtx: StatsCtx, isPremium = false): { questXp: number; passXp: number; newBadges: BadgeDef[] } => {
     const today = todayKey();
     const streakNext = bumpStreak(progress.streak);
     const daily = summary.mode === 'daily' && progress.daily && progress.daily.date === today
@@ -218,7 +247,7 @@ export function useProgress() {
     const questBase = progress.quests && progress.quests.date === today
       ? progress.quests.items
       : generateQuests(today);
-    const { items, xpGained } = applyGameToQuests(questBase, summary, isPremium);
+    const { items, xpGained, completedCount } = applyGameToQuests(questBase, summary, isPremium);
     const passport = summary.correctCountries.length
       ? [...new Set([...progress.passport, ...summary.correctCountries])]
       : progress.passport;
@@ -229,22 +258,62 @@ export function useProgress() {
       continentStats[cont] = (continentStats[cont] ?? 0) + n;
     }
 
+    // ——— Passe de Combat : gain de PP puis récompenses des niveaux atteints
+    const ppGain = summary.correctAnswers * PP_PER_CORRECT
+      + PP_PER_GAME
+      + completedCount * PP_PER_QUEST
+      + (summary.mode === 'daily' ? PP_DAILY_BONUS : 0);
+    const passPoints = progress.passPoints + ppGain;
+    const passLevel = passLevelForPoints(passPoints);
+    const acc = { xp: 0, freezes: 0, badges: [] as string[], titles: [] as string[], frames: [] as string[] };
+    applyPassRewards(FREE_TRACK.slice(progress.passFreeGranted, passLevel), acc);
+    let passPremiumGranted = progress.passPremiumGranted;
+    if (isPremium) {
+      applyPassRewards(PREMIUM_TRACK.slice(passPremiumGranted, passLevel), acc);
+      passPremiumGranted = passLevel;
+    }
+
     const ctx: BadgeCtx = { ...statsCtx, streak: aliveStreak(streakNext), passport, lastGame: summary };
-    const newBadges = BADGES.filter(b => !progress.badges.includes(b.id) && b.check(ctx));
+    const conditionBadges = BADGES.filter(b => !progress.badges.includes(b.id) && b.check(ctx));
+    const passBadges = BADGES.filter(b => acc.badges.includes(b.id) && !progress.badges.includes(b.id));
+    const newBadges = [...conditionBadges, ...passBadges];
 
     const next: ProgressState = {
       ...progress,
-      streak: streakNext,
+      streak: { ...streakNext, freezes: Math.min(MAX_FREEZES, streakNext.freezes + acc.freezes) },
       daily,
       quests: { date: today, items },
       passport,
-      badges: newBadges.length ? [...progress.badges, ...newBadges.map(b => b.id)] : progress.badges,
+      badges: [...new Set([...progress.badges, ...newBadges.map(b => b.id)])],
       continentStats,
+      passPoints,
+      passFreeGranted: passLevel,
+      passPremiumGranted,
+      passTitles: acc.titles.length ? [...progress.passTitles, ...acc.titles] : progress.passTitles,
+      passFrames: acc.frames.length ? [...progress.passFrames, ...acc.frames] : progress.passFrames,
     };
     setProgress(next);
     saveProgress(next);
-    return { questXp: xpGained, newBadges };
+    return { questXp: xpGained, passXp: acc.xp, newBadges };
   }, [progress]);
+
+  // Abonnement pris après coup : accorde rétroactivement les récompenses
+  // premium des niveaux déjà atteints. Retourne l'XP bonus à créditer.
+  const syncPassPremium = useCallback((): number => {
+    const level = passLevelForPoints(progress.passPoints);
+    if (progress.passPremiumGranted >= level) return 0;
+    const acc = { xp: 0, freezes: 0, badges: [] as string[], titles: [] as string[], frames: [] as string[] };
+    applyPassRewards(PREMIUM_TRACK.slice(progress.passPremiumGranted, level), acc);
+    update(p => ({
+      ...p,
+      passPremiumGranted: level,
+      streak: { ...p.streak, freezes: Math.min(MAX_FREEZES, p.streak.freezes + acc.freezes) },
+      badges: [...new Set([...p.badges, ...acc.badges])],
+      passTitles: [...p.passTitles, ...acc.titles],
+      passFrames: [...p.passFrames, ...acc.frames],
+    }));
+    return acc.xp;
+  }, [progress.passPoints, progress.passPremiumGranted, update]);
 
   // Passe du Savoir : un gel de streak offert chaque semaine.
   // Retourne true si un gel vient d'être crédité.
@@ -291,5 +360,9 @@ export function useProgress() {
     passport: progress.passport,
     badges: progress.badges,
     continentStats: progress.continentStats,
+    passPoints: progress.passPoints,
+    passTitles: progress.passTitles,
+    passFrames: progress.passFrames,
+    syncPassPremium,
   };
 }

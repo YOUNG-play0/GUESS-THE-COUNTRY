@@ -37,6 +37,11 @@ export const BADGES: BadgeDef[] = [
   { id: 'passport25', emoji: '🛂', check: c => c.passport.length >= 25 },
   { id: 'passport100', emoji: '🌍', check: c => c.passport.length >= 100 },
   { id: 'level5', emoji: '🗺️', check: c => c.level >= 5 },
+  // Récompenses du Passe de Combat (jamais débloquées par condition,
+  // uniquement accordées par la voie gratuite du Passe)
+  { id: 'pass_bronze', emoji: '🥉', check: () => false },
+  { id: 'pass_silver', emoji: '🥈', check: () => false },
+  { id: 'pass_gold', emoji: '🥇', check: () => false },
   ...['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'].map(continent => ({
     id: `master_${continent.replace(' ', '_')}`,
     emoji: '👑',
@@ -63,6 +68,9 @@ export function badgeLabel(badge: BadgeDef, t: Translations): { name: string; de
     case 'passport25': return { name: t.badge_passport25_name, desc: t.badge_passport25_desc };
     case 'passport100': return { name: t.badge_passport100_name, desc: t.badge_passport100_desc };
     case 'level5': return { name: t.badge_level5_name, desc: t.badge_level5_desc };
+    case 'pass_bronze': return { name: t.badge_pass_bronze_name, desc: t.badge_pass_desc };
+    case 'pass_silver': return { name: t.badge_pass_silver_name, desc: t.badge_pass_desc };
+    case 'pass_gold': return { name: t.badge_pass_gold_name, desc: t.badge_pass_desc };
     default: return { name: badge.id, desc: '' };
   }
 }
