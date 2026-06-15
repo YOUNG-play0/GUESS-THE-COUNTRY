@@ -147,6 +147,7 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  pass_next_reward: string;
   battle_pass: string;
   pass_points: string;
   activate_premium: string;
@@ -382,6 +383,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    pass_next_reward: 'Next:',
     battle_pass: 'Battle Pass',
     pass_points: 'Pass Points',
     activate_premium: 'Activate Premium',
@@ -616,6 +618,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    pass_next_reward: 'Prochain :',
     battle_pass: 'Passe de Combat',
     pass_points: 'Points de Passe',
     activate_premium: 'Activer le Passe Premium',
@@ -850,6 +853,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    pass_next_reward: 'Próximo:',
     battle_pass: 'Pase de Combate',
     pass_points: 'Puntos de Pase',
     activate_premium: 'Activar Premium',
@@ -1084,6 +1088,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    pass_next_reward: 'Nächste:',
     battle_pass: 'Battle Pass',
     pass_points: 'Pass-Punkte',
     activate_premium: 'Premium aktivieren',
@@ -1318,6 +1323,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    pass_next_reward: 'Próximo:',
     battle_pass: 'Passe de Batalha',
     pass_points: 'Pontos de Passe',
     activate_premium: 'Ativar Premium',
@@ -1552,6 +1558,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    pass_next_reward: '下一个：',
     battle_pass: '战斗通行证',
     pass_points: '通行证点数',
     activate_premium: '激活高级版',
@@ -1786,6 +1793,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    pass_next_reward: '次：',
     battle_pass: 'バトルパス',
     pass_points: 'パスポイント',
     activate_premium: 'プレミアム有効化',
@@ -2020,6 +2028,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    pass_next_reward: 'التالي:',
     battle_pass: 'بطاقة القتال',
     pass_points: 'نقاط البطاقة',
     activate_premium: 'تفعيل بريميوم',
