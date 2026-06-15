@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Globe2, Play, Zap } from 'lucide-react';
+import { Globe2, Play, Zap, ChevronRight } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
 import { QuestItem } from '../hooks/useProgress';
+import { PASS_LEVELS, passThreshold, passLevelForPoints, FREE_TRACK } from '../data/battlePass';
 import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -13,7 +14,21 @@ interface Props {
   freezeCost: number;
   onBuyFreeze: () => void;
   quests: QuestItem[];
+  passPoints: number;
   onNavigate: (screen: Screen) => void;
+}
+
+// Libellé court de la prochaine récompense du Passe (aperçu accueil)
+function nextRewardLabel(t: Translations): (level: number) => { emoji: string; label: string } {
+  return (level: number) => {
+    const r = FREE_TRACK[Math.min(level, PASS_LEVELS) - 1];
+    switch (r.type) {
+      case 'xp': return { emoji: '⚡', label: `+${r.amount} XP` };
+      case 'freeze': return { emoji: '❄️', label: t.reward_freeze };
+      case 'badge': return { emoji: r.id === 'pass_gold' ? '🥇' : r.id === 'pass_silver' ? '🥈' : '🥉', label: t.reward_badge };
+      default: return { emoji: '🎁', label: t.reward_badge };
+    }
+  };
 }
 
 function questLabel(q: QuestItem, t: Translations): string {
@@ -32,7 +47,7 @@ const QUEST_EMOJI: Record<QuestItem['id'], string> = {
   correct: '🎯', combo: '🔥', continent: '🌍', games: '🎮', score: '⚡', flags: '🚩',
 };
 
-export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, quests, onNavigate }: Props) {
+export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeCost, onBuyFreeze, quests, passPoints, onNavigate }: Props) {
   const { t } = useLanguage();
   const currentLevel = XP_LEVELS.find(l => l.level === stats.level) || XP_LEVELS[0];
   const nextLevel = XP_LEVELS.find(l => l.level === stats.level + 1);
@@ -40,16 +55,24 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
     ? ((stats.xp - currentLevel.xp) / (nextLevel.xp - currentLevel.xp)) * 100
     : 100;
 
+  // Aperçu Passe de Combat : niveau atteint + progression vers le suivant
+  const passLevel = passLevelForPoints(passPoints);
+  const passBase = passThreshold(passLevel);
+  const passNextCost = passThreshold(passLevel + 1) - passBase;
+  const passInLevel = passPoints - passBase;
+  const passPct = passLevel >= PASS_LEVELS ? 100 : Math.min(100, (passInLevel / passNextCost) * 100);
+  const reward = nextRewardLabel(t)(passLevel + 1);
+
   return (
-    // pb-28 : laisse la place à la barre de navigation fixe en bas
-    <div className="h-dvh overflow-y-auto w-full max-w-[480px] mx-auto flex flex-col px-5 pt-16 pb-36">
+    // px-4 (16px) + pb généreux : la BottomNav (auto-cachante) ne masque rien
+    <div className="h-dvh overflow-y-auto w-full max-w-[480px] mx-auto flex flex-col px-4 pt-16 pb-28">
 
       {/* ——— 1. Header : logo + titre + niveau XP ——— */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="text-center mb-6"
+        className="text-center mb-3"
       >
         <div className="flex items-center justify-center gap-2 mb-2">
           <Globe2 className="w-9 h-9 text-indigo-400 spin-slow" />
@@ -91,12 +114,12 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
         )}
       </motion.header>
 
-      {/* ——— 2. Actions : JOUER + Défi du jour ——— */}
+      {/* ——— 2. Action : JOUER ——— */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="space-y-3 mb-6"
+        className="mb-5"
       >
         <motion.button
           whileTap={{ scale: 0.96 }}
@@ -115,12 +138,12 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="mb-6 -mx-5"
+          className="mb-5 -mx-4"
         >
-          <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-2 px-5">
+          <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-2 px-4">
             🎯 {t.daily_quests}
           </p>
-          <div className="flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory [scrollbar-width:none]">
+          <div className="flex gap-3 overflow-x-auto px-4 pb-2 snap-x snap-mandatory [scrollbar-width:none]">
             {/* Card streak */}
             <div className="snap-start shrink-0 w-[150px] bg-gradient-to-b from-orange-500/15 to-red-500/5 border border-orange-500/25 rounded-2xl p-3.5 flex flex-col">
               <motion.span
@@ -211,7 +234,46 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
         </motion.section>
       )}
 
-      {/* ——— 5. La barre de navigation fixe est rendue par App (BottomNav) ——— */}
+      {/* ——— 5. Aperçu du Passe de Combat (remplit le bas) ——— */}
+      {stats.totalGames > 0 && (
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigate('premium')}
+          className="mt-5 w-full text-left bg-gradient-to-br from-cyan-500/10 to-indigo-500/10 border border-indigo-500/25 rounded-2xl p-4"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white font-bold text-sm flex items-center gap-2">
+              💎 {t.battle_pass}
+            </span>
+            <span className="text-cyan-300 text-xs font-bold flex items-center gap-1">
+              {t.level_title} {passLevel}/{PASS_LEVELS} <ChevronRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${passPct}%` }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            />
+          </div>
+          <div className="mt-2.5 flex items-center justify-between">
+            <span className="text-[11px] text-slate-400">
+              💠 {passPoints} {t.pass_points}
+            </span>
+            {passLevel < PASS_LEVELS && (
+              <span className="text-[11px] text-slate-300 flex items-center gap-1">
+                {t.pass_next_reward} <span className="select-none">{reward.emoji}</span> {reward.label}
+              </span>
+            )}
+          </div>
+        </motion.button>
+      )}
+
+      {/* La barre de navigation fixe est rendue par App (BottomNav) */}
     </div>
   );
 }

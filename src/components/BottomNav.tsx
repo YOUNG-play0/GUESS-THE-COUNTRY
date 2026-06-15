@@ -4,12 +4,14 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   current: Screen;
+  /** Masquée au scroll vers le bas (useHideOnScroll) */
+  hidden?: boolean;
   onNavigate: (screen: Screen) => void;
 }
 
 // Barre de navigation fixe en bas — 5 onglets, chacun avec sa page dédiée :
 // 🏠 Accueil · 🗺️ Passeport · 📅 Défi · 💎 Passe · 👤 Profil
-export default function BottomNav({ current, onNavigate }: Props) {
+export default function BottomNav({ current, hidden = false, onNavigate }: Props) {
   const { t } = useLanguage();
 
   const tabs: { id: Screen; label: string; emoji: string }[] = [
@@ -22,7 +24,9 @@ export default function BottomNav({ current, onNavigate }: Props) {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 w-full max-w-[480px] mx-auto bg-slate-950/80 backdrop-blur-xl border-t border-white/10 sm:border-x sm:rounded-t-2xl"
+      className={`fixed bottom-0 inset-x-0 z-50 w-full max-w-[480px] mx-auto bg-slate-950/80 backdrop-blur-xl border-t border-white/10 sm:border-x sm:rounded-t-2xl transition-transform duration-300 ease-out ${
+        hidden ? 'translate-y-full' : 'translate-y-0'
+      }`}
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="grid grid-cols-5">

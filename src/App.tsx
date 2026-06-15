@@ -25,6 +25,7 @@ import PassportScreen from './components/PassportScreen';
 import BattlePassScreen from './components/BattlePassScreen';
 import DailyScreen from './components/DailyScreen';
 import BottomNav from './components/BottomNav';
+import { useHideOnScroll } from './hooks/useHideOnScroll';
 import ChatAssistant from './components/ChatAssistant';
 import LanguageSelector from './components/LanguageSelector';
 
@@ -59,6 +60,7 @@ function AppContent() {
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
   const [theme, setTheme] = useState(getStoredTheme);
+  const navHidden = useHideOnScroll(screen);
   const premium = usePremium();
 
   const handleSetTheme = useCallback((id: string) => {
@@ -234,6 +236,7 @@ function AppContent() {
                 freezeCost={FREEZE_COST_XP}
                 onBuyFreeze={handleBuyFreeze}
                 quests={premium.isPremium ? questsToday : questsToday.filter(q => !q.premium)}
+                passPoints={passPoints}
                 onNavigate={setScreen}
               />
             </motion.div>
@@ -337,9 +340,9 @@ function AppContent() {
         </AnimatePresence>
       </div>
 
-      {/* Barre de navigation fixe (écrans hub uniquement) */}
+      {/* Barre de navigation fixe (écrans hub uniquement) — auto-cachante */}
       {(['home', 'passport', 'daily', 'premium', 'stats', 'profile'] as Screen[]).includes(screen) && (
-        <BottomNav current={screen} onNavigate={setScreen} />
+        <BottomNav current={screen} hidden={navHidden} onNavigate={setScreen} />
       )}
 
       {/* Popup de succès débloqués (après une partie) */}
