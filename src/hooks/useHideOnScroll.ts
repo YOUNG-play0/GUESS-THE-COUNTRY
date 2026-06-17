@@ -20,9 +20,16 @@ export function useHideOnScroll(resetKey?: unknown, threshold = 8): boolean {
     let lastEl: EventTarget | null = null;
 
     const onScroll = (e: Event) => {
-      const el = e.target as HTMLElement | null;
-      if (!el || typeof el.scrollTop !== 'number') return;
-      const y = el.scrollTop;
+      const el = e.target as (HTMLElement | Document | null);
+      // Scroll natif du document (body) OU d'un conteneur interne
+      let y: number;
+      if (!el || el === document || el === document.documentElement || el === document.body) {
+        y = window.scrollY || document.documentElement.scrollTop || 0;
+      } else if (typeof (el as HTMLElement).scrollTop === 'number') {
+        y = (el as HTMLElement).scrollTop;
+      } else {
+        return;
+      }
 
       // Nouveau conteneur scrollé : on réinitialise la référence
       if (el !== lastEl) {
@@ -43,8 +50,8 @@ export function useHideOnScroll(resetKey?: unknown, threshold = 8): boolean {
       lastY = y;
     };
 
-    window.addEventListener('scroll', onScroll, true);
-    return () => window.removeEventListener('scroll', onScroll, true);
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    return () => window.removeEventListener('scroll', onScroll, { capture: true } as EventListenerOptions);
   }, [threshold]);
 
   return hidden;

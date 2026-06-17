@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FlagImg from './FlagImg';
+import AtlasCompanion from './AtlasCompanion';
+import { useAtlas } from '../hooks/useAtlas';
 import { playCorrect, playWrong, playTick } from '../utils/sound';
 import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
@@ -52,6 +54,8 @@ interface Props {
   chronoTimeLeft: number;
   /** Duel fantôme : record du mode à battre (0 = pas encore de record) */
   ghostScore: number;
+  /** Niveau du joueur (= niveau d'ATLAS) */
+  playerLevel: number;
   onAnswer: (answer: string) => void;
   onNext: () => void;
   onQuit: () => void;
@@ -59,25 +63,31 @@ interface Props {
 
 export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
-  chronoTimeLeft, ghostScore, onAnswer, onNext, onQuit,
+  chronoTimeLeft, ghostScore, playerLevel, onAnswer, onNext, onQuit,
 }: Props) {
   const { t, language } = useLanguage();
+  const atlas = useAtlas(playerLevel);
+  const prevComboRef = useRef(0);
 
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
     onAnswer(answer);
   };
 
-  // Son + vibration au résultat (réponse cliquée OU temps écoulé)
+  // Son + vibration + réaction d'ATLAS au résultat (réponse OU temps écoulé)
   useEffect(() => {
     if (!showResult || isCorrect === null) return;
     if (isCorrect) {
       playCorrect(gameState.combo);
       haptics.correct();
+      const c = gameState.combo;
+      atlas.say(c >= 10 ? 'combo10' : c >= 5 ? 'combo5' : c >= 3 ? 'combo3' : 'correct');
     } else {
       playWrong();
       haptics.wrong();
+      atlas.say(prevComboRef.current >= 3 ? 'comboBreak' : 'wrong');
     }
+    prevComboRef.current = gameState.combo;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResult]);
 
@@ -533,6 +543,14 @@ export default function GameScreen({
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Compagnon ATLAS (en bas à gauche, réactions automatiques) */}
+      <AtlasCompanion
+        message={atlas.message}
+        visible={atlas.visible}
+        onToggle={atlas.toggleVisible}
+        onBubbleEnd={atlas.clear}
+      />
     </div>
   );
 }

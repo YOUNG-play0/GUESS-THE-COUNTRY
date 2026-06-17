@@ -65,7 +65,7 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
 
   return (
     // px-4 (16px) + pb généreux : la BottomNav (auto-cachante) ne masque rien
-    <div className="h-dvh overflow-y-auto w-full max-w-[480px] mx-auto flex flex-col px-4 pt-16 pb-28">
+    <div className="min-h-dvh w-full max-w-[480px] mx-auto flex flex-col px-4 pt-16 pb-28">
 
       {/* ——— 1. Header : logo + titre + niveau XP ——— */}
       <motion.header

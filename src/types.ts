@@ -2,8 +2,8 @@ export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'legendary';
 
 /** Échelle des difficultés, du plus simple au plus dur */
 export const DIFFICULTY_LADDER: Difficulty[] = ['easy', 'medium', 'hard', 'expert', 'legendary'];
-export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily' | 'explorer';
-export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium' | 'daily';
+export type GameMode = 'classic' | 'survival' | 'chrono' | 'map' | 'daily' | 'explorer' | 'duel';
+export type Screen = 'home' | 'game' | 'stats' | 'profile' | 'mode-select' | 'game-over' | 'name-entry' | 'passport' | 'premium' | 'daily' | 'duel' | 'atlas';
 export type QuestionType = 'flag' | 'capital' | 'monument' | 'shape' | 'hint'
   // Mode Explorateur (Passe du Savoir)
   | 'currency' | 'language' | 'population' | 'area';

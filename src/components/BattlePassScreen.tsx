@@ -45,7 +45,7 @@ export default function BattlePassScreen({
   const globalPct = level >= PASS_LEVELS ? 100 : Math.min(100, (inLevel / nextCost) * 100);
 
   return (
-    <div className="h-dvh overflow-y-auto px-4 pt-16 pb-36">
+    <div className="min-h-dvh px-4 pt-16 pb-36">
       <div className="w-full max-w-[480px] mx-auto">
 
         {/* En-tête + progression globale */}
