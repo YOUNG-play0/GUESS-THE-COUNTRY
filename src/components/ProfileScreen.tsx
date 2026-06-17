@@ -17,10 +17,11 @@ interface Props {
   onSetTheme: (id: string) => void;
   onPremium: () => void;
   onStats: () => void;
+  onAtlas: () => void;
   onBack: () => void;
 }
 
-export default function ProfileScreen({ stats, badges, passTitles, passFrames, isPremium, theme, onSetTheme, onPremium, onStats, onBack }: Props) {
+export default function ProfileScreen({ stats, badges, passTitles, passFrames, isPremium, theme, onSetTheme, onPremium, onStats, onAtlas, onBack }: Props) {
   // Cosmétiques premium : cadre doré autour de l'avatar + dernier titre gagné
   const goldFrame = isPremium && passFrames.length > 0;
   const passTitle = isPremium && passTitles.length > 0 ? passTitles[passTitles.length - 1] : null;
@@ -62,17 +63,29 @@ export default function ProfileScreen({ stats, badges, passTitles, passFrames, i
           </div>
         </motion.div>
 
-        {/* Statistiques détaillées (plus d'onglet dédié dans la nav) */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onStats}
-          className="w-full mb-6 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all"
-        >
-          📊 {t.statistics}
-        </motion.button>
+        {/* Accès rapides : Statistiques + page Mon ami ATLAS */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onStats}
+            className="py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all text-sm"
+          >
+            📊 {t.statistics}
+          </motion.button>
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onAtlas}
+            className="py-3.5 bg-indigo-500/10 border border-indigo-500/25 hover:bg-indigo-500/20 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all text-sm"
+          >
+            🧭 {t.atlas_my_friend}
+          </motion.button>
+        </div>
 
         {/* Level Progress */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 mb-6">

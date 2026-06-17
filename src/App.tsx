@@ -25,6 +25,7 @@ import PassportScreen from './components/PassportScreen';
 import BattlePassScreen from './components/BattlePassScreen';
 import DailyScreen from './components/DailyScreen';
 import DuelScreen from './components/DuelScreen';
+import AtlasScreen from './components/AtlasScreen';
 import BottomNav from './components/BottomNav';
 import { useHideOnScroll } from './hooks/useHideOnScroll';
 import ChatAssistant from './components/ChatAssistant';
@@ -319,6 +320,18 @@ function AppContent() {
               <DuelScreen playerLevel={stats.level} onExit={() => setScreen('home')} />
             </motion.div>
           )}
+          {screen === 'atlas' && (
+            <motion.div key="atlas" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <AtlasScreen
+                playerLevel={stats.level}
+                isPremium={premium.isPremium}
+                streak={streak}
+                continentStats={continentStats}
+                onPremium={() => setScreen('premium')}
+                onBack={() => setScreen('profile')}
+              />
+            </motion.div>
+          )}
           {screen === 'premium' && (
             <motion.div key="premium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <BattlePassScreen
@@ -345,6 +358,7 @@ function AppContent() {
                 onSetTheme={handleSetTheme}
                 onPremium={() => setScreen('premium')}
                 onStats={() => setScreen('stats')}
+                onAtlas={() => setScreen('atlas')}
                 onBack={() => setScreen('home')}
               />
             </motion.div>
@@ -353,7 +367,7 @@ function AppContent() {
       </div>
 
       {/* Barre de navigation fixe (écrans hub uniquement) — auto-cachante */}
-      {(['home', 'passport', 'daily', 'premium', 'stats', 'profile'] as Screen[]).includes(screen) && (
+      {(['home', 'passport', 'daily', 'premium', 'stats', 'profile', 'atlas'] as Screen[]).includes(screen) && (
         <BottomNav current={screen} hidden={navHidden} onNavigate={setScreen} />
       )}
 
