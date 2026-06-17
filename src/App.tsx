@@ -266,6 +266,7 @@ function AppContent() {
                 showResult={showResult}
                 chronoTimeLeft={chronoTimeLeft}
                 ghostScore={ghostRef.current}
+                playerLevel={stats.level}
                 onAnswer={handleAnswer}
                 onNext={handleNext}
                 onQuit={handleQuitGame}
