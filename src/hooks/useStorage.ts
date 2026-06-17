@@ -11,7 +11,7 @@ const DEFAULT_STATS: PlayerStats = {
   totalAnswers: 0,
   xp: 0,
   level: 1,
-  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0, daily: 0, explorer: 0 },
+  gamesPerMode: { classic: 0, survival: 0, chrono: 0, map: 0, daily: 0, explorer: 0, duel: 0 },
   bestScorePerMode: {},
   unlockedDifficulties: ['easy'],
 };

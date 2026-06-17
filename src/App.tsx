@@ -24,6 +24,7 @@ import ProfileScreen from './components/ProfileScreen';
 import PassportScreen from './components/PassportScreen';
 import BattlePassScreen from './components/BattlePassScreen';
 import DailyScreen from './components/DailyScreen';
+import DuelScreen from './components/DuelScreen';
 import BottomNav from './components/BottomNav';
 import { useHideOnScroll } from './hooks/useHideOnScroll';
 import ChatAssistant from './components/ChatAssistant';
@@ -132,6 +133,11 @@ function AppContent() {
   }, [gameState?.isActive]);
 
   const handleStartGame = useCallback((mode: GameMode) => {
+    // Le 1v1 contre ATLAS a son propre écran (pas le moteur classique)
+    if (mode === 'duel') {
+      setScreen('duel');
+      return;
+    }
     setLastMode(mode);
     gameRecordedRef.current = false;
     prevBestRef.current = stats.bestScore;
@@ -306,6 +312,11 @@ function AppContent() {
           {screen === 'daily' && (
             <motion.div key="daily" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               <DailyScreen daily={dailyToday} onPlay={handleStartDaily} />
+            </motion.div>
+          )}
+          {screen === 'duel' && (
+            <motion.div key="duel" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+              <DuelScreen playerLevel={stats.level} onExit={() => setScreen('home')} />
             </motion.div>
           )}
           {screen === 'premium' && (

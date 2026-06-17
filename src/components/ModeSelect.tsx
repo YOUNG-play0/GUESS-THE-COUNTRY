@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Gamepad2, Heart, Timer, Map, Compass, ArrowLeft, Lock, ChevronRight, Crown, TrendingUp } from 'lucide-react';
+import { Gamepad2, Heart, Timer, Map, Compass, Swords, ArrowLeft, Lock, ChevronRight, Crown, TrendingUp } from 'lucide-react';
 import { GameMode } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -21,6 +21,7 @@ export default function ModeSelect({ explorerUnlocked, onStart, onPremium, onBac
     { id: 'survival' as GameMode, name: t.survival_mode, desc: t.survival_desc, icon: Heart, color: 'from-red-500 to-rose-600', shadow: 'shadow-red-500/25' },
     { id: 'chrono' as GameMode, name: t.chrono_mode, desc: t.chrono_desc, icon: Timer, color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
     { id: 'map' as GameMode, name: t.map_mode, desc: t.map_desc, icon: Map, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
+    { id: 'duel' as GameMode, name: t.duel_mode, desc: t.duel_desc, icon: Swords, color: 'from-fuchsia-500 to-pink-600', shadow: 'shadow-fuchsia-500/25' },
     { id: 'explorer' as GameMode, name: t.explorer_mode, desc: t.explorer_desc, icon: Compass, color: 'from-yellow-500 to-amber-600', shadow: 'shadow-yellow-500/25', premium: true },
   ];
 
