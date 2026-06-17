@@ -30,7 +30,7 @@ export default function DailyScreen({ daily, onPlay }: Props) {
   };
 
   return (
-    <div className="h-dvh overflow-y-auto px-4 pt-16 pb-36">
+    <div className="min-h-dvh px-4 pt-16 pb-36">
       <div className="w-full max-w-[480px] mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 mt-6">
           <motion.span

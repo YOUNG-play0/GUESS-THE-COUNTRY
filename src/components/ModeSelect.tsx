@@ -25,7 +25,7 @@ export default function ModeSelect({ explorerUnlocked, onStart, onPremium, onBac
   ];
 
   return (
-    <div className="h-dvh overflow-y-auto flex flex-col items-center px-5 py-16 pb-28">
+    <div className="min-h-dvh flex flex-col items-center px-5 py-16 pb-28">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
         <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors py-2">
           <ArrowLeft className="w-4 h-4" /> {t.back}

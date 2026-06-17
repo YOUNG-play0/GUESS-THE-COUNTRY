@@ -12,18 +12,22 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
 }
 
-/* Le jeu doit occuper tout l'écran : fond pleine largeur, contenu centré
-   (max 480px sur grand écran, géré par les conteneurs des écrans). */
+/* Le jeu occupe tout l'écran : fond pleine largeur, contenu centré (max 480px).
+   Le défilement est NATIF sur le body (dans les deux sens, sans conteneur de
+   scroll interne qui « résiste » quand la barre d'URL mobile se réaffiche). */
 html, body, #root {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+html {
+  /* pas de overscroll-behavior:none ici : laissait le scroll vers le haut
+     « accrocher » sur mobile. On garde un comportement natif fluide. */
+  overscroll-behavior-y: none; /* évite seulement le pull-to-refresh accidentel */
 }
 
 body {
@@ -31,6 +35,8 @@ body {
   background: #0a0a1a;
   color: white;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
