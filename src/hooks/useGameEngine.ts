@@ -3,6 +3,9 @@ import { GameState, GameMode, Difficulty, Question, QuestionType, DIFFICULTY_TIM
 import { countries, getRandomCountries } from '../data/countries';
 import { countryShapes } from '../data/countryShapes';
 import { recordAdaptiveAnswer } from '../utils/adaptive';
+import { prepareMonumentImage } from '../utils/monumentImage';
+
+const MONUMENT_PREP_BUDGET_MS = 3000;
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -133,6 +136,41 @@ export function useGameEngine() {
   const monumentsUsedRef = useRef(0);
   // Défi du jour : questions imposées, pas d'adaptation de difficulté
   const isPresetRef = useRef(false);
+  // Préchargement des images monument : le timer est gelé tant qu'on prépare
+  const [preparing, setPreparing] = useState(false);
+  const prepareTokenRef = useRef(0);
+
+  // Affiche une question ; pour un monument, précharge l'image AVANT de
+  // lancer le timer (spinner neutre pendant ce temps). Si l'image n'est pas
+  // prête sous 3 s, on bascule sur une question drapeau (même pays).
+  const beginQuestion = useCallback((q: Question) => {
+    const token = ++prepareTokenRef.current;
+    setSelectedAnswer(null);
+    setIsCorrect(null);
+    setShowResult(false);
+    answeredRef.current = false;
+
+    if (q.type === 'monument' && q.country.monument && !q.imageUrl) {
+      setPreparing(true);
+      setCurrentQuestion(q); // l'écran montre un spinner neutre (aucun texte révélateur)
+      const title = q.country.monumentWiki ?? q.country.monument;
+      prepareMonumentImage(title, MONUMENT_PREP_BUDGET_MS).then(url => {
+        if (token !== prepareTokenRef.current) return; // le joueur a déjà avancé
+        if (url) {
+          setCurrentQuestion({ ...q, imageUrl: url });
+        } else {
+          // Échec/lenteur : on remplace par une question drapeau du même pays
+          setCurrentQuestion({ ...q, type: 'flag', imageUrl: undefined, hintIndex: undefined, blurred: false, zoomed: false });
+        }
+        questionStartRef.current = Date.now();
+        setPreparing(false);
+      });
+    } else {
+      setPreparing(false);
+      setCurrentQuestion(q);
+      questionStartRef.current = Date.now();
+    }
+  }, []);
 
   const makeQuestion = useCallback((mode: GameMode, difficulty: Difficulty): Question => {
     const country = pickCountry(mode, difficulty, usedCountriesRef.current, gameOptsRef.current);
@@ -194,21 +232,16 @@ export function useGameEngine() {
 
     setGameState(state);
     setQuestions(qs);
-    setCurrentQuestion(qs[0]);
-    setSelectedAnswer(null);
-    setIsCorrect(null);
-    setShowResult(false);
-    answeredRef.current = false;
-    questionStartRef.current = Date.now();
-
     if (mode === 'chrono') {
       setChronoTimeLeft(30);
     }
-  }, [clearTimers, makeQuestion]);
+    beginQuestion(qs[0]); // gère le préchargement monument + le démarrage du timer
+  }, [clearTimers, makeQuestion, beginQuestion]);
 
   // Per-question countdown timer (désactivé en Chrono : seul le chrono global compte)
   useEffect(() => {
     if (!gameState?.isActive || gameState.isPaused || showResult) return;
+    if (preparing) return; // timer gelé pendant le préchargement de l'image
     if (gameState.mode === 'chrono') return;
 
     const interval = setInterval(() => {
@@ -224,11 +257,12 @@ export function useGameEngine() {
 
     timerRef.current = interval;
     return () => clearInterval(interval);
-  }, [gameState?.isActive, gameState?.isPaused, gameState?.mode, showResult, gameState?.currentQuestion]);
+  }, [gameState?.isActive, gameState?.isPaused, gameState?.mode, showResult, gameState?.currentQuestion, preparing]);
 
   // Chrono global timer
   useEffect(() => {
     if (!gameState?.isActive || gameState.mode !== 'chrono' || gameState.isPaused) return;
+    if (preparing) return; // gelé pendant le préchargement de l'image
 
     const interval = setInterval(() => {
       setChronoTimeLeft(prev => {
@@ -239,7 +273,7 @@ export function useGameEngine() {
 
     chronoRef.current = interval;
     return () => clearInterval(interval);
-  }, [gameState?.isActive, gameState?.mode, gameState?.isPaused]);
+  }, [gameState?.isActive, gameState?.mode, gameState?.isPaused, preparing]);
 
   // Handle question time up
   useEffect(() => {
@@ -359,18 +393,13 @@ export function useGameEngine() {
       return;
     }
 
-    answeredRef.current = false;
     setGameState(prev => prev ? {
       ...prev,
       currentQuestion: nextIdx,
       timeLeft: prev.maxTime,
     } : prev);
-    setCurrentQuestion(qs[nextIdx]);
-    setSelectedAnswer(null);
-    setIsCorrect(null);
-    setShowResult(false);
-    questionStartRef.current = Date.now();
-  }, [gameState, questions, endGame, makeQuestion]);
+    beginQuestion(qs[nextIdx]); // préchargement monument + (re)démarrage du timer
+  }, [gameState, questions, endGame, makeQuestion, beginQuestion]);
 
   return {
     gameState,
@@ -379,6 +408,7 @@ export function useGameEngine() {
     isCorrect,
     showResult,
     chronoTimeLeft,
+    preparing,
     startGame,
     handleAnswer,
     nextQuestion,

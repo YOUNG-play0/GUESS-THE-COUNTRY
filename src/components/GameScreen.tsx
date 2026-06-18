@@ -11,7 +11,6 @@ import { Translations } from '../i18n/translations';
 import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
 import { useLanguage } from '../contexts/LanguageContext';
-import MonumentImage from './MonumentImage';
 
 function CountryFlag({ name, size = 24 }: { name: string; size?: number }) {
   const country = countries.find(c => c.name === name);
@@ -56,6 +55,8 @@ interface Props {
   ghostScore: number;
   /** Niveau du joueur (= niveau d'ATLAS) */
   playerLevel: number;
+  /** Préchargement d'une image monument en cours : écran neutre, timer gelé */
+  preparing: boolean;
   onAnswer: (answer: string) => void;
   onNext: () => void;
   onQuit: () => void;
@@ -63,7 +64,7 @@ interface Props {
 
 export default function GameScreen({
   gameState, currentQuestion, selectedAnswer, isCorrect, showResult,
-  chronoTimeLeft, ghostScore, playerLevel, onAnswer, onNext, onQuit,
+  chronoTimeLeft, ghostScore, playerLevel, preparing, onAnswer, onNext, onQuit,
 }: Props) {
   const { t, language } = useLanguage();
   const atlas = useAtlas(playerLevel);
@@ -106,6 +107,25 @@ export default function GameScreen({
   }, [chronoSec]);
 
   if (!currentQuestion) return null;
+
+  // Écran de transition neutre pendant le préchargement d'une image monument :
+  // spinner seul, AUCUN texte ni option qui révélerait la réponse, timer gelé.
+  if (preparing) {
+    return (
+      <div className="min-h-dvh w-full max-w-[480px] mx-auto flex flex-col px-4 py-4 pt-14">
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={onQuit} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-slate-400">
+            <X className="w-5 h-5" />
+          </button>
+          <div className="w-10" />
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <span aria-hidden className="w-10 h-10 rounded-full border-[3px] border-white/15 border-t-indigo-400 animate-spin" />
+          <p className="text-slate-500 text-xs uppercase tracking-wider">{t.loading}</p>
+        </div>
+      </div>
+    );
+  }
 
   const timerPercent = (gameState.timeLeft / gameState.maxTime) * 100;
   const timerColor = timerPercent > 50 ? 'bg-emerald-500' : timerPercent > 25 ? 'bg-yellow-500' : 'bg-red-500';
@@ -173,7 +193,17 @@ export default function GameScreen({
               transition={{ type: 'spring', stiffness: 150 }}
               className="my-5"
             >
-              <MonumentImage title={q.country.monumentWiki ?? q.country.monument!} />
+              {/* Image déjà préchargée par le moteur (q.imageUrl) → affichage
+                  instantané. alt vide + aria-hidden : zéro texte révélateur. */}
+              {q.imageUrl && (
+                <img
+                  src={q.imageUrl}
+                  alt=""
+                  aria-hidden
+                  className="mx-auto mb-4 rounded-2xl border border-white/10 shadow-2xl object-cover"
+                  style={{ maxWidth: 'min(280px, 70vw)', maxHeight: 180 }}
+                />
+              )}
               <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
                 <span className="text-3xl">🗽</span>
                 <span className="text-2xl font-bold text-white">{q.country.monument}</span>
