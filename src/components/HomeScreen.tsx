@@ -1,10 +1,13 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Globe2, Play, Zap, ChevronRight } from 'lucide-react';
 import { PlayerStats, Screen, XP_LEVELS } from '../types';
 import { QuestItem } from '../hooks/useProgress';
 import { PASS_LEVELS, passThreshold, passLevelForPoints, FREE_TRACK } from '../data/battlePass';
+import { proactiveMessage } from '../utils/atlasFriend';
 import { Translations, continentLabel } from '../i18n/translations';
 import { useLanguage } from '../contexts/LanguageContext';
+import AtlasAvatar from './AtlasAvatar';
 
 interface Props {
   stats: PlayerStats;
@@ -63,6 +66,12 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
   const passPct = passLevel >= PASS_LEVELS ? 100 : Math.min(100, (passInLevel / passNextCost) * 100);
   const reward = nextRewardLabel(t)(passLevel + 1);
 
+  // Message proactif d'ATLAS, stable le temps de la visite de l'accueil
+  const atlasMsg = useMemo(
+    () => proactiveMessage({ level: stats.level, totalGames: stats.totalGames }),
+    [stats.level, stats.totalGames]
+  );
+
   return (
     // px-4 (16px) + pb généreux : la BottomNav (auto-cachante) ne masque rien
     <div className="min-h-dvh w-full max-w-[480px] mx-auto flex flex-col px-4 pt-16 pb-28">
@@ -113,6 +122,24 @@ export default function HomeScreen({ stats, streak, freezes, maxFreezes, freezeC
           </motion.div>
         )}
       </motion.header>
+
+      {/* ——— Message proactif d'ATLAS ——— */}
+      {stats.name && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigate('atlas')}
+          className="mb-4 w-full flex items-start gap-2.5 bg-indigo-500/10 border border-indigo-500/25 rounded-2xl p-3 text-left"
+        >
+          <div className="shrink-0"><AtlasAvatar expression="normal" size={40} /></div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-bold text-indigo-300 mb-0.5">ATLAS</p>
+            <p className="text-[12px] text-slate-200 leading-snug">{atlasMsg}</p>
+          </div>
+        </motion.button>
+      )}
 
       {/* ——— 2. Action : JOUER ——— */}
       <motion.section

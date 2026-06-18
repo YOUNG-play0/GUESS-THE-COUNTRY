@@ -52,6 +52,9 @@ export default async function handler(req, res) {
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
     ];
+    if (context.relationTone) {
+      messages.push({ role: 'system', content: `Relation avec ce joueur : ${context.relationTone}` });
+    }
     if (ctxLines.length) {
       messages.push({ role: 'system', content: `Contexte de la partie en cours :\n${ctxLines.join('\n')}` });
     }

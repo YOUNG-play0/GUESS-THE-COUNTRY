@@ -15,6 +15,8 @@ export interface ChatContext {
   lastResult?: string;
   streak?: number;
   continentStats?: Record<string, number>;
+  /** Ton à adopter selon le palier d'amitié */
+  relationTone?: string;
 }
 
 export interface ChatMessage {
