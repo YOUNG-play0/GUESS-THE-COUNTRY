@@ -22,3 +22,6 @@ npm-debug.log*
 # Clés de signature Android — à ne JAMAIS committer (voir PUBLISHING.md)
 *.keystore
 signing-key-info.txt
+
+# Vercel
+.vercel
