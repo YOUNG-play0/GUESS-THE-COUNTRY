@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { AtlasExpression, AtlasSituation, atlasLevel, getAtlasPhrase, SITUATION_EXPRESSION } from '../data/atlas';
+import { speakAtlas } from '../utils/atlasVoice';
 
 export interface AtlasMessage {
   id: number;
@@ -22,13 +23,16 @@ export function useAtlas(playerLevel: number) {
 
   const say = useCallback((situation: AtlasSituation) => {
     seq.current += 1;
-    setMessage({ id: seq.current, text: getAtlasPhrase(situation, level), expression: SITUATION_EXPRESSION[situation] });
+    const text = getAtlasPhrase(situation, level);
+    setMessage({ id: seq.current, text, expression: SITUATION_EXPRESSION[situation] });
+    speakAtlas(text);
   }, [level]);
 
   // Phrase libre (réactions 1v1 imposées par le scénario)
   const sayText = useCallback((text: string, expression: AtlasExpression = 'normal') => {
     seq.current += 1;
     setMessage({ id: seq.current, text, expression });
+    speakAtlas(text);
   }, []);
 
   const clear = useCallback(() => setMessage(null), []);

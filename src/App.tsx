@@ -6,6 +6,7 @@ import { getAdaptiveDifficulty } from './utils/adaptive';
 import { BadgeDef } from './data/badges';
 import BadgePopup from './components/BadgePopup';
 import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
+import { isVoiceEnabled, setVoiceEnabled, stopAtlasVoice } from './utils/atlasVoice';
 import { getStoredTheme, storeTheme, themeGradient, DEFAULT_THEME } from './utils/themes';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
@@ -61,6 +62,7 @@ function AppContent() {
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
+  const [voiceOn, setVoiceOn] = useState(isVoiceEnabled);
   const [theme, setTheme] = useState(getStoredTheme);
   const navHidden = useHideOnScroll(screen);
   const premium = usePremium();
@@ -221,14 +223,25 @@ function AppContent() {
         <LanguageSelector />
       </div>
 
-      {/* Interrupteur son */}
-      <button
-        onClick={() => { setSoundEnabled(!soundOn); setSoundOn(!soundOn); }}
-        aria-label={soundOn ? 'Mute' : 'Unmute'}
-        className="fixed top-3 left-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
-      >
-        {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-      </button>
+      {/* Interrupteurs : son du jeu + voix d'ATLAS (indépendants) */}
+      <div className="fixed top-3 left-3 z-50 flex gap-2">
+        <button
+          onClick={() => { setSoundEnabled(!soundOn); setSoundOn(!soundOn); }}
+          aria-label={soundOn ? 'Couper le son' : 'Activer le son'}
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+        >
+          {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </button>
+        <button
+          onClick={() => { setVoiceEnabled(!voiceOn); setVoiceOn(!voiceOn); if (voiceOn) stopAtlasVoice(); }}
+          aria-label={voiceOn ? 'Couper la voix d’ATLAS' : 'Activer la voix d’ATLAS'}
+          className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all ${
+            voiceOn ? 'bg-indigo-500/20 border-indigo-400/40 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-500'
+          }`}
+        >
+          <span className="text-base leading-none select-none">{voiceOn ? '🗣️' : '🔇'}</span>
+        </button>
+      </div>
 
       {/* Main Content */}
       <div className="relative z-10 w-full">

@@ -8,6 +8,7 @@ import { getCountryDisplayName, getCountryHint, countries } from '../data/countr
 import { countryShapes } from '../data/countryShapes';
 import { useLanguage } from '../contexts/LanguageContext';
 import { playCorrect, playWrong } from '../utils/sound';
+import { speakAtlas } from '../utils/atlasVoice';
 import { haptics } from '../utils/haptics';
 import FlagImg from './FlagImg';
 import MonumentImage from './MonumentImage';
@@ -57,6 +58,7 @@ export default function DuelScreen({ playerLevel, onExit }: Props) {
     reactSeq.current += 1;
     setReaction({ id: reactSeq.current, text });
     setExpression(exp);
+    speakAtlas(text); // ATLAS parle aussi à voix haute pendant le duel
   }, []);
 
   // Résolution d'une question : score + réactions, puis passage à la suivante
@@ -73,8 +75,18 @@ export default function DuelScreen({ playerLevel, onExit }: Props) {
     if (pCorrect) { playCorrect(0); haptics.correct(); } else { playWrong(); haptics.wrong(); }
 
     // Réactions de fin de question
-    if (!pCorrect) react('Vraiment ?? C’était classique...', 'laugh');
-    else if (!aCorrect) react('J’avais dit ça pour te tester.', 'normal');
+    if (!pCorrect) {
+      react('Vraiment ?? C’était classique...', 'laugh');
+    } else if (!aCorrect) {
+      // ATLAS commente sa propre erreur (mauvais perdant attachant)
+      const excuses = [
+        'J’avais dit ça pour te tester.',
+        'J’avais pas dormi cette nuit, c’est pour ça 😅',
+        'Le soleil dans les yeux, ça compte pas.',
+        'Bon, même moi j’ai le droit à un jour sans.',
+      ];
+      react(excuses[Math.floor(Math.random() * excuses.length)], 'duelLoss');
+    }
 
     // Points : 1 par bonne réponse, +1 bonus au plus rapide parmi les corrects
     let pAdd = pCorrect ? 1 : 0;
