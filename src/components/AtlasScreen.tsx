@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Send, Lock, Swords, Crown } from 'lucide-react';
 import AtlasAvatar from './AtlasAvatar';
 import { atlasLevel } from '../data/atlas';
+import { relationInfo, RELATION_TONE } from '../data/atlasRelation';
+import { getFriendship, loadChatHistory, appendChat } from '../utils/atlasFriend';
 import { loadDuelHistory, duelStats } from '../utils/duel';
 import { sendAtlasMessage, remainingMessages, AtlasChatError, type ChatMessage } from '../utils/atlasChat';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -16,14 +18,23 @@ interface Props {
   onBack: () => void;
 }
 
+const TIER_LABELS: Record<string, keyof import('../i18n/translations').Translations> = {
+  stranger: 'rel_stranger', rival: 'rel_rival', friendlyRival: 'rel_friendly_rival',
+  friend: 'rel_friend', bestFriend: 'rel_best_friend', legend: 'rel_legend',
+};
+
 export default function AtlasScreen({ playerLevel, isPremium, streak, continentStats, onPremium, onBack }: Props) {
   const { t } = useLanguage();
   const level = atlasLevel(playerLevel);
   const stats = duelStats();
   const history = loadDuelHistory().slice(0, 5);
   const winRate = stats.played ? Math.round((stats.won / stats.played) * 100) : 0;
+  const atlasWins = Math.max(0, stats.played - stats.won);
+  const friendship = getFriendship();
+  const rel = relationInfo(friendship);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Mémoire persistante : on reprend la conversation où elle s'est arrêtée
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadChatHistory() as ChatMessage[]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [remaining, setRemaining] = useState(remainingMessages());
@@ -40,12 +51,16 @@ export default function AtlasScreen({ playerLevel, isPremium, streak, continentS
     const userMsg: ChatMessage = { role: 'user', content: text };
     const nextHistory = [...messages, userMsg];
     setMessages(nextHistory);
+    appendChat('user', text);
     setSending(true);
     try {
+      const h = new Date().getHours();
+      const timeOfDay = h < 12 ? 'matin' : h < 18 ? 'après-midi' : 'soir';
       const reply = await sendAtlasMessage(text, {
-        playerLevel, atlasLevel: level, streak, continentStats,
-      }, messages);
+        playerLevel, atlasLevel: level, streak, continentStats, relationTone: RELATION_TONE[rel.tier], timeOfDay,
+      }, messages.slice(-10));
       setMessages([...nextHistory, { role: 'assistant', content: reply }]);
+      appendChat('assistant', reply);
       setRemaining(remainingMessages());
     } catch (e) {
       const code = e instanceof AtlasChatError ? e.message : 'server';
@@ -77,13 +92,30 @@ export default function AtlasScreen({ playerLevel, isPremium, streak, continentS
           </div>
         </motion.div>
 
-        {/* Stats des duels */}
+        {/* Jauge d'amitié */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white font-bold text-sm flex items-center gap-1.5">
+              <span className="select-none">{rel.emoji}</span> {t[TIER_LABELS[rel.tier]]}
+            </span>
+            <span className="text-indigo-300 text-xs font-bold">{friendship}/100</span>
+          </div>
+          <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+            <motion.div className="h-full bg-gradient-to-r from-pink-400 via-rose-400 to-indigo-400 rounded-full"
+              initial={{ width: 0 }} animate={{ width: `${friendship}%` }} transition={{ duration: 0.8 }} />
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1.5">{t.atlas_friendship_hint}</p>
+        </motion.div>
+
+        {/* Tableau des scores : toi vs ATLAS */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
           <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2"><Swords className="w-4 h-4 text-fuchsia-400" /> {t.atlas_duels}</h3>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div><p className="text-2xl font-black text-white">{stats.played}</p><p className="text-[10px] text-slate-400 uppercase">{t.atlas_duels_played}</p></div>
-            <div><p className="text-2xl font-black text-emerald-400">{stats.won}</p><p className="text-[10px] text-slate-400 uppercase">{t.atlas_duels_won}</p></div>
-            <div><p className="text-2xl font-black text-indigo-300">{winRate}%</p><p className="text-[10px] text-slate-400 uppercase">{t.atlas_winrate}</p></div>
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="text-center"><p className="text-3xl font-black text-emerald-400">{stats.won}</p><p className="text-[10px] text-slate-400 uppercase">{t.duel_you}</p></div>
+            <span className="text-slate-500 font-bold">—</span>
+            <div className="text-center"><p className="text-3xl font-black text-indigo-300">{atlasWins}</p><p className="text-[10px] text-slate-400 uppercase">ATLAS</p></div>
+            <span className="text-slate-600">·</span>
+            <div className="text-center"><p className="text-3xl font-black text-white">{winRate}%</p><p className="text-[10px] text-slate-400 uppercase">{t.atlas_winrate}</p></div>
           </div>
           {history.length > 0 && (
             <div className="mt-3 space-y-1.5">

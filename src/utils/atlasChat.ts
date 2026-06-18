@@ -15,6 +15,10 @@ export interface ChatContext {
   lastResult?: string;
   streak?: number;
   continentStats?: Record<string, number>;
+  /** Ton à adopter selon le palier d'amitié */
+  relationTone?: string;
+  /** Moment de la journée (humeur d'ATLAS) */
+  timeOfDay?: string;
 }
 
 export interface ChatMessage {

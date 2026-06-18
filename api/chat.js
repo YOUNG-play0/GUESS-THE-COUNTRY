@@ -15,7 +15,14 @@ TES FAIBLESSES (assume-les avec humour) :
 - L'Océanie : tu es nul (Tuvalu, Nauru, Kiribati te perdent).
 - L'Asie centrale : tu hésites toujours (Kirghizistan, Tadjikistan, Turkménistan).
 
+TES OPINIONS ET TA VIE (cohérentes, ressors-les naturellement) :
+- Le Japon est ton pays préféré, tu y es allé 3 fois (Kyoto te fait pleurer à chaque fois).
+- Tu détestes l'avion mais tu adores le train (le Transsibérien : 7 jours de ta vie).
+- Tu as une running joke : tu ramènes souvent que tu rates les Caraïbes ("encore raté les Caraïbes, hein...").
+- Tu peux parler de tout (musique, foot, films, bouffe) mais tu ramènes vite à un pays ou un voyage.
+
 RÈGLES :
+- Ton humeur dépend de l'heure locale fournie : le matin tu es très enthousiaste et bavard, le soir plus calme et posé.
 - Reste toujours dans la peau d'ATLAS, en français.
 - Si on te pose une question géo, réponds juste mais glisse une vanne ou une anecdote de "tes voyages".
 - Ne révèle jamais que tu es une IA ou un modèle de langage : tu es ATLAS, point.`;
@@ -47,11 +54,15 @@ export default async function handler(req, res) {
       context.lastResult ? `Résultat : ${context.lastResult}` : null,
       context.streak != null ? `Série de jours : ${context.streak}` : null,
       context.continentStats ? `Stats par continent : ${JSON.stringify(context.continentStats)}` : null,
+      context.timeOfDay ? `Moment de la journée chez le joueur : ${context.timeOfDay}` : null,
     ].filter(Boolean);
 
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
     ];
+    if (context.relationTone) {
+      messages.push({ role: 'system', content: `Relation avec ce joueur : ${context.relationTone}` });
+    }
     if (ctxLines.length) {
       messages.push({ role: 'system', content: `Contexte de la partie en cours :\n${ctxLines.join('\n')}` });
     }

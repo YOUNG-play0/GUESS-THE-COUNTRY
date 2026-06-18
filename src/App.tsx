@@ -6,6 +6,10 @@ import { getAdaptiveDifficulty } from './utils/adaptive';
 import { BadgeDef } from './data/badges';
 import BadgePopup from './components/BadgePopup';
 import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
+import { isVoiceEnabled, setVoiceEnabled, stopAtlasVoice } from './utils/atlasVoice';
+import { needsSeasonReset, markSeasonCurrent, performSeasonReset } from './utils/season';
+import { addFriendship, markSeen } from './utils/atlasFriend';
+import SeasonScreen from './components/SeasonScreen';
 import { getStoredTheme, storeTheme, themeGradient, DEFAULT_THEME } from './utils/themes';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
@@ -37,6 +41,7 @@ const MIN_QUESTIONS_TO_RECORD = 3;
 
 function AppContent() {
   const { isRTL } = useLanguage();
+  const [showSeason] = useState(() => needsSeasonReset());
   const [screen, setScreen] = useState<Screen>('home');
   const [lastMode, setLastMode] = useState<GameMode>('classic');
   const gameRecordedRef = useRef(false);
@@ -61,6 +66,7 @@ function AppContent() {
   } = useProgress();
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled);
+  const [voiceOn, setVoiceOn] = useState(isVoiceEnabled);
   const [theme, setTheme] = useState(getStoredTheme);
   const navHidden = useHideOnScroll(screen);
   const premium = usePremium();
@@ -69,6 +75,12 @@ function AppContent() {
     setTheme(id);
     storeTheme(id);
   }, []);
+
+  // Nouveaux joueurs (sans ancienne donnée) : on marque la saison
+  // silencieusement pour ne jamais déclencher l'écran de reset.
+  useEffect(() => {
+    if (!showSeason) markSeasonCurrent();
+  }, [showSeason]);
 
   // Passe du Savoir : gel de streak offert chaque semaine + récompenses
   // premium du Passe de Combat accordées rétroactivement à l'abonnement
@@ -125,6 +137,8 @@ function AppContent() {
       }, premium.isPremium);
       if (questXp + passXp > 0) addXP(questXp + passXp);
       setNewBadges(unlocked);
+      // L'amitié avec ATLAS grandit en jouant (bonnes réponses + bonus combo)
+      addFriendship(1 + Math.min(4, Math.floor(gameState.correctAnswers / 3)));
       // Fanfare de niveau gagné (XP de la partie + quêtes + Passe)
       if (levelForXP(stats.xp + gameState.xpEarned + questXp + passXp) > stats.level) {
         playFanfare();
@@ -134,6 +148,7 @@ function AppContent() {
   }, [gameState?.isActive]);
 
   const handleStartGame = useCallback((mode: GameMode) => {
+    markSeen(); // ATLAS note ta venue (messages proactifs)
     // Le 1v1 contre ATLAS a son propre écran (pas le moteur classique)
     if (mode === 'duel') {
       setScreen('duel');
@@ -208,6 +223,16 @@ function AppContent() {
 
   const isNewBest = gameState ? gameState.score >= stats.bestScore && gameState.score > 0 : false;
 
+  // Écran "Nouvelle saison" pour les anciens joueurs (reset une seule fois)
+  if (showSeason) {
+    return (
+      <div className="min-h-screen w-full font-sans text-white overflow-hidden relative" dir={isRTL ? 'rtl' : 'ltr'}>
+        <WorldBackground gradient={themeGradient(DEFAULT_THEME)} />
+        <SeasonScreen onStart={() => { performSeasonReset(); window.location.reload(); }} />
+      </div>
+    );
+  }
+
   return (
     <div
       className="min-h-screen w-full font-sans text-white overflow-x-hidden no-select relative"
@@ -221,14 +246,25 @@ function AppContent() {
         <LanguageSelector />
       </div>
 
-      {/* Interrupteur son */}
-      <button
-        onClick={() => { setSoundEnabled(!soundOn); setSoundOn(!soundOn); }}
-        aria-label={soundOn ? 'Mute' : 'Unmute'}
-        className="fixed top-3 left-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
-      >
-        {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-      </button>
+      {/* Interrupteurs : son du jeu + voix d'ATLAS (indépendants) */}
+      <div className="fixed top-3 left-3 z-50 flex gap-2">
+        <button
+          onClick={() => { setSoundEnabled(!soundOn); setSoundOn(!soundOn); }}
+          aria-label={soundOn ? 'Couper le son' : 'Activer le son'}
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+        >
+          {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </button>
+        <button
+          onClick={() => { setVoiceEnabled(!voiceOn); setVoiceOn(!voiceOn); if (voiceOn) stopAtlasVoice(); }}
+          aria-label={voiceOn ? 'Couper la voix d’ATLAS' : 'Activer la voix d’ATLAS'}
+          className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all ${
+            voiceOn ? 'bg-indigo-500/20 border-indigo-400/40 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-500'
+          }`}
+        >
+          <span className="text-base leading-none select-none">{voiceOn ? '🗣️' : '🔇'}</span>
+        </button>
+      </div>
 
       {/* Main Content */}
       <div className="relative z-10 w-full">
