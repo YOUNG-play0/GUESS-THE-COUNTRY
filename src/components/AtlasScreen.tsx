@@ -54,8 +54,10 @@ export default function AtlasScreen({ playerLevel, isPremium, streak, continentS
     appendChat('user', text);
     setSending(true);
     try {
+      const h = new Date().getHours();
+      const timeOfDay = h < 12 ? 'matin' : h < 18 ? 'après-midi' : 'soir';
       const reply = await sendAtlasMessage(text, {
-        playerLevel, atlasLevel: level, streak, continentStats, relationTone: RELATION_TONE[rel.tier],
+        playerLevel, atlasLevel: level, streak, continentStats, relationTone: RELATION_TONE[rel.tier], timeOfDay,
       }, messages.slice(-10));
       setMessages([...nextHistory, { role: 'assistant', content: reply }]);
       appendChat('assistant', reply);
