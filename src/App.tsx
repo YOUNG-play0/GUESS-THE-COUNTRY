@@ -102,6 +102,7 @@ function AppContent() {
     isCorrect,
     showResult,
     chronoTimeLeft,
+    preparing,
     startGame,
     handleAnswer,
     nextQuestion,
@@ -310,6 +311,7 @@ function AppContent() {
                 chronoTimeLeft={chronoTimeLeft}
                 ghostScore={ghostRef.current}
                 playerLevel={stats.level}
+                preparing={preparing}
                 onAnswer={handleAnswer}
                 onNext={handleNext}
                 onQuit={handleQuitGame}

@@ -147,6 +147,7 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  loading: string;
   rel_stranger: string;
   rel_rival: string;
   rel_friendly_rival: string;
@@ -413,6 +414,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    loading: 'Loading…',
     rel_stranger: 'Stranger',
     rel_rival: 'Rival',
     rel_friendly_rival: 'Friendly Rival',
@@ -678,6 +680,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    loading: 'Chargement…',
     rel_stranger: 'Inconnu',
     rel_rival: 'Rival',
     rel_friendly_rival: 'Rival Amical',
@@ -943,6 +946,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    loading: 'Cargando…',
     rel_stranger: 'Desconocido',
     rel_rival: 'Rival',
     rel_friendly_rival: 'Rival Amistoso',
@@ -1208,6 +1212,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    loading: 'Lädt…',
     rel_stranger: 'Fremder',
     rel_rival: 'Rivale',
     rel_friendly_rival: 'Freundlicher Rivale',
@@ -1473,6 +1478,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    loading: 'Carregando…',
     rel_stranger: 'Desconhecido',
     rel_rival: 'Rival',
     rel_friendly_rival: 'Rival Amigável',
@@ -1738,6 +1744,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    loading: '加载中…',
     rel_stranger: '陌生人',
     rel_rival: '对手',
     rel_friendly_rival: '友好对手',
@@ -2003,6 +2010,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    loading: '読み込み中…',
     rel_stranger: '他人',
     rel_rival: 'ライバル',
     rel_friendly_rival: '良きライバル',
@@ -2268,6 +2276,7 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    loading: 'جارٍ التحميل…',
     rel_stranger: 'غريب',
     rel_rival: 'منافس',
     rel_friendly_rival: 'منافس ودود',
