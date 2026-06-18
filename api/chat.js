@@ -40,7 +40,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, context = {}, history = [] } = req.body || {};
+    // Selon le runtime, req.body peut être déjà parsé (objet) ou brut (string)
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { message, context = {}, history = [] } = body || {};
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'message requis' });
       return;

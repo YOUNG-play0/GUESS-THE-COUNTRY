@@ -8,8 +8,15 @@ import { VitePWA } from "vite-plugin-pwa";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Base de l'app :
+// - Vercel (et dev) : racine "/" → l'API serverless /api/chat fonctionne
+// - GitHub Pages : sous-chemin "/GUESS-THE-COUNTRY/"
+// Vercel définit la variable d'env VERCEL=1 pendant le build.
+// Pour forcer un build GitHub Pages : GHPAGES=1 npm run build
+const base = process.env.GHPAGES ? "/GUESS-THE-COUNTRY/" : "/";
+
 export default defineConfig({
-  base: "/GUESS-THE-COUNTRY/", // 🔥 OBLIGATOIRE pour GitHub Pages
+  base,
   plugins: [
     react(),
     tailwindcss(),
