@@ -147,6 +147,10 @@ export interface Translations {
   level_title: string;
   progress: string;
   unlocked_difficulties: string;
+  season_tag: string;
+  season_title: string;
+  season_desc: string;
+  season_cta: string;
   atlas_my_friend: string;
   atlas_subtitle: string;
   atlas_duels: string;
@@ -402,6 +406,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choose your preferred language',
     progress: 'Progress',
     unlocked_difficulties: 'Unlocked Difficulties',
+    season_tag: 'New season',
+    season_title: 'A new adventure with ATLAS!',
+    season_desc: 'ATLAS, your AI geographer companion, joins the journey. Everything restarts from zero — XP, levels, passport, badges — and you grow together. Ready?',
+    season_cta: 'Let\'s go!',
     atlas_my_friend: 'My friend ATLAS',
     atlas_subtitle: 'Geographer · 150 countries visited',
     atlas_duels: 'Duels vs ATLAS',
@@ -656,6 +664,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Choisissez votre langue préférée',
     progress: 'Progrès',
     unlocked_difficulties: 'Difficultés débloquées',
+    season_tag: 'Nouvelle saison',
+    season_title: 'Une nouvelle aventure avec ATLAS !',
+    season_desc: 'ATLAS, ton compagnon géographe IA, rejoint l\'aventure. Tout repart de zéro — XP, niveaux, passeport, badges — et vous progressez ensemble. Prêt ?',
+    season_cta: 'C\'est parti !',
     atlas_my_friend: 'Mon ami ATLAS',
     atlas_subtitle: 'Géographe · 150 pays visités',
     atlas_duels: 'Duels contre ATLAS',
@@ -910,6 +922,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Elige tu idioma preferido',
     progress: 'Progreso',
     unlocked_difficulties: 'Dificultades desbloqueadas',
+    season_tag: 'Nueva temporada',
+    season_title: '¡Una nueva aventura con ATLAS!',
+    season_desc: 'ATLAS, tu compañero geógrafo IA, se une a la aventura. Todo vuelve a cero — XP, niveles, pasaporte, insignias — y crecéis juntos. ¿Listo?',
+    season_cta: '¡Vamos!',
     atlas_my_friend: 'Mi amigo ATLAS',
     atlas_subtitle: 'Geógrafo · 150 países visitados',
     atlas_duels: 'Duelos vs ATLAS',
@@ -1164,6 +1180,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Wähle deine bevorzugte Sprache',
     progress: 'Fortschritt',
     unlocked_difficulties: 'Freigeschaltete Schwierigkeiten',
+    season_tag: 'Neue Saison',
+    season_title: 'Ein neues Abenteuer mit ATLAS!',
+    season_desc: 'ATLAS, dein KI-Geograf, kommt mit. Alles beginnt bei null — XP, Level, Reisepass, Abzeichen — und ihr wachst zusammen. Bereit?',
+    season_cta: 'Los geht\'s!',
     atlas_my_friend: 'Mein Freund ATLAS',
     atlas_subtitle: 'Geograf · 150 Länder bereist',
     atlas_duels: 'Duelle gegen ATLAS',
@@ -1418,6 +1438,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'Escolha seu idioma preferido',
     progress: 'Progresso',
     unlocked_difficulties: 'Dificuldades desbloqueadas',
+    season_tag: 'Nova temporada',
+    season_title: 'Uma nova aventura com ATLAS!',
+    season_desc: 'ATLAS, seu companheiro geógrafo IA, entra na jornada. Tudo recomeça do zero — XP, níveis, passaporte, emblemas — e vocês crescem juntos. Pronto?',
+    season_cta: 'Vamos!',
     atlas_my_friend: 'Meu amigo ATLAS',
     atlas_subtitle: 'Geógrafo · 150 países visitados',
     atlas_duels: 'Duelos vs ATLAS',
@@ -1672,6 +1696,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: '选择你的首选语言',
     progress: '进度',
     unlocked_difficulties: '已解锁难度',
+    season_tag: '新赛季',
+    season_title: '与 ATLAS 的全新冒险！',
+    season_desc: '你的 AI 地理学家伙伴 ATLAS 加入冒险。一切从零开始——经验、等级、护照、徽章——你们一起成长。准备好了吗？',
+    season_cta: '出发！',
     atlas_my_friend: '我的朋友 ATLAS',
     atlas_subtitle: '地理学家 · 走过150国',
     atlas_duels: '对战 ATLAS',
@@ -1926,6 +1954,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'お好みの言語を選択してください',
     progress: '進行状況',
     unlocked_difficulties: '解除された難易度',
+    season_tag: '新シーズン',
+    season_title: 'ATLASとの新たな冒険！',
+    season_desc: 'AI地理学者の相棒ATLASが冒険に加わる。XP・レベル・パスポート・バッジ、すべてゼロから。一緒に成長しよう。準備はいい？',
+    season_cta: 'さあ行こう！',
     atlas_my_friend: '相棒 ATLAS',
     atlas_subtitle: '地理学者 · 150カ国制覇',
     atlas_duels: 'ATLASとの対戦',
@@ -2180,6 +2212,10 @@ export const translations: Record<Language, Translations> = {
     language_hint: 'اختر لغتك المفضلة',
     progress: 'التقدم',
     unlocked_difficulties: 'الصعوبات المفتوحة',
+    season_tag: 'موسم جديد',
+    season_title: '!مغامرة جديدة مع ATLAS',
+    season_desc: 'ATLAS، رفيقك الجغرافي الذكي، ينضم إلى المغامرة. كل شيء يبدأ من الصفر — الخبرة، المستويات، جواز السفر، الشارات — وتكبران معًا. مستعد؟',
+    season_cta: '!هيا بنا',
     atlas_my_friend: 'صديقي ATLAS',
     atlas_subtitle: 'جغرافي · زار 150 دولة',
     atlas_duels: 'مبارزات ضد ATLAS',

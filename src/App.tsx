@@ -7,6 +7,9 @@ import { BadgeDef } from './data/badges';
 import BadgePopup from './components/BadgePopup';
 import { isSoundEnabled, setSoundEnabled, playFanfare } from './utils/sound';
 import { isVoiceEnabled, setVoiceEnabled, stopAtlasVoice } from './utils/atlasVoice';
+import { needsSeasonReset, markSeasonCurrent, performSeasonReset } from './utils/season';
+import { addFriendship, markSeen } from './utils/atlasFriend';
+import SeasonScreen from './components/SeasonScreen';
 import { getStoredTheme, storeTheme, themeGradient, DEFAULT_THEME } from './utils/themes';
 import { useStorage } from './hooks/useStorage';
 import { useGameEngine } from './hooks/useGameEngine';
@@ -38,6 +41,7 @@ const MIN_QUESTIONS_TO_RECORD = 3;
 
 function AppContent() {
   const { isRTL } = useLanguage();
+  const [showSeason] = useState(() => needsSeasonReset());
   const [screen, setScreen] = useState<Screen>('home');
   const [lastMode, setLastMode] = useState<GameMode>('classic');
   const gameRecordedRef = useRef(false);
@@ -71,6 +75,12 @@ function AppContent() {
     setTheme(id);
     storeTheme(id);
   }, []);
+
+  // Nouveaux joueurs (sans ancienne donnée) : on marque la saison
+  // silencieusement pour ne jamais déclencher l'écran de reset.
+  useEffect(() => {
+    if (!showSeason) markSeasonCurrent();
+  }, [showSeason]);
 
   // Passe du Savoir : gel de streak offert chaque semaine + récompenses
   // premium du Passe de Combat accordées rétroactivement à l'abonnement
@@ -127,6 +137,8 @@ function AppContent() {
       }, premium.isPremium);
       if (questXp + passXp > 0) addXP(questXp + passXp);
       setNewBadges(unlocked);
+      // L'amitié avec ATLAS grandit en jouant (bonnes réponses + bonus combo)
+      addFriendship(1 + Math.min(4, Math.floor(gameState.correctAnswers / 3)));
       // Fanfare de niveau gagné (XP de la partie + quêtes + Passe)
       if (levelForXP(stats.xp + gameState.xpEarned + questXp + passXp) > stats.level) {
         playFanfare();
@@ -136,6 +148,7 @@ function AppContent() {
   }, [gameState?.isActive]);
 
   const handleStartGame = useCallback((mode: GameMode) => {
+    markSeen(); // ATLAS note ta venue (messages proactifs)
     // Le 1v1 contre ATLAS a son propre écran (pas le moteur classique)
     if (mode === 'duel') {
       setScreen('duel');
@@ -209,6 +222,16 @@ function AppContent() {
   }, [gameState, nextQuestion]);
 
   const isNewBest = gameState ? gameState.score >= stats.bestScore && gameState.score > 0 : false;
+
+  // Écran "Nouvelle saison" pour les anciens joueurs (reset une seule fois)
+  if (showSeason) {
+    return (
+      <div className="min-h-screen w-full font-sans text-white overflow-hidden relative" dir={isRTL ? 'rtl' : 'ltr'}>
+        <WorldBackground gradient={themeGradient(DEFAULT_THEME)} />
+        <SeasonScreen onStart={() => { performSeasonReset(); window.location.reload(); }} />
+      </div>
+    );
+  }
 
   return (
     <div
