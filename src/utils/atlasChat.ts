@@ -19,6 +19,17 @@ export interface ChatContext {
   relationTone?: string;
   /** Moment de la journée (humeur d'ATLAS) */
   timeOfDay?: string;
+  /** Heure locale 0-23 (réactions nuit/matin) */
+  hour?: number;
+  /** 5 dernières questions : "Pays (type) ✓/✗" */
+  recentQuestions?: string[];
+  /** Continent le plus faible + précision % */
+  weakest?: { continent: string; rate: number } | null;
+  /** Précision par continent : { Europe: "8/10", ... } */
+  continentAccuracy?: Record<string, string>;
+  /** Dernier événement marquant : "vient de gagner", "vient de perdre", "record battu (ancien: X)" */
+  lastEvent?: string;
+  bestScore?: number;
 }
 
 export interface ChatMessage {

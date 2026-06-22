@@ -36,6 +36,7 @@ export function performSeasonReset() {
   const toRemove = [
     'gtc_stats', 'gtc_progress', 'gtc_adaptive',
     'gtc_duel_history', 'gtc_atlas_chat_quota',
+    'gtc_atlas_recent', 'gtc_atlas_cont_acc',
   ];
   try {
     for (const k of toRemove) localStorage.removeItem(k);

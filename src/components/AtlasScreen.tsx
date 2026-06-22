@@ -5,6 +5,7 @@ import AtlasAvatar from './AtlasAvatar';
 import { atlasLevel } from '../data/atlas';
 import { relationInfo, RELATION_TONE } from '../data/atlasRelation';
 import { getFriendship, loadChatHistory, appendChat } from '../utils/atlasFriend';
+import { recentQuestions, continentAccuracy, weakestContinent } from '../utils/atlasContext';
 import { loadDuelHistory, duelStats } from '../utils/duel';
 import { sendAtlasMessage, remainingMessages, AtlasChatError, type ChatMessage } from '../utils/atlasChat';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -55,9 +56,17 @@ export default function AtlasScreen({ playerLevel, isPremium, streak, continentS
     setSending(true);
     try {
       const h = new Date().getHours();
-      const timeOfDay = h < 12 ? 'matin' : h < 18 ? 'après-midi' : 'soir';
+      const timeOfDay = h < 6 ? 'nuit' : h < 12 ? 'matin' : h < 18 ? 'après-midi' : 'soir';
+      const recent = recentQuestions().map(q => `${q.name} (${q.type}) ${q.correct ? '✓' : '✗'}`);
+      const acc = continentAccuracy();
+      const accMap: Record<string, string> = {};
+      for (const [c, a] of Object.entries(acc)) accMap[c] = `${a.correct}/${a.total}`;
       const reply = await sendAtlasMessage(text, {
-        playerLevel, atlasLevel: level, streak, continentStats, relationTone: RELATION_TONE[rel.tier], timeOfDay,
+        playerLevel, atlasLevel: level, streak, continentStats,
+        relationTone: RELATION_TONE[rel.tier], timeOfDay, hour: h,
+        recentQuestions: recent,
+        weakest: weakestContinent(),
+        continentAccuracy: accMap,
       }, messages.slice(-10));
       setMessages([...nextHistory, { role: 'assistant', content: reply }]);
       appendChat('assistant', reply);

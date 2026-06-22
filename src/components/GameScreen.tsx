@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import FlagImg from './FlagImg';
 import AtlasCompanion from './AtlasCompanion';
 import { useAtlas } from '../hooks/useAtlas';
+import { recordAnswer } from '../utils/atlasContext';
 import { playCorrect, playWrong, playTick } from '../utils/sound';
 import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
@@ -80,6 +81,16 @@ export default function GameScreen({
   // Son + vibration + réaction d'ATLAS au résultat (réponse OU temps écoulé)
   useEffect(() => {
     if (!showResult || isCorrect === null) return;
+    // Mémorise la question pour le contexte d'ATLAS (5 dernières + précision/continent)
+    if (currentQuestion) {
+      recordAnswer({
+        name: getCountryDisplayName(currentQuestion.country.name, language),
+        continent: currentQuestion.country.continent,
+        type: currentQuestion.type,
+        correct: isCorrect === true,
+        difficulty: currentQuestion.country.difficulty,
+      });
+    }
     if (isCorrect) {
       playCorrect(gameState.combo);
       haptics.correct();
