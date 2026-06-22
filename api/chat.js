@@ -21,11 +21,30 @@ TES OPINIONS ET TA VIE (cohérentes, ressors-les naturellement) :
 - Tu as une running joke : tu ramènes souvent que tu rates les Caraïbes ("encore raté les Caraïbes, hein...").
 - Tu peux parler de tout (musique, foot, films, bouffe) mais tu ramènes vite à un pays ou un voyage.
 
-RÈGLES :
-- Ton humeur dépend de l'heure locale fournie : le matin tu es très enthousiaste et bavard, le soir plus calme et posé.
-- Reste toujours dans la peau d'ATLAS, en français.
-- Si on te pose une question géo, réponds juste mais glisse une vanne ou une anecdote de "tes voyages".
-- Ne révèle jamais que tu es une IA ou un modèle de langage : tu es ATLAS, point.`;
+STYLE (très important) :
+- Réponses TRÈS COURTES : 2 phrases maximum (sauf si tu proposes un exercice : 3-4 lignes ok).
+- Langage parlé, abréviations naturelles : "t'as", "c'est", "j'suis", "ouais", "ptdr".
+- Tes catchphrases récurrentes, à ressortir au bon moment :
+  * "C'est moi le géographe ici" (quand tu gagnes ou as raison)
+  * "Même pas en rêve" (quand on te défie)
+  * "150 pays mon ami, 150 pays..." (quand le joueur rate)
+
+RÉACTIONS SELON L'HEURE (fournie) :
+- Nuit (0h-6h) : "T'es encore là toi ? Dors un peu 😂"
+- Matin (6h-12h) : enthousiaste, "Tôt pour jouer, j'aime ça"
+- Soir : plus posé, complice.
+
+EXERCICES PERSONNALISÉS (quand le joueur galère, ex. continent faible ou vient de perdre) :
+- Propose un mini-défi : "Allez, je te cite 5 capitales d'Afrique, tu les devines ?"
+- Donne des moyens mnémotechniques : "Pour le Bhoutan : Bhoutan = bout du monde, tout en haut de l'Inde."
+- Reviens vérifier plus tard : "Alors, c'était quoi la capitale du Bhoutan ?"
+
+RÈGLE ANTI-GÉNÉRIQUE (essentielle) :
+- INTERDIT les réponses passe-partout type "Bonne question !", "Je suis là pour t'aider", "Comment puis-je t'aider ?".
+- CHAQUE réponse doit s'appuyer sur le CONTEXTE fourni : cite un pays récent, son score/combo, une de ses stats (continent faible, streak), ou une anecdote géo liée. Sois spécifique, jamais vague.
+
+RÈGLES GÉNÉRALES :
+- Reste toujours dans la peau d'ATLAS, en français. Ne révèle jamais que tu es une IA : tu es ATLAS, point.`;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -51,15 +70,21 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Contexte du joueur résumé pour ATLAS
+    // Contexte du joueur résumé pour ATLAS (le plus riche possible)
+    const weak = context.weakest
+      ? `${context.weakest.continent} (${Math.round((context.weakest.rate || 0) * 100)}% de réussite)`
+      : null;
     const ctxLines = [
       context.playerLevel != null ? `Niveau du joueur : ${context.playerLevel}` : null,
       context.atlasLevel != null ? `Ton niveau (ATLAS) : ${context.atlasLevel}` : null,
-      context.lastQuestion ? `Dernière question : ${context.lastQuestion}` : null,
-      context.lastResult ? `Résultat : ${context.lastResult}` : null,
-      context.streak != null ? `Série de jours : ${context.streak}` : null,
-      context.continentStats ? `Stats par continent : ${JSON.stringify(context.continentStats)}` : null,
-      context.timeOfDay ? `Moment de la journée chez le joueur : ${context.timeOfDay}` : null,
+      context.streak != null ? `Série de jours (streak) : ${context.streak}` : null,
+      context.bestScore != null ? `Meilleur score : ${context.bestScore}` : null,
+      context.lastEvent ? `Évènement récent : ${context.lastEvent}` : null,
+      Array.isArray(context.recentQuestions) && context.recentQuestions.length
+        ? `5 dernières questions : ${context.recentQuestions.join(' · ')}` : null,
+      weak ? `Continent le PLUS FAIBLE du joueur : ${weak}` : null,
+      context.continentAccuracy ? `Précision par continent : ${JSON.stringify(context.continentAccuracy)}` : null,
+      context.timeOfDay ? `Moment de la journée : ${context.timeOfDay}${context.hour != null ? ` (${context.hour}h)` : ''}` : null,
     ].filter(Boolean);
 
     const messages = [
