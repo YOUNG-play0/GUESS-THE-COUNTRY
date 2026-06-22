@@ -6,7 +6,7 @@ import { useAtlas } from '../hooks/useAtlas';
 import { playCorrect, playWrong, playTick } from '../utils/sound';
 import { haptics } from '../utils/haptics';
 import { Clock, Zap, Heart, Flame, X, HelpCircle, MapPin, Flag } from 'lucide-react';
-import { GameState, Question, Difficulty } from '../types';
+import { GameState, Question, Difficulty, DIFFICULTY_LADDER } from '../types';
 import { Translations } from '../i18n/translations';
 import { countryShapes } from '../data/countryShapes';
 import { countries, getCountryDisplayName, getCountryHint } from '../data/countries';
@@ -69,6 +69,8 @@ export default function GameScreen({
   const { t, language } = useLanguage();
   const atlas = useAtlas(playerLevel);
   const prevComboRef = useRef(0);
+  const prevDiffRef = useRef(gameState.difficulty);
+  const hurryFiredRef = useRef(false);
 
   const handleAnswerClick = (answer: string) => {
     if (showResult) return;
@@ -86,18 +88,51 @@ export default function GameScreen({
     } else {
       playWrong();
       haptics.wrong();
-      atlas.say(prevComboRef.current >= 3 ? 'comboBreak' : 'wrong');
+      // Erreur sur un pays FACILE/MOYEN → ATLAS chambre nommément le pays
+      const diff = currentQuestion?.country.difficulty;
+      if ((diff === 'easy' || diff === 'medium') && currentQuestion) {
+        const name = getCountryDisplayName(currentQuestion.country.name, language);
+        const lines = [
+          `Attends... ${name} ?? 😂`,
+          `${name}, sérieux ? 150 pays mon ami, 150 pays...`,
+          `Aïe, ${name} c'était cadeau pourtant 😅`,
+        ];
+        atlas.sayText(lines[Math.floor(Math.random() * lines.length)], 'laugh');
+      } else {
+        atlas.say(prevComboRef.current >= 3 ? 'comboBreak' : 'wrong');
+      }
     }
     prevComboRef.current = gameState.combo;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResult]);
+
+  // Réinitialise le déclencheur « hurry » à chaque nouvelle question
+  useEffect(() => { hurryFiredRef.current = false; }, [gameState.currentQuestion]);
+
+  // ATLAS proactif : la difficulté adaptative vient de monter d'un cran
+  useEffect(() => {
+    const before = DIFFICULTY_LADDER.indexOf(prevDiffRef.current);
+    const now = DIFFICULTY_LADDER.indexOf(gameState.difficulty);
+    if (now > before) {
+      atlas.sayText(`La difficulté monte ! T'es prêt pour ${difficultyLabel(gameState.difficulty, t)} ?`, 'wow');
+    }
+    prevDiffRef.current = gameState.difficulty;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.difficulty]);
 
   // Tic-tac dramatique sous 3 s (timer par question ; en Chrono : 5 dernières s du global)
   const questionSec = Math.ceil(gameState.timeLeft);
   const chronoSec = Math.ceil(chronoTimeLeft);
   useEffect(() => {
     if (!gameState.isActive || showResult || gameState.mode === 'chrono') return;
-    if (questionSec <= 3 && questionSec > 0) playTick();
+    if (questionSec <= 3 && questionSec > 0) {
+      playTick();
+      // ATLAS encourage une seule fois sous la barre des 3 s
+      if (!hurryFiredRef.current) {
+        hurryFiredRef.current = true;
+        atlas.sayText('Allez allez allez !', 'combo');
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionSec]);
   useEffect(() => {
